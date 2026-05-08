@@ -51,7 +51,7 @@ export function NotificationBell() {
 
   const marcarLidas = useMutation({
     mutationFn: async (ids?: string[]) => {
-      const { error } = await supabase.rpc("marcar_notificacoes_lidas", { p_ids: ids ?? null });
+      const { error } = await supabase.rpc("marcar_notificacoes_lidas", ids ? { p_ids: ids } : {});
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["notificacoes", user?.id] }),
