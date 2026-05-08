@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Shield, Users, Trophy, Settings, Banknote, Wallet, FileText, ClipboardList,
-  TrendingUp, AlertCircle, MailPlus,
+  TrendingUp, AlertCircle, MailPlus, ArrowDownCircle,
 } from "lucide-react";
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
@@ -22,6 +22,7 @@ const fmt = (c: number) =>
 
 const tiles = [
   { icon: Trophy, label: "Partidas", desc: "Lançar resultados e apurar", to: "/admin/partidas" as const },
+  { icon: ArrowDownCircle, label: "Depósitos", desc: "Confirmar PIX recebido", to: "/admin/depositos" as const },
   { icon: Banknote, label: "Saques", desc: "Aprovar acertos via PIX", to: "/admin/saques" as const },
   { icon: Users, label: "Usuários", desc: "Bloquear, ajustar saldo", to: "/admin/usuarios" as const },
   { icon: MailPlus, label: "Convites", desc: "Allowlist do bolão privado", to: "/admin/convites" as const },
@@ -63,6 +64,17 @@ function AdminPage() {
         .from("usuarios_autorizados")
         .select("email", { count: "exact", head: true })
         .eq("convite_aceito", false);
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+  const { data: depositosPendentes } = useQuery({
+    queryKey: ["admin", "depositosPendentes"],
+    queryFn: async () => {
+      const { count, error } = await (supabase as any)
+        .from("depositos")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "aguardando_confirmacao");
       if (error) throw error;
       return count ?? 0;
     },
@@ -147,6 +159,9 @@ function AdminPage() {
                 {t.label}
                 {t.label === "Convites" && (convitesPendentes ?? 0) > 0 && (
                   <Badge className="bg-gold text-gold-foreground">{convitesPendentes} pend.</Badge>
+                )}
+                {t.label === "Depósitos" && (depositosPendentes ?? 0) > 0 && (
+                  <Badge className="bg-gold text-gold-foreground">{depositosPendentes} pend.</Badge>
                 )}
               </h3>
               <p className="text-sm text-muted-foreground">{t.desc}</p>

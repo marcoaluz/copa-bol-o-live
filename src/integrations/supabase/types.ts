@@ -169,9 +169,14 @@ export type Database = {
       }
       config: {
         Row: {
+          chave_pix_admin: string
+          deposito_maximo_centavos: number
+          deposito_maximo_mensal_centavos: number
+          deposito_minimo_centavos: number
           id: number
           manutencao_ativa: boolean
           manutencao_mensagem: string | null
+          nome_admin_recebedor: string
           politica_sem_ganhadores: Database["public"]["Enums"]["politica_sem_ganhadores"]
           taxa_casa_percentual: number
           updated_at: string
@@ -181,9 +186,14 @@ export type Database = {
           valor_minimo_saque_centavos: number
         }
         Insert: {
+          chave_pix_admin?: string
+          deposito_maximo_centavos?: number
+          deposito_maximo_mensal_centavos?: number
+          deposito_minimo_centavos?: number
           id?: number
           manutencao_ativa?: boolean
           manutencao_mensagem?: string | null
+          nome_admin_recebedor?: string
           politica_sem_ganhadores?: Database["public"]["Enums"]["politica_sem_ganhadores"]
           taxa_casa_percentual?: number
           updated_at?: string
@@ -193,9 +203,14 @@ export type Database = {
           valor_minimo_saque_centavos?: number
         }
         Update: {
+          chave_pix_admin?: string
+          deposito_maximo_centavos?: number
+          deposito_maximo_mensal_centavos?: number
+          deposito_minimo_centavos?: number
           id?: number
           manutencao_ativa?: boolean
           manutencao_mensagem?: string | null
+          nome_admin_recebedor?: string
           politica_sem_ganhadores?: Database["public"]["Enums"]["politica_sem_ganhadores"]
           taxa_casa_percentual?: number
           updated_at?: string
@@ -205,6 +220,80 @@ export type Database = {
           valor_minimo_saque_centavos?: number
         }
         Relationships: []
+      }
+      depositos: {
+        Row: {
+          codigo_referencia: string
+          confirmado_em: string | null
+          confirmado_por_admin_id: string | null
+          created_at: string
+          e2e_id_pix: string | null
+          id: string
+          motivo_rejeicao: string | null
+          observacao_admin: string | null
+          status: string
+          updated_at: string
+          usuario_id: string
+          valor_centavos: number
+        }
+        Insert: {
+          codigo_referencia: string
+          confirmado_em?: string | null
+          confirmado_por_admin_id?: string | null
+          created_at?: string
+          e2e_id_pix?: string | null
+          id?: string
+          motivo_rejeicao?: string | null
+          observacao_admin?: string | null
+          status?: string
+          updated_at?: string
+          usuario_id: string
+          valor_centavos: number
+        }
+        Update: {
+          codigo_referencia?: string
+          confirmado_em?: string | null
+          confirmado_por_admin_id?: string | null
+          created_at?: string
+          e2e_id_pix?: string | null
+          id?: string
+          motivo_rejeicao?: string | null
+          observacao_admin?: string | null
+          status?: string
+          updated_at?: string
+          usuario_id?: string
+          valor_centavos?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "depositos_confirmado_por_admin_id_fkey"
+            columns: ["confirmado_por_admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "depositos_confirmado_por_admin_id_fkey"
+            columns: ["confirmado_por_admin_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_usuarios"
+            referencedColumns: ["usuario_id"]
+          },
+          {
+            foreignKeyName: "depositos_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "depositos_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_usuarios"
+            referencedColumns: ["usuario_id"]
+          },
+        ]
       }
       notificacoes: {
         Row: {
@@ -814,6 +903,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      criar_deposito: { Args: { p_valor_centavos: number }; Returns: Json }
       criar_ou_alterar_aposta: {
         Args: {
           p_palpite: Database["public"]["Enums"]["palpite_aposta"]
@@ -900,7 +990,40 @@ export type Database = {
         }
       }
       marcar_convite_aceito: { Args: never; Returns: undefined }
+      marcar_deposito_pago: {
+        Args: { p_deposito_id: string }
+        Returns: undefined
+      }
       marcar_notificacoes_lidas: { Args: { p_ids?: string[] }; Returns: number }
+      processar_deposito: {
+        Args: {
+          p_acao: string
+          p_deposito_id: string
+          p_e2e_id?: string
+          p_motivo?: string
+          p_observacao?: string
+        }
+        Returns: {
+          codigo_referencia: string
+          confirmado_em: string | null
+          confirmado_por_admin_id: string | null
+          created_at: string
+          e2e_id_pix: string | null
+          id: string
+          motivo_rejeicao: string | null
+          observacao_admin: string | null
+          status: string
+          updated_at: string
+          usuario_id: string
+          valor_centavos: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "depositos"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       processar_saque: {
         Args: {
           p_acao: string
