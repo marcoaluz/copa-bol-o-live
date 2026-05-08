@@ -1,0 +1,1 @@
+ALTER TABLE public.config ADD COLUMN IF NOT EXISTS saldo_bancario_declarado_centavos bigint NOT NULL DEFAULT 0;

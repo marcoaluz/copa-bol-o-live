@@ -178,6 +178,7 @@ export type Database = {
           manutencao_mensagem: string | null
           nome_admin_recebedor: string
           politica_sem_ganhadores: Database["public"]["Enums"]["politica_sem_ganhadores"]
+          saldo_bancario_declarado_centavos: number
           taxa_casa_percentual: number
           updated_at: string
           valor_maximo_aposta_centavos: number
@@ -195,6 +196,7 @@ export type Database = {
           manutencao_mensagem?: string | null
           nome_admin_recebedor?: string
           politica_sem_ganhadores?: Database["public"]["Enums"]["politica_sem_ganhadores"]
+          saldo_bancario_declarado_centavos?: number
           taxa_casa_percentual?: number
           updated_at?: string
           valor_maximo_aposta_centavos?: number
@@ -212,6 +214,7 @@ export type Database = {
           manutencao_mensagem?: string | null
           nome_admin_recebedor?: string
           politica_sem_ganhadores?: Database["public"]["Enums"]["politica_sem_ganhadores"]
+          saldo_bancario_declarado_centavos?: number
           taxa_casa_percentual?: number
           updated_at?: string
           valor_maximo_aposta_centavos?: number
