@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Shield, Users, Trophy, Settings, Banknote, Wallet, FileText, ClipboardList,
-  TrendingUp, AlertCircle, MailPlus, ArrowDownCircle, Scale,
+  TrendingUp, AlertCircle, MailPlus, ArrowDownCircle, Scale, Bell,
 } from "lucide-react";
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
@@ -30,6 +30,7 @@ const tiles = [
   { icon: Settings, label: "Configurações", desc: "Limites e manutenção", to: "/admin/configuracoes" as const },
   { icon: ClipboardList, label: "Auditoria", desc: "Log imutável de ações", to: "/admin/auditoria" as const },
   { icon: FileText, label: "Relatórios", desc: "Exportar CSV financeiro", to: "/admin/relatorios" as const },
+  { icon: Bell, label: "Notificações", desc: "Avisos por e-mail e Telegram", to: "/admin/notificacoes" as const },
   { icon: ClipboardList, label: "Checklist", desc: "Pré-lançamento", to: "/admin/checklist" as const },
 ];
 
@@ -76,6 +77,17 @@ function AdminPage() {
         .from("depositos")
         .select("id", { count: "exact", head: true })
         .eq("status", "aguardando_confirmacao");
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+  const { data: notifFalharam } = useQuery({
+    queryKey: ["admin", "notifFalharam"],
+    queryFn: async () => {
+      const { count, error } = await (supabase as any)
+        .from("notificacoes_admin")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "falhou");
       if (error) throw error;
       return count ?? 0;
     },
@@ -163,6 +175,9 @@ function AdminPage() {
                 )}
                 {t.label === "Depósitos" && (depositosPendentes ?? 0) > 0 && (
                   <Badge className="bg-gold text-gold-foreground">{depositosPendentes} pend.</Badge>
+                )}
+                {t.label === "Notificações" && (notifFalharam ?? 0) > 0 && (
+                  <Badge className="bg-destructive text-destructive-foreground">{notifFalharam} falhou</Badge>
                 )}
               </h3>
               <p className="text-sm text-muted-foreground">{t.desc}</p>
