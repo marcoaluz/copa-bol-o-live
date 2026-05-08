@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { Joyride, type EventData, type Step, STATUS } from "react-joyride";
+import Joyride, { type CallBackProps, type Step, STATUS } from "react-joyride";
 import { useAuth } from "@/hooks/use-auth";
 
 const KEY = "tour_v1_done";
 
 const steps: Step[] = [
-  { target: "body", placement: "center", content: "Bem-vindo ao Copa Bolão 2026! Vamos te mostrar o essencial em 5 passos." },
+  { target: "body", placement: "center", content: "Bem-vindo ao Copa Bolão 2026! Vamos te mostrar o essencial em 5 passos.", disableBeacon: true },
   { target: '[data-tour="bracket"]', content: "Aqui você vê o chaveamento ao vivo e pode apostar nas próximas partidas." },
   { target: '[data-tour="ranking"]', content: "Ranking dos jogadores — quem mais acertou aparece no topo." },
   { target: '[data-tour="wallet"]', content: "Sua carteira: deposite via PIX e solicite saque quando quiser." },
@@ -26,8 +26,9 @@ export function OnboardingTour() {
     } catch { /* ignore */ }
   }, [user]);
 
-  function onCallback(data: EventData) {
-    if (data.status === STATUS.FINISHED || data.status === STATUS.SKIPPED) {
+  function onCallback(data: CallBackProps) {
+    const finished: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
+    if (finished.includes(data.status)) {
       try { localStorage.setItem(KEY, "1"); } catch { /* ignore */ }
       setRun(false);
     }
@@ -45,10 +46,14 @@ export function OnboardingTour() {
       callback={onCallback}
       locale={{ back: "Voltar", close: "Fechar", last: "Pronto", next: "Próximo", skip: "Pular" }}
       styles={{
-        overlay: { backgroundColor: "rgba(0,0,0,0.6)" },
-        tooltip: { backgroundColor: "hsl(var(--card))", color: "hsl(var(--foreground))", borderRadius: 12 },
-        buttonPrimary: { backgroundColor: "hsl(var(--primary))", color: "hsl(var(--primary-foreground))" },
-        buttonBack: { color: "hsl(var(--muted-foreground))" },
+        options: {
+          primaryColor: "hsl(var(--primary))",
+          backgroundColor: "hsl(var(--card))",
+          textColor: "hsl(var(--foreground))",
+          arrowColor: "hsl(var(--card))",
+          overlayColor: "rgba(0,0,0,0.6)",
+          zIndex: 9999,
+        },
       }}
     />
   );
