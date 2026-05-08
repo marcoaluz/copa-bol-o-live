@@ -14,6 +14,7 @@ import { NotificationBell } from "@/components/NotificationBell";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AlertTriangle } from "lucide-react";
+import { LegalModal } from "@/components/LegalModal";
 
 const navItems = [
   { to: "/home", label: "Home", icon: Home },
@@ -209,6 +210,14 @@ export function AppLayout() {
         </main>
       </div>
       <BottomNav />
+      <footer className="hidden lg:block border-t border-border bg-background/60 px-6 py-3 text-xs text-muted-foreground text-center">
+        Bolão privado · sem fim lucrativo · 100% redistribuído ·{" "}
+        <LegalModal
+          title="Como o Bolão Funciona"
+          src="/legal/operacional.md"
+          trigger={<button type="button" className="underline hover:text-foreground">Como funciona</button>}
+        />
+      </footer>
     </div>
   );
 }
