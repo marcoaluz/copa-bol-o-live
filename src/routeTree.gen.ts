@@ -21,6 +21,7 @@ import { Route as MainChaveamentoRouteImport } from './routes/_main/chaveamento'
 import { Route as MainCarteiraRouteImport } from './routes/_main/carteira'
 import { Route as MainAdminRouteImport } from './routes/_main/admin'
 import { Route as MainAdminIndexRouteImport } from './routes/_main/admin.index'
+import { Route as MainAdminSaquesRouteImport } from './routes/_main/admin.saques'
 import { Route as MainAdminPartidasRouteImport } from './routes/_main/admin.partidas'
 import { Route as ApiPublicHooksSyncPartidasRouteImport } from './routes/api/public/hooks/sync-partidas'
 
@@ -83,6 +84,11 @@ const MainAdminIndexRoute = MainAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => MainAdminRoute,
 } as any)
+const MainAdminSaquesRoute = MainAdminSaquesRouteImport.update({
+  id: '/saques',
+  path: '/saques',
+  getParentRoute: () => MainAdminRoute,
+} as any)
 const MainAdminPartidasRoute = MainAdminPartidasRouteImport.update({
   id: '/partidas',
   path: '/partidas',
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof MainPerfilRoute
   '/ranking': typeof MainRankingRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
+  '/admin/saques': typeof MainAdminSaquesRoute
   '/admin/': typeof MainAdminIndexRoute
   '/api/public/hooks/sync-partidas': typeof ApiPublicHooksSyncPartidasRoute
 }
@@ -121,6 +128,7 @@ export interface FileRoutesByTo {
   '/perfil': typeof MainPerfilRoute
   '/ranking': typeof MainRankingRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
+  '/admin/saques': typeof MainAdminSaquesRoute
   '/admin': typeof MainAdminIndexRoute
   '/api/public/hooks/sync-partidas': typeof ApiPublicHooksSyncPartidasRoute
 }
@@ -138,6 +146,7 @@ export interface FileRoutesById {
   '/_main/perfil': typeof MainPerfilRoute
   '/_main/ranking': typeof MainRankingRoute
   '/_main/admin/partidas': typeof MainAdminPartidasRoute
+  '/_main/admin/saques': typeof MainAdminSaquesRoute
   '/_main/admin/': typeof MainAdminIndexRoute
   '/api/public/hooks/sync-partidas': typeof ApiPublicHooksSyncPartidasRoute
 }
@@ -155,6 +164,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/ranking'
     | '/admin/partidas'
+    | '/admin/saques'
     | '/admin/'
     | '/api/public/hooks/sync-partidas'
   fileRoutesByTo: FileRoutesByTo
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/ranking'
     | '/admin/partidas'
+    | '/admin/saques'
     | '/admin'
     | '/api/public/hooks/sync-partidas'
   id:
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/_main/perfil'
     | '/_main/ranking'
     | '/_main/admin/partidas'
+    | '/_main/admin/saques'
     | '/_main/admin/'
     | '/api/public/hooks/sync-partidas'
   fileRoutesById: FileRoutesById
@@ -283,6 +295,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainAdminIndexRouteImport
       parentRoute: typeof MainAdminRoute
     }
+    '/_main/admin/saques': {
+      id: '/_main/admin/saques'
+      path: '/saques'
+      fullPath: '/admin/saques'
+      preLoaderRoute: typeof MainAdminSaquesRouteImport
+      parentRoute: typeof MainAdminRoute
+    }
     '/_main/admin/partidas': {
       id: '/_main/admin/partidas'
       path: '/partidas'
@@ -302,11 +321,13 @@ declare module '@tanstack/react-router' {
 
 interface MainAdminRouteChildren {
   MainAdminPartidasRoute: typeof MainAdminPartidasRoute
+  MainAdminSaquesRoute: typeof MainAdminSaquesRoute
   MainAdminIndexRoute: typeof MainAdminIndexRoute
 }
 
 const MainAdminRouteChildren: MainAdminRouteChildren = {
   MainAdminPartidasRoute: MainAdminPartidasRoute,
+  MainAdminSaquesRoute: MainAdminSaquesRoute,
   MainAdminIndexRoute: MainAdminIndexRoute,
 }
 

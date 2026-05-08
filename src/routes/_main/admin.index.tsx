@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { PageHeader } from "@/components/PageHeader";
 import { Card } from "@/components/ui/card";
-import { Shield, Users, Trophy, Settings } from "lucide-react";
+import { Shield, Users, Trophy, Settings, Banknote } from "lucide-react";
 
 export const Route = createFileRoute("/_main/admin/")({
   head: () => ({ meta: [{ title: "Admin — Copa Bolão 2026" }] }),
@@ -11,6 +11,7 @@ export const Route = createFileRoute("/_main/admin/")({
 
 const tiles = [
   { icon: Trophy, label: "Partidas", desc: "Lançar resultados, apurar e distribuir prêmios", to: "/admin/partidas" as const },
+  { icon: Banknote, label: "Saques", desc: "Aprovar/rejeitar acertos via PIX", to: "/admin/saques" as const },
   { icon: Users, label: "Usuários", desc: "Lista de jogadores", to: null },
   { icon: Shield, label: "Permissões", desc: "Controle de acesso", to: null },
   { icon: Settings, label: "Configurações", desc: "Ajustes do bolão", to: null },

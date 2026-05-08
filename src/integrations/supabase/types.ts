@@ -332,6 +332,57 @@ export type Database = {
         }
         Relationships: []
       }
+      saques: {
+        Row: {
+          admin_revisor_id: string | null
+          chave_pix: string
+          created_at: string
+          id: string
+          motivo_rejeicao: string | null
+          observacao_admin: string | null
+          pago_em: string | null
+          revisado_em: string | null
+          solicitado_em: string
+          status: Database["public"]["Enums"]["status_saque"]
+          tipo_chave: Database["public"]["Enums"]["tipo_chave_pix"]
+          updated_at: string
+          usuario_id: string
+          valor_centavos: number
+        }
+        Insert: {
+          admin_revisor_id?: string | null
+          chave_pix: string
+          created_at?: string
+          id?: string
+          motivo_rejeicao?: string | null
+          observacao_admin?: string | null
+          pago_em?: string | null
+          revisado_em?: string | null
+          solicitado_em?: string
+          status?: Database["public"]["Enums"]["status_saque"]
+          tipo_chave: Database["public"]["Enums"]["tipo_chave_pix"]
+          updated_at?: string
+          usuario_id: string
+          valor_centavos: number
+        }
+        Update: {
+          admin_revisor_id?: string | null
+          chave_pix?: string
+          created_at?: string
+          id?: string
+          motivo_rejeicao?: string | null
+          observacao_admin?: string | null
+          pago_em?: string | null
+          revisado_em?: string | null
+          solicitado_em?: string
+          status?: Database["public"]["Enums"]["status_saque"]
+          tipo_chave?: Database["public"]["Enums"]["tipo_chave_pix"]
+          updated_at?: string
+          usuario_id?: string
+          valor_centavos?: number
+        }
+        Relationships: []
+      }
       selecoes: {
         Row: {
           bandeira_url: string | null
@@ -571,6 +622,36 @@ export type Database = {
         }
       }
       marcar_notificacoes_lidas: { Args: { p_ids?: string[] }; Returns: number }
+      processar_saque: {
+        Args: {
+          p_acao: string
+          p_motivo?: string
+          p_observacao?: string
+          p_saque_id: string
+        }
+        Returns: {
+          admin_revisor_id: string | null
+          chave_pix: string
+          created_at: string
+          id: string
+          motivo_rejeicao: string | null
+          observacao_admin: string | null
+          pago_em: string | null
+          revisado_em: string | null
+          solicitado_em: string
+          status: Database["public"]["Enums"]["status_saque"]
+          tipo_chave: Database["public"]["Enums"]["tipo_chave_pix"]
+          updated_at: string
+          usuario_id: string
+          valor_centavos: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "saques"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       ranking_filtrado: {
         Args: { p_filtro?: string }
         Returns: {
@@ -588,6 +669,35 @@ export type Database = {
         }[]
       }
       resgatar_bonus: { Args: { p_tipo: string }; Returns: Json }
+      solicitar_saque: {
+        Args: {
+          p_chave_pix: string
+          p_tipo_chave: Database["public"]["Enums"]["tipo_chave_pix"]
+          p_valor_centavos: number
+        }
+        Returns: {
+          admin_revisor_id: string | null
+          chave_pix: string
+          created_at: string
+          id: string
+          motivo_rejeicao: string | null
+          observacao_admin: string | null
+          pago_em: string | null
+          revisado_em: string | null
+          solicitado_em: string
+          status: Database["public"]["Enums"]["status_saque"]
+          tipo_chave: Database["public"]["Enums"]["tipo_chave_pix"]
+          updated_at: string
+          usuario_id: string
+          valor_centavos: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "saques"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       fase_partida:
@@ -602,6 +712,8 @@ export type Database = {
       resultado_partida: "casa" | "empate" | "visitante"
       status_aposta: "ativa" | "ganhou" | "perdeu" | "devolvida"
       status_partida: "agendada" | "ao_vivo" | "encerrada" | "cancelada"
+      status_saque: "pendente" | "pago" | "rejeitado" | "cancelado"
+      tipo_chave_pix: "cpf" | "email" | "telefone" | "aleatoria"
       tipo_transacao:
         | "deposito"
         | "aposta"
@@ -610,6 +722,7 @@ export type Database = {
         | "saque"
         | "ajuste_admin"
         | "bonus"
+        | "devolucao_saque"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -750,6 +863,8 @@ export const Constants = {
       resultado_partida: ["casa", "empate", "visitante"],
       status_aposta: ["ativa", "ganhou", "perdeu", "devolvida"],
       status_partida: ["agendada", "ao_vivo", "encerrada", "cancelada"],
+      status_saque: ["pendente", "pago", "rejeitado", "cancelado"],
+      tipo_chave_pix: ["cpf", "email", "telefone", "aleatoria"],
       tipo_transacao: [
         "deposito",
         "aposta",
@@ -758,6 +873,7 @@ export const Constants = {
         "saque",
         "ajuste_admin",
         "bonus",
+        "devolucao_saque",
       ],
     },
   },

@@ -6,8 +6,9 @@ import { useAuth } from "@/hooks/use-auth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Wallet, Gift, CalendarDays, Coins, AlertCircle, ArrowDownCircle, ArrowUpCircle, Trophy, RefreshCw } from "lucide-react";
+import { Wallet, Gift, CalendarDays, Coins, AlertCircle, ArrowDownCircle, ArrowUpCircle, Trophy, RefreshCw, Send, Clock, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "sonner";
+import { SolicitarSaqueDialog } from "@/components/SolicitarSaqueDialog";
 
 export const Route = createFileRoute("/_main/carteira")({
   component: CarteiraPage,
@@ -89,6 +90,7 @@ function BonusCard({
 function CarteiraPage() {
   const { profile, refreshProfile } = useAuth();
   const qc = useQueryClient();
+  const [saqueOpen, setSaqueOpen] = useState(false);
 
   const { data: transacoes, refetch } = useQuery({
     queryKey: ["transacoes", profile?.id],
@@ -99,6 +101,18 @@ function CarteiraPage() {
         .select("*")
         .order("created_at", { ascending: false })
         .limit(50);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: saques, refetch: refetchSaques } = useQuery({
+    queryKey: ["saques", profile?.id],
+    enabled: !!profile?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("saques").select("*")
+        .order("solicitado_em", { ascending: false }).limit(20);
       if (error) throw error;
       return data;
     },
@@ -174,6 +188,54 @@ function CarteiraPage() {
           />
         </div>
       </section>
+
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-xl">Acerto via PIX</h2>
+          <Button onClick={() => setSaqueOpen(true)} disabled={(profile?.saldo_centavos ?? 0) < 2000}>
+            <Send className="w-4 h-4 mr-2" /> Solicitar acerto
+          </Button>
+        </div>
+        <Card className="divide-y divide-border">
+          {!saques?.length && (
+            <div className="p-8 text-center text-muted-foreground text-sm">
+              Nenhuma solicitação ainda.
+            </div>
+          )}
+          {saques?.map((s) => {
+            const Icon = s.status === "pago" ? CheckCircle2
+              : s.status === "rejeitado" ? XCircle
+              : Clock;
+            const cor = s.status === "pago" ? "text-green-500"
+              : s.status === "rejeitado" ? "text-destructive"
+              : "text-gold";
+            return (
+              <div key={s.id} className="flex items-center gap-4 p-4">
+                <div className={`w-10 h-10 rounded-full bg-surface-elevated flex items-center justify-center ${cor}`}>
+                  <Icon className="w-5 h-5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm">
+                    R$ {formatBRL(s.valor_centavos)} <span className="text-muted-foreground">via {s.tipo_chave.toUpperCase()}</span>
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">{s.chave_pix}</p>
+                  {s.motivo_rejeicao && (
+                    <p className="text-xs text-destructive mt-1">Motivo: {s.motivo_rejeicao}</p>
+                  )}
+                </div>
+                <div className="text-right">
+                  <Badge variant="secondary" className={`uppercase ${cor}`}>{s.status}</Badge>
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    {new Date(s.solicitado_em).toLocaleDateString("pt-BR")}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </Card>
+      </section>
+
+      <SolicitarSaqueDialog open={saqueOpen} onOpenChange={(v) => { setSaqueOpen(v); if (!v) refetchSaques(); }} />
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">
