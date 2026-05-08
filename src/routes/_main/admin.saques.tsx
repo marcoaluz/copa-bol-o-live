@@ -53,7 +53,7 @@ function AdminSaquesPage() {
     queryKey: ["admin-saques", filtro],
     queryFn: async () => {
       let q = supabase.from("saques").select("*").order("solicitado_em", { ascending: false });
-      if (filtro !== "todos") q = q.eq("status", filtro);
+      if (filtro !== "todos") q = q.eq("status", filtro as Saque["status"]);
       const { data, error } = await q;
       if (error) throw error;
       return data as Saque[];
@@ -76,8 +76,8 @@ function AdminSaquesPage() {
       const { error } = await supabase.rpc("processar_saque", {
         p_saque_id: saqueSel.id,
         p_acao: acaoTipo,
-        p_motivo: acaoTipo === "rejeitar" ? motivo : null,
-        p_observacao: observacao || null,
+        p_motivo: acaoTipo === "rejeitar" ? motivo : undefined,
+        p_observacao: observacao || undefined,
       });
       if (error) throw error;
     },
