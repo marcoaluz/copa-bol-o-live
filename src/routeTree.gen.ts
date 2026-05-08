@@ -21,6 +21,7 @@ import { Route as MainChaveamentoRouteImport } from './routes/_main/chaveamento'
 import { Route as MainAdminRouteImport } from './routes/_main/admin'
 import { Route as MainAdminIndexRouteImport } from './routes/_main/admin.index'
 import { Route as MainAdminPartidasRouteImport } from './routes/_main/admin.partidas'
+import { Route as ApiPublicHooksSyncPartidasRouteImport } from './routes/api/public/hooks/sync-partidas'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -81,6 +82,12 @@ const MainAdminPartidasRoute = MainAdminPartidasRouteImport.update({
   path: '/partidas',
   getParentRoute: () => MainAdminRoute,
 } as any)
+const ApiPublicHooksSyncPartidasRoute =
+  ApiPublicHooksSyncPartidasRouteImport.update({
+    id: '/api/public/hooks/sync-partidas',
+    path: '/api/public/hooks/sync-partidas',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/ranking': typeof MainRankingRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
   '/admin/': typeof MainAdminIndexRoute
+  '/api/public/hooks/sync-partidas': typeof ApiPublicHooksSyncPartidasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -106,6 +114,7 @@ export interface FileRoutesByTo {
   '/ranking': typeof MainRankingRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
   '/admin': typeof MainAdminIndexRoute
+  '/api/public/hooks/sync-partidas': typeof ApiPublicHooksSyncPartidasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -121,6 +130,7 @@ export interface FileRoutesById {
   '/_main/ranking': typeof MainRankingRoute
   '/_main/admin/partidas': typeof MainAdminPartidasRoute
   '/_main/admin/': typeof MainAdminIndexRoute
+  '/api/public/hooks/sync-partidas': typeof ApiPublicHooksSyncPartidasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/ranking'
     | '/admin/partidas'
     | '/admin/'
+    | '/api/public/hooks/sync-partidas'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -148,6 +159,7 @@ export interface FileRouteTypes {
     | '/ranking'
     | '/admin/partidas'
     | '/admin'
+    | '/api/public/hooks/sync-partidas'
   id:
     | '__root__'
     | '/'
@@ -162,6 +174,7 @@ export interface FileRouteTypes {
     | '/_main/ranking'
     | '/_main/admin/partidas'
     | '/_main/admin/'
+    | '/api/public/hooks/sync-partidas'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -169,6 +182,7 @@ export interface RootRouteChildren {
   MainRoute: typeof MainRouteWithChildren
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
+  ApiPublicHooksSyncPartidasRoute: typeof ApiPublicHooksSyncPartidasRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -257,6 +271,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainAdminPartidasRouteImport
       parentRoute: typeof MainAdminRoute
     }
+    '/api/public/hooks/sync-partidas': {
+      id: '/api/public/hooks/sync-partidas'
+      path: '/api/public/hooks/sync-partidas'
+      fullPath: '/api/public/hooks/sync-partidas'
+      preLoaderRoute: typeof ApiPublicHooksSyncPartidasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -299,7 +320,18 @@ const rootRouteChildren: RootRouteChildren = {
   MainRoute: MainRouteWithChildren,
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
+  ApiPublicHooksSyncPartidasRoute: ApiPublicHooksSyncPartidasRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
