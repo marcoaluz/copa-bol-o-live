@@ -28,6 +28,11 @@ type Cfg = {
   valor_maximo_saque_diario_centavos: number;
   manutencao_ativa: boolean;
   manutencao_mensagem: string | null;
+  chave_pix_admin: string;
+  nome_admin_recebedor: string;
+  deposito_minimo_centavos: number;
+  deposito_maximo_centavos: number;
+  deposito_maximo_mensal_centavos: number;
 };
 
 function Page() {
@@ -103,6 +108,44 @@ function Page() {
         <div className="grid sm:grid-cols-2 gap-3">
           <div><Label>Mínimo</Label><Input type="number" step="0.01" value={reais(form.valor_minimo_saque_centavos)} onChange={(e) => setReais("valor_minimo_saque_centavos", e.target.value)} /></div>
           <div><Label>Máximo diário</Label><Input type="number" step="0.01" value={reais(form.valor_maximo_saque_diario_centavos)} onChange={(e) => setReais("valor_maximo_saque_diario_centavos", e.target.value)} /></div>
+        </div>
+      </Card>
+
+      <Card className="bg-card border-border rounded-xl shadow-card p-5 mb-4">
+        <h3 className="font-semibold mb-1">Recebimento PIX</h3>
+        <p className="text-xs text-muted-foreground mb-4">
+          Dados que aparecem para o usuário ao depositar. Sem chave configurada, depósitos ficam bloqueados.
+        </p>
+        <div className="space-y-3">
+          <div>
+            <Label>Chave PIX para recebimento</Label>
+            <Input value={form.chave_pix_admin ?? ""}
+              onChange={(e) => setForm({ ...form, chave_pix_admin: e.target.value })}
+              placeholder="cpf, e-mail, telefone ou aleatória" />
+          </div>
+          <div>
+            <Label>Nome que aparece na transferência</Label>
+            <Input value={form.nome_admin_recebedor ?? ""}
+              onChange={(e) => setForm({ ...form, nome_admin_recebedor: e.target.value })}
+              placeholder="Nome do organizador" />
+          </div>
+          <div className="grid sm:grid-cols-3 gap-3">
+            <div>
+              <Label>Mínimo por depósito (R$)</Label>
+              <Input type="number" step="0.01" value={reais(form.deposito_minimo_centavos)}
+                onChange={(e) => setReais("deposito_minimo_centavos", e.target.value)} />
+            </div>
+            <div>
+              <Label>Máximo por depósito (R$)</Label>
+              <Input type="number" step="0.01" value={reais(form.deposito_maximo_centavos)}
+                onChange={(e) => setReais("deposito_maximo_centavos", e.target.value)} />
+            </div>
+            <div>
+              <Label>Limite mensal por usuário (R$)</Label>
+              <Input type="number" step="0.01" value={reais(form.deposito_maximo_mensal_centavos)}
+                onChange={(e) => setReais("deposito_maximo_mensal_centavos", e.target.value)} />
+            </div>
+          </div>
         </div>
       </Card>
 
