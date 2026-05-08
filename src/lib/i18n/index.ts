@@ -1,8 +1,8 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import ptBR from "./pt-BR.json";
-import enUS from "./en-US.json";
-import esES from "./es-ES.json";
+import { ptBR } from "./pt-BR";
+import { enUS } from "./en-US";
+import { esES } from "./es-ES";
 
 let initialized = false;
 
