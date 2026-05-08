@@ -27,6 +27,7 @@ const tiles = [
   { icon: Settings, label: "Configurações", desc: "Limites e manutenção", to: "/admin/configuracoes" as const },
   { icon: ClipboardList, label: "Auditoria", desc: "Log imutável de ações", to: "/admin/auditoria" as const },
   { icon: FileText, label: "Relatórios", desc: "Exportar CSV financeiro", to: "/admin/relatorios" as const },
+  { icon: ClipboardList, label: "Checklist", desc: "Pré-lançamento", to: "/admin/checklist" as const },
 ];
 
 function AdminPage() {
