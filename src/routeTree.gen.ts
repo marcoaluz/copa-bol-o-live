@@ -13,6 +13,7 @@ import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MainRouteImport } from './routes/_main'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiSitemapDotxmlRouteImport } from './routes/api/sitemap[.]xml'
 import { Route as MainRankingRouteImport } from './routes/_main/ranking'
 import { Route as MainPerfilRouteImport } from './routes/_main/perfil'
 import { Route as MainHomeRouteImport } from './routes/_main/home'
@@ -49,6 +50,11 @@ const MainRoute = MainRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSitemapDotxmlRoute = ApiSitemapDotxmlRouteImport.update({
+  id: '/api/sitemap.xml',
+  path: '/api/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MainRankingRoute = MainRankingRouteImport.update({
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/home': typeof MainHomeRoute
   '/perfil': typeof MainPerfilRoute
   '/ranking': typeof MainRankingRoute
+  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/admin/auditoria': typeof MainAdminAuditoriaRoute
   '/admin/checklist': typeof MainAdminChecklistRoute
   '/admin/configuracoes': typeof MainAdminConfiguracoesRoute
@@ -177,6 +184,7 @@ export interface FileRoutesByTo {
   '/home': typeof MainHomeRoute
   '/perfil': typeof MainPerfilRoute
   '/ranking': typeof MainRankingRoute
+  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/admin/auditoria': typeof MainAdminAuditoriaRoute
   '/admin/checklist': typeof MainAdminChecklistRoute
   '/admin/configuracoes': typeof MainAdminConfiguracoesRoute
@@ -202,6 +210,7 @@ export interface FileRoutesById {
   '/_main/home': typeof MainHomeRoute
   '/_main/perfil': typeof MainPerfilRoute
   '/_main/ranking': typeof MainRankingRoute
+  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/_main/admin/auditoria': typeof MainAdminAuditoriaRoute
   '/_main/admin/checklist': typeof MainAdminChecklistRoute
   '/_main/admin/configuracoes': typeof MainAdminConfiguracoesRoute
@@ -227,6 +236,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/perfil'
     | '/ranking'
+    | '/api/sitemap.xml'
     | '/admin/auditoria'
     | '/admin/checklist'
     | '/admin/configuracoes'
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/perfil'
     | '/ranking'
+    | '/api/sitemap.xml'
     | '/admin/auditoria'
     | '/admin/checklist'
     | '/admin/configuracoes'
@@ -273,6 +284,7 @@ export interface FileRouteTypes {
     | '/_main/home'
     | '/_main/perfil'
     | '/_main/ranking'
+    | '/api/sitemap.xml'
     | '/_main/admin/auditoria'
     | '/_main/admin/checklist'
     | '/_main/admin/configuracoes'
@@ -290,6 +302,7 @@ export interface RootRouteChildren {
   MainRoute: typeof MainRouteWithChildren
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
+  ApiSitemapDotxmlRoute: typeof ApiSitemapDotxmlRoute
   ApiPublicHooksSyncPartidasRoute: typeof ApiPublicHooksSyncPartidasRoute
 }
 
@@ -321,6 +334,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/sitemap.xml': {
+      id: '/api/sitemap.xml'
+      path: '/api/sitemap.xml'
+      fullPath: '/api/sitemap.xml'
+      preLoaderRoute: typeof ApiSitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_main/ranking': {
@@ -518,6 +538,7 @@ const rootRouteChildren: RootRouteChildren = {
   MainRoute: MainRouteWithChildren,
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
+  ApiSitemapDotxmlRoute: ApiSitemapDotxmlRoute,
   ApiPublicHooksSyncPartidasRoute: ApiPublicHooksSyncPartidasRoute,
 }
 export const routeTree = rootRouteImport
