@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { Card } from "@/components/ui/card";
 import { Shield, Users, Trophy, Settings } from "lucide-react";
 
-export const Route = createFileRoute("/_main/admin")({
+export const Route = createFileRoute("/_main/admin/")({
   head: () => ({ meta: [{ title: "Admin — Copa Bolão 2026" }] }),
   component: AdminPage,
 });
