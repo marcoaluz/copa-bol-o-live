@@ -13,8 +13,11 @@ import { useMinhasApostas, formatBRL, PALPITE_LABEL, STATUS_LABEL, type Aposta }
 import { usePartidas, useSelecoes, selecaoMap, FASE_LABEL, type Partida } from "@/lib/tournament";
 import { useEstatisticasUsuario, useEvolucaoSaldo, useToggleAnonimo } from "@/lib/ranking";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-import { Trophy, Flame, Target, TrendingUp } from "lucide-react";
+import { Trophy, Flame, Target, TrendingUp, Eye, Download } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_main/perfil")({
   head: () => ({ meta: [{ title: "Perfil — Copa Bolão 2026" }] }),
@@ -30,6 +33,59 @@ function ProfilePage() {
   const { data: stats } = useEstatisticasUsuario(user?.id);
   const { data: evol } = useEvolucaoSaldo(user?.id, 30);
   const toggleAnon = useToggleAnonimo();
+
+  const { data: transp } = useQuery({
+    queryKey: ["perfil", "transparencia", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const uid = user!.id;
+      const [dep, ap, sq] = await Promise.all([
+        supabase.from("depositos").select("valor_centavos").eq("usuario_id", uid).eq("status", "confirmado"),
+        supabase.from("apostas").select("valor_centavos, premio_centavos").eq("usuario_id", uid),
+        supabase.from("saques").select("valor_centavos").eq("usuario_id", uid).eq("status", "pago"),
+      ]);
+      const totalDep = (dep.data ?? []).reduce((s: number, r: any) => s + Number(r.valor_centavos), 0);
+      const totalApostado = (ap.data ?? []).reduce((s: number, r: any) => s + Number(r.valor_centavos), 0);
+      const totalGanho = (ap.data ?? []).reduce((s: number, r: any) => s + Number(r.premio_centavos ?? 0), 0);
+      const totalSaq = (sq.data ?? []).reduce((s: number, r: any) => s + Number(r.valor_centavos), 0);
+      return { totalDep, totalApostado, totalGanho, totalSaq };
+    },
+  });
+
+  const exportarHistorico = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from("transacoes")
+        .select("created_at, tipo, valor_centavos, saldo_apos_centavos, descricao")
+        .eq("usuario_id", user.id)
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      const linhas = [
+        ["data", "tipo", "valor_brl", "saldo_apos_brl", "descricao"].join(","),
+        ...(data ?? []).map((t: any) =>
+          [
+            new Date(t.created_at).toISOString(),
+            t.tipo,
+            (Number(t.valor_centavos) / 100).toFixed(2).replace(".", ","),
+            (Number(t.saldo_apos_centavos) / 100).toFixed(2).replace(".", ","),
+            `"${(t.descricao ?? "").replace(/"/g, '""')}"`,
+          ].join(",")
+        ),
+      ];
+      const blob = new Blob([linhas.join("\n")], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `meu-historico-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("Histórico exportado");
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  };
+
   const pMap = useMemo(() => {
     const m: Record<string, Partida> = {};
     partidas?.forEach((p) => (m[p.id] = p));
@@ -120,6 +176,26 @@ function ProfilePage() {
           <StatTile icon={<TrendingUp className="w-4 h-4" />} label="Lucro" value={formatBRL(stats?.lucro_centavos ?? 0)}
             className={(stats?.lucro_centavos ?? 0) >= 0 ? "text-primary" : "text-destructive"} />
           <StatTile icon={<Flame className="w-4 h-4" />} label="Sequência" value={String(stats?.melhor_sequencia ?? 0)} />
+        </div>
+      </Card>
+
+      {/* Transparência */}
+      <Card className="bg-card border-border rounded-xl p-5 mb-6">
+        <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
+          <div className="flex items-center gap-2">
+            <Eye className="w-4 h-4 text-gold" />
+            <h3 className="font-display text-xl tracking-wider">Transparência</h3>
+          </div>
+          <Button onClick={exportarHistorico} size="sm" variant="outline">
+            <Download className="w-4 h-4 mr-2" /> Exportar meu histórico CSV
+          </Button>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <StatTile icon={<TrendingUp className="w-4 h-4" />} label="Depositado" value={formatBRL(transp?.totalDep ?? 0)} />
+          <StatTile icon={<Target className="w-4 h-4" />} label="Apostado" value={formatBRL(transp?.totalApostado ?? 0)} />
+          <StatTile icon={<Trophy className="w-4 h-4" />} label="Ganho em prêmios" value={formatBRL(transp?.totalGanho ?? 0)} />
+          <StatTile icon={<TrendingUp className="w-4 h-4" />} label="Sacado" value={formatBRL(transp?.totalSaq ?? 0)} />
+          <StatTile icon={<Flame className="w-4 h-4" />} label="Saldo atual" value={formatBRL(profile?.saldo_centavos ?? 0)} className="text-gold" />
         </div>
       </Card>
 
