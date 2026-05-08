@@ -12,6 +12,8 @@ export type Profile = {
   is_admin: boolean;
   aceitou_termos_em: string | null;
   aceitou_risco_em: string | null;
+  anonimo?: boolean;
+  foto_url?: string | null;
 };
 
 type AuthCtx = {

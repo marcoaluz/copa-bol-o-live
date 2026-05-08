@@ -6,9 +6,15 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
 import { useMinhasApostas, formatBRL, PALPITE_LABEL, STATUS_LABEL, type Aposta } from "@/lib/bets";
 import { usePartidas, useSelecoes, selecaoMap, FASE_LABEL, type Partida } from "@/lib/tournament";
+import { useEstatisticasUsuario, useEvolucaoSaldo, useToggleAnonimo } from "@/lib/ranking";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { Trophy, Flame, Target, TrendingUp } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_main/perfil")({
   head: () => ({ meta: [{ title: "Perfil — Copa Bolão 2026" }] }),
@@ -16,11 +22,14 @@ export const Route = createFileRoute("/_main/perfil")({
 });
 
 function ProfilePage() {
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const { data: apostas } = useMinhasApostas(user?.id);
   const { data: partidas } = usePartidas();
   const { data: selecoes } = useSelecoes();
   const sMap = useMemo(() => selecaoMap(selecoes), [selecoes]);
+  const { data: stats } = useEstatisticasUsuario(user?.id);
+  const { data: evol } = useEvolucaoSaldo(user?.id, 30);
+  const toggleAnon = useToggleAnonimo();
   const pMap = useMemo(() => {
     const m: Record<string, Partida> = {};
     partidas?.forEach((p) => (m[p.id] = p));
@@ -34,7 +43,7 @@ function ProfilePage() {
   const ativas = apostas?.filter((a) => a.status === "ativa").length ?? 0;
   const premioTotal = apostas?.reduce((s, a) => s + (a.premio_centavos ?? 0), 0) ?? 0;
 
-  const stats = [
+  const cards = [
     { label: "Apostas", value: String(total) },
     { label: "Ativas", value: String(ativas) },
     { label: "Acertos", value: String(ganhas) },
@@ -59,6 +68,22 @@ function ProfilePage() {
     .slice(0, 2)
     .toUpperCase();
 
+  const onToggleAnonimo = async (v: boolean) => {
+    if (!user) return;
+    try {
+      await toggleAnon.mutateAsync({ uid: user.id, anonimo: v });
+      await refreshProfile();
+      toast.success(v ? "Perfil agora aparece como Anônimo no ranking" : "Perfil voltou a aparecer com seu apelido");
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  };
+
+  const chartData = (evol ?? []).map((t) => ({
+    x: new Date(t.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }),
+    saldo: Number(t.saldo_apos_centavos) / 100,
+  }));
+
   return (
     <div>
       <PageHeader title="Meu Perfil" />
@@ -66,14 +91,66 @@ function ProfilePage() {
         <Avatar className="w-20 h-20 border-4 border-primary shadow-glow">
           <AvatarFallback className="bg-surface-elevated text-2xl font-bold">{initials}</AvatarFallback>
         </Avatar>
-        <div>
+        <div className="flex-1">
           <h2 className="font-display text-2xl tracking-wide">{profile?.nome_completo ?? "Usuário"}</h2>
           <p className="text-muted-foreground text-sm">@{profile?.apelido ?? "—"}</p>
           <p className="text-gold text-sm font-semibold mt-1">Saldo: {formatBRL(profile?.saldo_centavos ?? 0)}</p>
         </div>
+        <div className="flex items-center gap-2">
+          <Switch
+            id="anon"
+            checked={!!profile?.anonimo}
+            onCheckedChange={onToggleAnonimo}
+            disabled={toggleAnon.isPending}
+          />
+          <Label htmlFor="anon" className="text-xs text-muted-foreground cursor-pointer">Anônimo no ranking</Label>
+        </div>
       </Card>
+
+      {/* Sua estatística */}
+      <Card className="bg-gradient-to-br from-primary/10 to-gold/10 border-gold/30 rounded-xl p-5 mb-6">
+        <div className="flex items-center gap-2 mb-3">
+          <Trophy className="w-4 h-4 text-gold" />
+          <h3 className="font-display text-xl tracking-wider">Sua estatística</h3>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          <StatTile icon={<Trophy className="w-4 h-4" />} label="Posição" value={stats?.posicao ? `#${stats.posicao}` : "—"} />
+          <StatTile icon={<Target className="w-4 h-4" />} label="Acertos" value={String(stats?.total_acertos ?? 0)} />
+          <StatTile icon={<TrendingUp className="w-4 h-4" />} label="Taxa de acerto" value={`${stats?.taxa_acerto ?? 0}%`} />
+          <StatTile icon={<TrendingUp className="w-4 h-4" />} label="Lucro" value={formatBRL(stats?.lucro_centavos ?? 0)}
+            className={(stats?.lucro_centavos ?? 0) >= 0 ? "text-primary" : "text-destructive"} />
+          <StatTile icon={<Flame className="w-4 h-4" />} label="Sequência" value={String(stats?.melhor_sequencia ?? 0)} />
+        </div>
+      </Card>
+
+      {/* Evolução do saldo */}
+      <Card className="bg-card border-border rounded-xl p-5 mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-display text-xl tracking-wider">Evolução do saldo</h3>
+          <span className="text-xs text-muted-foreground">Últimas {chartData.length} transações</span>
+        </div>
+        {chartData.length < 2 ? (
+          <div className="text-sm text-muted-foreground py-8 text-center">Faça apostas para ver seu histórico aqui.</div>
+        ) : (
+          <div className="h-56">
+            <ResponsiveContainer>
+              <LineChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: -20 }}>
+                <CartesianGrid stroke="var(--border)" strokeOpacity={0.3} vertical={false} />
+                <XAxis dataKey="x" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+                <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `R$${v}`} />
+                <Tooltip
+                  contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--foreground)" }}
+                  formatter={(v: number) => [`R$ ${v.toFixed(2)}`, "Saldo"]}
+                />
+                <Line type="monotone" dataKey="saldo" stroke="var(--gold)" strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+      </Card>
+
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-        {stats.map((s) => (
+        {cards.map((s) => (
           <Card key={s.label} className="bg-card border-border rounded-xl p-4 text-center">
             <div className="font-display text-2xl text-foreground">{s.value}</div>
             <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1">{s.label}</div>
@@ -115,6 +192,17 @@ function ProfilePage() {
           <ApostasList apostas={todasList} pMap={pMap} sMap={sMap} />
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+function StatTile({ icon, label, value, className }: { icon: React.ReactNode; label: string; value: string; className?: string }) {
+  return (
+    <div className="bg-card/60 rounded-lg p-3 border border-border/40">
+      <div className="flex items-center gap-1.5 text-muted-foreground text-xs uppercase tracking-wider mb-1">
+        {icon}<span>{label}</span>
+      </div>
+      <div className={`font-display text-2xl ${className ?? ""}`}>{value}</div>
     </div>
   );
 }
