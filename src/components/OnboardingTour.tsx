@@ -1,32 +1,15 @@
 import { useEffect, useState } from "react";
-import Joyride, { type Step, type CallBackProps, STATUS } from "react-joyride";
+import { Joyride, type Step, STATUS, type Status } from "react-joyride";
 import { useAuth } from "@/hooks/use-auth";
 
 const KEY = "tour_v1_done";
 
 const steps: Step[] = [
-  {
-    target: "body",
-    content: "Bem-vindo ao Copa Bolão 2026! Vamos te mostrar o essencial em 5 passos.",
-    placement: "center",
-    disableBeacon: true,
-  },
-  {
-    target: '[data-tour="bracket"]',
-    content: "Aqui você vê o chaveamento ao vivo e pode apostar nas próximas partidas.",
-  },
-  {
-    target: '[data-tour="ranking"]',
-    content: "Ranking dos jogadores — quem mais acertou aparece no topo.",
-  },
-  {
-    target: '[data-tour="wallet"]',
-    content: "Sua carteira: deposite via PIX e solicite saque quando quiser.",
-  },
-  {
-    target: '[data-tour="profile"]',
-    content: "Seu perfil com histórico de apostas, prêmios e suporte.",
-  },
+  { target: "body", placement: "center", content: "Bem-vindo ao Copa Bolão 2026! Vamos te mostrar o essencial em 5 passos." },
+  { target: '[data-tour="bracket"]', content: "Aqui você vê o chaveamento ao vivo e pode apostar nas próximas partidas." },
+  { target: '[data-tour="ranking"]', content: "Ranking dos jogadores — quem mais acertou aparece no topo." },
+  { target: '[data-tour="wallet"]', content: "Sua carteira: deposite via PIX e solicite saque quando quiser." },
+  { target: '[data-tour="profile"]', content: "Seu perfil com histórico de apostas, prêmios e suporte." },
 ];
 
 export function OnboardingTour() {
@@ -40,14 +23,11 @@ export function OnboardingTour() {
         const t = setTimeout(() => setRun(true), 800);
         return () => clearTimeout(t);
       }
-    } catch {
-      /* ignore */
-    }
+    } catch { /* ignore */ }
   }, [user]);
 
-  function onCallback(data: CallBackProps) {
-    const finished: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
-    if (finished.includes(data.status)) {
+  function onCallback(data: { status: Status }) {
+    if (data.status === STATUS.FINISHED || data.status === STATUS.SKIPPED) {
       try { localStorage.setItem(KEY, "1"); } catch { /* ignore */ }
       setRun(false);
     }
