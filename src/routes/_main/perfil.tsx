@@ -135,14 +135,14 @@ function ProfilePage() {
           <div className="h-56">
             <ResponsiveContainer>
               <LineChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: -20 }}>
-                <CartesianGrid stroke="hsl(var(--border))" strokeOpacity={0.2} vertical={false} />
-                <XAxis dataKey="x" stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} axisLine={false} />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `R$${v}`} />
+                <CartesianGrid stroke="var(--border)" strokeOpacity={0.3} vertical={false} />
+                <XAxis dataKey="x" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+                <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `R$${v}`} />
                 <Tooltip
-                  contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }}
+                  contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--foreground)" }}
                   formatter={(v: number) => [`R$ ${v.toFixed(2)}`, "Saldo"]}
                 />
-                <Line type="monotone" dataKey="saldo" stroke="hsl(var(--gold))" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="saldo" stroke="var(--gold)" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
