@@ -13,12 +13,14 @@ import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MainRouteImport } from './routes/_main'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiSitemapDotxmlRouteImport } from './routes/api/sitemap[.]xml'
 import { Route as MainRankingRouteImport } from './routes/_main/ranking'
 import { Route as MainPerfilRouteImport } from './routes/_main/perfil'
 import { Route as MainHomeRouteImport } from './routes/_main/home'
 import { Route as MainGruposRouteImport } from './routes/_main/grupos'
 import { Route as MainChaveamentoRouteImport } from './routes/_main/chaveamento'
 import { Route as MainCarteiraRouteImport } from './routes/_main/carteira'
+import { Route as MainAjudaRouteImport } from './routes/_main/ajuda'
 import { Route as MainAdminRouteImport } from './routes/_main/admin'
 import { Route as MainAdminIndexRouteImport } from './routes/_main/admin.index'
 import { Route as MainAdminUsuariosRouteImport } from './routes/_main/admin.usuarios'
@@ -26,6 +28,7 @@ import { Route as MainAdminSaquesRouteImport } from './routes/_main/admin.saques
 import { Route as MainAdminRelatoriosRouteImport } from './routes/_main/admin.relatorios'
 import { Route as MainAdminPartidasRouteImport } from './routes/_main/admin.partidas'
 import { Route as MainAdminConfiguracoesRouteImport } from './routes/_main/admin.configuracoes'
+import { Route as MainAdminChecklistRouteImport } from './routes/_main/admin.checklist'
 import { Route as MainAdminAuditoriaRouteImport } from './routes/_main/admin.auditoria'
 import { Route as ApiPublicHooksSyncPartidasRouteImport } from './routes/api/public/hooks/sync-partidas'
 import { Route as MainAdminUsuariosIdRouteImport } from './routes/_main/admin.usuarios.$id'
@@ -47,6 +50,11 @@ const MainRoute = MainRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSitemapDotxmlRoute = ApiSitemapDotxmlRouteImport.update({
+  id: '/api/sitemap.xml',
+  path: '/api/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MainRankingRoute = MainRankingRouteImport.update({
@@ -77,6 +85,11 @@ const MainChaveamentoRoute = MainChaveamentoRouteImport.update({
 const MainCarteiraRoute = MainCarteiraRouteImport.update({
   id: '/carteira',
   path: '/carteira',
+  getParentRoute: () => MainRoute,
+} as any)
+const MainAjudaRoute = MainAjudaRouteImport.update({
+  id: '/ajuda',
+  path: '/ajuda',
   getParentRoute: () => MainRoute,
 } as any)
 const MainAdminRoute = MainAdminRouteImport.update({
@@ -114,6 +127,11 @@ const MainAdminConfiguracoesRoute = MainAdminConfiguracoesRouteImport.update({
   path: '/configuracoes',
   getParentRoute: () => MainAdminRoute,
 } as any)
+const MainAdminChecklistRoute = MainAdminChecklistRouteImport.update({
+  id: '/checklist',
+  path: '/checklist',
+  getParentRoute: () => MainAdminRoute,
+} as any)
 const MainAdminAuditoriaRoute = MainAdminAuditoriaRouteImport.update({
   id: '/auditoria',
   path: '/auditoria',
@@ -136,13 +154,16 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/admin': typeof MainAdminRouteWithChildren
+  '/ajuda': typeof MainAjudaRoute
   '/carteira': typeof MainCarteiraRoute
   '/chaveamento': typeof MainChaveamentoRoute
   '/grupos': typeof MainGruposRoute
   '/home': typeof MainHomeRoute
   '/perfil': typeof MainPerfilRoute
   '/ranking': typeof MainRankingRoute
+  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/admin/auditoria': typeof MainAdminAuditoriaRoute
+  '/admin/checklist': typeof MainAdminChecklistRoute
   '/admin/configuracoes': typeof MainAdminConfiguracoesRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
   '/admin/relatorios': typeof MainAdminRelatoriosRoute
@@ -156,13 +177,16 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/ajuda': typeof MainAjudaRoute
   '/carteira': typeof MainCarteiraRoute
   '/chaveamento': typeof MainChaveamentoRoute
   '/grupos': typeof MainGruposRoute
   '/home': typeof MainHomeRoute
   '/perfil': typeof MainPerfilRoute
   '/ranking': typeof MainRankingRoute
+  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/admin/auditoria': typeof MainAdminAuditoriaRoute
+  '/admin/checklist': typeof MainAdminChecklistRoute
   '/admin/configuracoes': typeof MainAdminConfiguracoesRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
   '/admin/relatorios': typeof MainAdminRelatoriosRoute
@@ -179,13 +203,16 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/_main/admin': typeof MainAdminRouteWithChildren
+  '/_main/ajuda': typeof MainAjudaRoute
   '/_main/carteira': typeof MainCarteiraRoute
   '/_main/chaveamento': typeof MainChaveamentoRoute
   '/_main/grupos': typeof MainGruposRoute
   '/_main/home': typeof MainHomeRoute
   '/_main/perfil': typeof MainPerfilRoute
   '/_main/ranking': typeof MainRankingRoute
+  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/_main/admin/auditoria': typeof MainAdminAuditoriaRoute
+  '/_main/admin/checklist': typeof MainAdminChecklistRoute
   '/_main/admin/configuracoes': typeof MainAdminConfiguracoesRoute
   '/_main/admin/partidas': typeof MainAdminPartidasRoute
   '/_main/admin/relatorios': typeof MainAdminRelatoriosRoute
@@ -202,13 +229,16 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/admin'
+    | '/ajuda'
     | '/carteira'
     | '/chaveamento'
     | '/grupos'
     | '/home'
     | '/perfil'
     | '/ranking'
+    | '/api/sitemap.xml'
     | '/admin/auditoria'
+    | '/admin/checklist'
     | '/admin/configuracoes'
     | '/admin/partidas'
     | '/admin/relatorios'
@@ -222,13 +252,16 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/onboarding'
+    | '/ajuda'
     | '/carteira'
     | '/chaveamento'
     | '/grupos'
     | '/home'
     | '/perfil'
     | '/ranking'
+    | '/api/sitemap.xml'
     | '/admin/auditoria'
+    | '/admin/checklist'
     | '/admin/configuracoes'
     | '/admin/partidas'
     | '/admin/relatorios'
@@ -244,13 +277,16 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/_main/admin'
+    | '/_main/ajuda'
     | '/_main/carteira'
     | '/_main/chaveamento'
     | '/_main/grupos'
     | '/_main/home'
     | '/_main/perfil'
     | '/_main/ranking'
+    | '/api/sitemap.xml'
     | '/_main/admin/auditoria'
+    | '/_main/admin/checklist'
     | '/_main/admin/configuracoes'
     | '/_main/admin/partidas'
     | '/_main/admin/relatorios'
@@ -266,6 +302,7 @@ export interface RootRouteChildren {
   MainRoute: typeof MainRouteWithChildren
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
+  ApiSitemapDotxmlRoute: typeof ApiSitemapDotxmlRoute
   ApiPublicHooksSyncPartidasRoute: typeof ApiPublicHooksSyncPartidasRoute
 }
 
@@ -297,6 +334,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/sitemap.xml': {
+      id: '/api/sitemap.xml'
+      path: '/api/sitemap.xml'
+      fullPath: '/api/sitemap.xml'
+      preLoaderRoute: typeof ApiSitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_main/ranking': {
@@ -339,6 +383,13 @@ declare module '@tanstack/react-router' {
       path: '/carteira'
       fullPath: '/carteira'
       preLoaderRoute: typeof MainCarteiraRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/ajuda': {
+      id: '/_main/ajuda'
+      path: '/ajuda'
+      fullPath: '/ajuda'
+      preLoaderRoute: typeof MainAjudaRouteImport
       parentRoute: typeof MainRoute
     }
     '/_main/admin': {
@@ -390,6 +441,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainAdminConfiguracoesRouteImport
       parentRoute: typeof MainAdminRoute
     }
+    '/_main/admin/checklist': {
+      id: '/_main/admin/checklist'
+      path: '/checklist'
+      fullPath: '/admin/checklist'
+      preLoaderRoute: typeof MainAdminChecklistRouteImport
+      parentRoute: typeof MainAdminRoute
+    }
     '/_main/admin/auditoria': {
       id: '/_main/admin/auditoria'
       path: '/auditoria'
@@ -427,6 +485,7 @@ const MainAdminUsuariosRouteWithChildren =
 
 interface MainAdminRouteChildren {
   MainAdminAuditoriaRoute: typeof MainAdminAuditoriaRoute
+  MainAdminChecklistRoute: typeof MainAdminChecklistRoute
   MainAdminConfiguracoesRoute: typeof MainAdminConfiguracoesRoute
   MainAdminPartidasRoute: typeof MainAdminPartidasRoute
   MainAdminRelatoriosRoute: typeof MainAdminRelatoriosRoute
@@ -437,6 +496,7 @@ interface MainAdminRouteChildren {
 
 const MainAdminRouteChildren: MainAdminRouteChildren = {
   MainAdminAuditoriaRoute: MainAdminAuditoriaRoute,
+  MainAdminChecklistRoute: MainAdminChecklistRoute,
   MainAdminConfiguracoesRoute: MainAdminConfiguracoesRoute,
   MainAdminPartidasRoute: MainAdminPartidasRoute,
   MainAdminRelatoriosRoute: MainAdminRelatoriosRoute,
@@ -451,6 +511,7 @@ const MainAdminRouteWithChildren = MainAdminRoute._addFileChildren(
 
 interface MainRouteChildren {
   MainAdminRoute: typeof MainAdminRouteWithChildren
+  MainAjudaRoute: typeof MainAjudaRoute
   MainCarteiraRoute: typeof MainCarteiraRoute
   MainChaveamentoRoute: typeof MainChaveamentoRoute
   MainGruposRoute: typeof MainGruposRoute
@@ -461,6 +522,7 @@ interface MainRouteChildren {
 
 const MainRouteChildren: MainRouteChildren = {
   MainAdminRoute: MainAdminRouteWithChildren,
+  MainAjudaRoute: MainAjudaRoute,
   MainCarteiraRoute: MainCarteiraRoute,
   MainChaveamentoRoute: MainChaveamentoRoute,
   MainGruposRoute: MainGruposRoute,
@@ -476,6 +538,7 @@ const rootRouteChildren: RootRouteChildren = {
   MainRoute: MainRouteWithChildren,
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
+  ApiSitemapDotxmlRoute: ApiSitemapDotxmlRoute,
   ApiPublicHooksSyncPartidasRoute: ApiPublicHooksSyncPartidasRoute,
 }
 export const routeTree = rootRouteImport

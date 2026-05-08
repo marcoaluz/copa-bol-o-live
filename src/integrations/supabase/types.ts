@@ -110,6 +110,63 @@ export type Database = {
           },
         ]
       }
+      checklist_lancamento: {
+        Row: {
+          categoria: string
+          concluido: boolean
+          concluido_em: string | null
+          concluido_por: string | null
+          created_at: string
+          descricao: string | null
+          id: string
+          observacao: string | null
+          ordem: number
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          categoria: string
+          concluido?: boolean
+          concluido_em?: string | null
+          concluido_por?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          observacao?: string | null
+          ordem?: number
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          categoria?: string
+          concluido?: boolean
+          concluido_em?: string | null
+          concluido_por?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          observacao?: string | null
+          ordem?: number
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_lancamento_concluido_por_fkey"
+            columns: ["concluido_por"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checklist_lancamento_concluido_por_fkey"
+            columns: ["concluido_por"]
+            isOneToOne: false
+            referencedRelation: "ranking_usuarios"
+            referencedColumns: ["usuario_id"]
+          },
+        ]
+      }
       config: {
         Row: {
           id: number
@@ -436,6 +493,77 @@ export type Database = {
           nome?: string
         }
         Relationships: []
+      }
+      suporte_mensagens: {
+        Row: {
+          assunto: string
+          created_at: string
+          email_contato: string
+          id: string
+          mensagem: string
+          respondido_em: string | null
+          respondido_por: string | null
+          resposta_admin: string | null
+          status: string
+          updated_at: string
+          usuario_id: string | null
+        }
+        Insert: {
+          assunto: string
+          created_at?: string
+          email_contato: string
+          id?: string
+          mensagem: string
+          respondido_em?: string | null
+          respondido_por?: string | null
+          resposta_admin?: string | null
+          status?: string
+          updated_at?: string
+          usuario_id?: string | null
+        }
+        Update: {
+          assunto?: string
+          created_at?: string
+          email_contato?: string
+          id?: string
+          mensagem?: string
+          respondido_em?: string | null
+          respondido_por?: string | null
+          resposta_admin?: string | null
+          status?: string
+          updated_at?: string
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suporte_mensagens_respondido_por_fkey"
+            columns: ["respondido_por"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suporte_mensagens_respondido_por_fkey"
+            columns: ["respondido_por"]
+            isOneToOne: false
+            referencedRelation: "ranking_usuarios"
+            referencedColumns: ["usuario_id"]
+          },
+          {
+            foreignKeyName: "suporte_mensagens_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suporte_mensagens_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_usuarios"
+            referencedColumns: ["usuario_id"]
+          },
+        ]
       }
       transacoes: {
         Row: {
