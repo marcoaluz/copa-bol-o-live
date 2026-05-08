@@ -23,6 +23,7 @@ function OnboardingPage() {
   const [cpf, setCpf] = useState("");
   const [aceitouTermos, setAceitouTermos] = useState(false);
   const [aceitouRisco, setAceitouRisco] = useState(false);
+  const [aceitouOperacional, setAceitouOperacional] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [erroIdade, setErroIdade] = useState(false);
   const [naoAutorizado, setNaoAutorizado] = useState(false);
@@ -54,6 +55,7 @@ function OnboardingPage() {
   const podeEnviar =
     aceitouTermos &&
     aceitouRisco &&
+    aceitouOperacional &&
     dataNasc.length === 10 &&
     isValidCpf(cpf) &&
     !submitting;
@@ -219,6 +221,23 @@ function OnboardingPage() {
                   trigger={<button type="button" className="underline text-foreground hover:text-gold">risco de perda total</button>}
                 />{" "}
                 e que não há garantia de ganho. Sou maior de 18 anos.
+              </span>
+            </label>
+
+            <label className="flex items-start gap-3 cursor-pointer">
+              <Checkbox
+                checked={aceitouOperacional}
+                onCheckedChange={(c) => setAceitouOperacional(c === true)}
+                className="mt-0.5"
+              />
+              <span className="text-sm text-muted-foreground leading-relaxed">
+                Entendi e concordo com o{" "}
+                <LegalModal
+                  title="Como o Bolão Funciona"
+                  src="/legal/operacional.md"
+                  trigger={<button type="button" className="underline text-foreground hover:text-gold">modelo operacional do bolão</button>}
+                />{" "}
+                (depósito/saque via PIX manual, sem fim lucrativo, sem taxa da casa).
               </span>
             </label>
           </div>
