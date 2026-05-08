@@ -1,5 +1,5 @@
 import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
-import { Home, Trophy, Users, BarChart3, User, Shield, Wallet, ChevronDown, LogOut, Settings, Coins } from "lucide-react";
+import { Home, Trophy, Users, BarChart3, User, Shield, Wallet, ChevronDown, LogOut, Settings, Coins, LifeBuoy } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,11 +17,11 @@ import { AlertTriangle } from "lucide-react";
 
 const navItems = [
   { to: "/home", label: "Home", icon: Home },
-  { to: "/chaveamento", label: "Chaveamento", icon: Trophy },
+  { to: "/chaveamento", label: "Chaveamento", icon: Trophy, tour: "bracket" },
   { to: "/grupos", label: "Grupos", icon: Users },
-  { to: "/ranking", label: "Ranking", icon: BarChart3 },
-  { to: "/carteira", label: "Carteira", icon: Coins },
-  { to: "/perfil", label: "Perfil", icon: User },
+  { to: "/ranking", label: "Ranking", icon: BarChart3, tour: "ranking" },
+  { to: "/carteira", label: "Carteira", icon: Coins, tour: "wallet" },
+  { to: "/perfil", label: "Perfil", icon: User, tour: "profile" },
 ] as const;
 
 function Logo() {
@@ -74,6 +74,9 @@ function UserMenu() {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link to="/perfil" className="cursor-pointer"><User className="w-4 h-4 mr-2" /> Meu perfil</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/ajuda" className="cursor-pointer"><LifeBuoy className="w-4 h-4 mr-2" /> Ajuda & suporte</Link>
         </DropdownMenuItem>
         {profile?.is_admin && (
           <DropdownMenuItem asChild>
@@ -131,6 +134,7 @@ function Sidebar() {
           <Link
             key={item.to}
             to={item.to}
+            data-tour={"tour" in item ? item.tour : undefined}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
               active
                 ? "bg-gradient-primary text-primary-foreground shadow-glow"
@@ -168,6 +172,7 @@ function BottomNav() {
             <Link
               key={item.to}
               to={item.to}
+              data-tour={"tour" in item ? item.tour : undefined}
               className={`flex flex-col items-center justify-center gap-1 transition-colors ${
                 active ? "text-primary" : "text-muted-foreground"
               }`}
