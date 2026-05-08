@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Shield, Users, Trophy, Settings, Banknote, Wallet, FileText, ClipboardList,
-  TrendingUp, AlertCircle,
+  TrendingUp, AlertCircle, MailPlus,
 } from "lucide-react";
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
@@ -24,6 +24,7 @@ const tiles = [
   { icon: Trophy, label: "Partidas", desc: "Lançar resultados e apurar", to: "/admin/partidas" as const },
   { icon: Banknote, label: "Saques", desc: "Aprovar acertos via PIX", to: "/admin/saques" as const },
   { icon: Users, label: "Usuários", desc: "Bloquear, ajustar saldo", to: "/admin/usuarios" as const },
+  { icon: MailPlus, label: "Convites", desc: "Allowlist do bolão privado", to: "/admin/convites" as const },
   { icon: Settings, label: "Configurações", desc: "Limites e manutenção", to: "/admin/configuracoes" as const },
   { icon: ClipboardList, label: "Auditoria", desc: "Log imutável de ações", to: "/admin/auditoria" as const },
   { icon: FileText, label: "Relatórios", desc: "Exportar CSV financeiro", to: "/admin/relatorios" as const },
@@ -53,6 +54,17 @@ function AdminPage() {
       const { data, error } = await (supabase as any).rpc("admin_top_partidas", { p_limite: 5 });
       if (error) throw error;
       return (data ?? []) as Array<{ partida_id: string; codigo: string; fase: string; data_hora: string; bolo_centavos: number; qtd_apostas: number }>;
+    },
+  });
+  const { data: convitesPendentes } = useQuery({
+    queryKey: ["admin", "convitesPendentes"],
+    queryFn: async () => {
+      const { count, error } = await (supabase as any)
+        .from("usuarios_autorizados")
+        .select("email", { count: "exact", head: true })
+        .eq("convite_aceito", false);
+      if (error) throw error;
+      return count ?? 0;
     },
   });
 
@@ -131,7 +143,12 @@ function AdminPage() {
           <Link key={t.label} to={t.to}>
             <Card className="bg-card border-border rounded-xl p-5 shadow-card hover:border-gold/50 transition-colors cursor-pointer h-full">
               <div className="w-10 h-10 rounded-lg bg-gold/15 flex items-center justify-center mb-3"><t.icon className="w-5 h-5 text-gold" /></div>
-              <h3 className="font-semibold mb-1">{t.label}</h3>
+              <h3 className="font-semibold mb-1 flex items-center gap-2">
+                {t.label}
+                {t.label === "Convites" && (convitesPendentes ?? 0) > 0 && (
+                  <Badge className="bg-gold text-gold-foreground">{convitesPendentes} pend.</Badge>
+                )}
+              </h3>
               <p className="text-sm text-muted-foreground">{t.desc}</p>
             </Card>
           </Link>
