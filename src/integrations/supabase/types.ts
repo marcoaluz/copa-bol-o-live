@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      apostas: {
+        Row: {
+          created_at: string
+          id: string
+          palpite: Database["public"]["Enums"]["palpite_aposta"]
+          partida_id: string
+          premio_centavos: number | null
+          status: Database["public"]["Enums"]["status_aposta"]
+          updated_at: string
+          usuario_id: string
+          valor_centavos: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          palpite: Database["public"]["Enums"]["palpite_aposta"]
+          partida_id: string
+          premio_centavos?: number | null
+          status?: Database["public"]["Enums"]["status_aposta"]
+          updated_at?: string
+          usuario_id: string
+          valor_centavos: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          palpite?: Database["public"]["Enums"]["palpite_aposta"]
+          partida_id?: string
+          premio_centavos?: number | null
+          status?: Database["public"]["Enums"]["status_aposta"]
+          updated_at?: string
+          usuario_id?: string
+          valor_centavos?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "apostas_partida_id_fkey"
+            columns: ["partida_id"]
+            isOneToOne: false
+            referencedRelation: "partidas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "apostas_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partidas: {
         Row: {
           bracket_proximo_id: string | null
@@ -182,6 +233,47 @@ export type Database = {
         }
         Relationships: []
       }
+      transacoes: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          id: string
+          referencia_id: string | null
+          saldo_apos_centavos: number
+          tipo: Database["public"]["Enums"]["tipo_transacao"]
+          usuario_id: string
+          valor_centavos: number
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          referencia_id?: string | null
+          saldo_apos_centavos: number
+          tipo: Database["public"]["Enums"]["tipo_transacao"]
+          usuario_id: string
+          valor_centavos: number
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          referencia_id?: string | null
+          saldo_apos_centavos?: number
+          tipo?: Database["public"]["Enums"]["tipo_transacao"]
+          usuario_id?: string
+          valor_centavos?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transacoes_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       classificacao_grupos: {
@@ -201,6 +293,31 @@ export type Database = {
       }
     }
     Functions: {
+      agora_servidor: { Args: never; Returns: string }
+      criar_ou_alterar_aposta: {
+        Args: {
+          p_palpite: Database["public"]["Enums"]["palpite_aposta"]
+          p_partida_id: string
+          p_valor_centavos: number
+        }
+        Returns: {
+          created_at: string
+          id: string
+          palpite: Database["public"]["Enums"]["palpite_aposta"]
+          partida_id: string
+          premio_centavos: number | null
+          status: Database["public"]["Enums"]["status_aposta"]
+          updated_at: string
+          usuario_id: string
+          valor_centavos: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "apostas"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
@@ -211,8 +328,17 @@ export type Database = {
         | "semi"
         | "terceiro"
         | "final"
+      palpite_aposta: "casa" | "empate" | "visitante"
       resultado_partida: "casa" | "empate" | "visitante"
+      status_aposta: "ativa" | "ganhou" | "perdeu" | "devolvida"
       status_partida: "agendada" | "ao_vivo" | "encerrada" | "cancelada"
+      tipo_transacao:
+        | "deposito"
+        | "aposta"
+        | "devolucao_aposta"
+        | "premio"
+        | "saque"
+        | "ajuste_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -348,8 +474,18 @@ export const Constants = {
         "terceiro",
         "final",
       ],
+      palpite_aposta: ["casa", "empate", "visitante"],
       resultado_partida: ["casa", "empate", "visitante"],
+      status_aposta: ["ativa", "ganhou", "perdeu", "devolvida"],
       status_partida: ["agendada", "ao_vivo", "encerrada", "cancelada"],
+      tipo_transacao: [
+        "deposito",
+        "aposta",
+        "devolucao_aposta",
+        "premio",
+        "saque",
+        "ajuste_admin",
+      ],
     },
   },
 } as const

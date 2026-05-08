@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { TeamLabel } from "@/components/TeamLabel";
 import { Calendar, MapPin } from "lucide-react";
 import { FASE_LABEL, type Partida, type Selecao } from "@/lib/tournament";
+import { BetDialog } from "@/components/BetDialog";
+import { CountdownPartida, useApostasEncerradas } from "@/components/CountdownPartida";
+import { useState } from "react";
 
 function fmtDate(d: string) {
   return new Date(d).toLocaleString("pt-BR", {
@@ -26,10 +29,12 @@ export function MatchDetailDialog({
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) {
+  const [betOpen, setBetOpen] = useState(false);
+  const encerrada = partida?.status === "encerrada";
+  const apostasFechadas = useApostasEncerradas(partida?.data_hora);
   if (!partida) return null;
   const casa = partida.selecao_casa_id ? sMap[partida.selecao_casa_id] : undefined;
   const visitante = partida.selecao_visitante_id ? sMap[partida.selecao_visitante_id] : undefined;
-  const encerrada = partida.status === "encerrada";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -74,14 +79,21 @@ export function MatchDetailDialog({
               <span>{partida.estadio}</span>
             </div>
           )}
+          {!encerrada && (
+            <div className="text-xs">
+              <CountdownPartida dataHora={partida.data_hora} />
+            </div>
+          )}
         </div>
 
         <Button
-          disabled={encerrada || !casa || !visitante}
+          disabled={encerrada || apostasFechadas || !casa || !visitante}
+          onClick={() => setBetOpen(true)}
           className="w-full mt-4 bg-gradient-primary shadow-glow font-semibold"
         >
-          {encerrada ? "Partida encerrada" : "Apostar nesta partida"}
+          {encerrada ? "Partida encerrada" : apostasFechadas ? "Apostas encerradas" : "Apostar nesta partida"}
         </Button>
+        <BetDialog partida={partida} sMap={sMap} open={betOpen} onOpenChange={setBetOpen} />
       </DialogContent>
     </Dialog>
   );

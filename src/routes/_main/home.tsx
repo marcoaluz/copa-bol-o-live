@@ -8,6 +8,7 @@ import { Clock, Trophy } from "lucide-react";
 import { TeamLabel } from "@/components/TeamLabel";
 import { MatchDetailDialog } from "@/components/MatchDetailDialog";
 import { useSelecoes, usePartidas, selecaoMap, FASE_LABEL, type Partida } from "@/lib/tournament";
+import { useApostasEncerradas } from "@/components/CountdownPartida";
 
 export const Route = createFileRoute("/_main/home")({
   head: () => ({ meta: [{ title: "Home — Copa Bolão 2026" }] }),
@@ -185,8 +186,15 @@ function MatchCard({
           onOpen(partida);
         }}
       >
-        {encerrada ? "Encerrada" : "Apostar"}
+        <ApostarBtnLabel partida={partida} encerrada={encerrada} />
       </Button>
     </Card>
   );
+}
+
+function ApostarBtnLabel({ partida, encerrada }: { partida: Partida; encerrada: boolean }) {
+  const fechadas = useApostasEncerradas(partida.data_hora);
+  if (encerrada) return <>Encerrada</>;
+  if (fechadas) return <span className="text-muted-foreground">Apostas encerradas</span>;
+  return <>Apostar</>;
 }
