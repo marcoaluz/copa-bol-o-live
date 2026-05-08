@@ -21,6 +21,7 @@ import { Route as MainChaveamentoRouteImport } from './routes/_main/chaveamento'
 import { Route as MainCarteiraRouteImport } from './routes/_main/carteira'
 import { Route as MainAdminRouteImport } from './routes/_main/admin'
 import { Route as MainAdminIndexRouteImport } from './routes/_main/admin.index'
+import { Route as MainAdminUsuariosRouteImport } from './routes/_main/admin.usuarios'
 import { Route as MainAdminSaquesRouteImport } from './routes/_main/admin.saques'
 import { Route as MainAdminPartidasRouteImport } from './routes/_main/admin.partidas'
 import { Route as ApiPublicHooksSyncPartidasRouteImport } from './routes/api/public/hooks/sync-partidas'
@@ -84,6 +85,11 @@ const MainAdminIndexRoute = MainAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => MainAdminRoute,
 } as any)
+const MainAdminUsuariosRoute = MainAdminUsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => MainAdminRoute,
+} as any)
 const MainAdminSaquesRoute = MainAdminSaquesRouteImport.update({
   id: '/saques',
   path: '/saques',
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/ranking': typeof MainRankingRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
   '/admin/saques': typeof MainAdminSaquesRoute
+  '/admin/usuarios': typeof MainAdminUsuariosRoute
   '/admin/': typeof MainAdminIndexRoute
   '/api/public/hooks/sync-partidas': typeof ApiPublicHooksSyncPartidasRoute
 }
@@ -129,6 +136,7 @@ export interface FileRoutesByTo {
   '/ranking': typeof MainRankingRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
   '/admin/saques': typeof MainAdminSaquesRoute
+  '/admin/usuarios': typeof MainAdminUsuariosRoute
   '/admin': typeof MainAdminIndexRoute
   '/api/public/hooks/sync-partidas': typeof ApiPublicHooksSyncPartidasRoute
 }
@@ -147,6 +155,7 @@ export interface FileRoutesById {
   '/_main/ranking': typeof MainRankingRoute
   '/_main/admin/partidas': typeof MainAdminPartidasRoute
   '/_main/admin/saques': typeof MainAdminSaquesRoute
+  '/_main/admin/usuarios': typeof MainAdminUsuariosRoute
   '/_main/admin/': typeof MainAdminIndexRoute
   '/api/public/hooks/sync-partidas': typeof ApiPublicHooksSyncPartidasRoute
 }
@@ -165,6 +174,7 @@ export interface FileRouteTypes {
     | '/ranking'
     | '/admin/partidas'
     | '/admin/saques'
+    | '/admin/usuarios'
     | '/admin/'
     | '/api/public/hooks/sync-partidas'
   fileRoutesByTo: FileRoutesByTo
@@ -180,6 +190,7 @@ export interface FileRouteTypes {
     | '/ranking'
     | '/admin/partidas'
     | '/admin/saques'
+    | '/admin/usuarios'
     | '/admin'
     | '/api/public/hooks/sync-partidas'
   id:
@@ -197,6 +208,7 @@ export interface FileRouteTypes {
     | '/_main/ranking'
     | '/_main/admin/partidas'
     | '/_main/admin/saques'
+    | '/_main/admin/usuarios'
     | '/_main/admin/'
     | '/api/public/hooks/sync-partidas'
   fileRoutesById: FileRoutesById
@@ -295,6 +307,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainAdminIndexRouteImport
       parentRoute: typeof MainAdminRoute
     }
+    '/_main/admin/usuarios': {
+      id: '/_main/admin/usuarios'
+      path: '/usuarios'
+      fullPath: '/admin/usuarios'
+      preLoaderRoute: typeof MainAdminUsuariosRouteImport
+      parentRoute: typeof MainAdminRoute
+    }
     '/_main/admin/saques': {
       id: '/_main/admin/saques'
       path: '/saques'
@@ -322,12 +341,14 @@ declare module '@tanstack/react-router' {
 interface MainAdminRouteChildren {
   MainAdminPartidasRoute: typeof MainAdminPartidasRoute
   MainAdminSaquesRoute: typeof MainAdminSaquesRoute
+  MainAdminUsuariosRoute: typeof MainAdminUsuariosRoute
   MainAdminIndexRoute: typeof MainAdminIndexRoute
 }
 
 const MainAdminRouteChildren: MainAdminRouteChildren = {
   MainAdminPartidasRoute: MainAdminPartidasRoute,
   MainAdminSaquesRoute: MainAdminSaquesRoute,
+  MainAdminUsuariosRoute: MainAdminUsuariosRoute,
   MainAdminIndexRoute: MainAdminIndexRoute,
 }
 
@@ -367,3 +388,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
