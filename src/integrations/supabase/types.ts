@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      api_sync_log: {
+        Row: {
+          detalhes: Json | null
+          erro: string | null
+          finalizado_em: string | null
+          fonte: string
+          id: string
+          iniciado_em: string
+          partidas_atualizadas: number
+          partidas_inseridas: number
+          requests_consumidos: number
+          selecoes_atualizadas: number
+          selecoes_inseridas: number
+          status: string
+        }
+        Insert: {
+          detalhes?: Json | null
+          erro?: string | null
+          finalizado_em?: string | null
+          fonte?: string
+          id?: string
+          iniciado_em?: string
+          partidas_atualizadas?: number
+          partidas_inseridas?: number
+          requests_consumidos?: number
+          selecoes_atualizadas?: number
+          selecoes_inseridas?: number
+          status?: string
+        }
+        Update: {
+          detalhes?: Json | null
+          erro?: string | null
+          finalizado_em?: string | null
+          fonte?: string
+          id?: string
+          iniciado_em?: string
+          partidas_atualizadas?: number
+          partidas_inseridas?: number
+          requests_consumidos?: number
+          selecoes_atualizadas?: number
+          selecoes_inseridas?: number
+          status?: string
+        }
+        Relationships: []
+      }
       apostas: {
         Row: {
           created_at: string
@@ -230,6 +275,11 @@ export type Database = {
       }
       config: {
         Row: {
+          api_football_league_id: number
+          api_football_season: number
+          api_football_sync_ativo: boolean
+          api_football_ultimo_erro: string | null
+          api_football_ultimo_sync: string | null
           chave_pix_admin: string
           deposito_maximo_centavos: number
           deposito_maximo_mensal_centavos: number
@@ -252,6 +302,11 @@ export type Database = {
           valor_minimo_saque_centavos: number
         }
         Insert: {
+          api_football_league_id?: number
+          api_football_season?: number
+          api_football_sync_ativo?: boolean
+          api_football_ultimo_erro?: string | null
+          api_football_ultimo_sync?: string | null
           chave_pix_admin?: string
           deposito_maximo_centavos?: number
           deposito_maximo_mensal_centavos?: number
@@ -274,6 +329,11 @@ export type Database = {
           valor_minimo_saque_centavos?: number
         }
         Update: {
+          api_football_league_id?: number
+          api_football_season?: number
+          api_football_sync_ativo?: boolean
+          api_football_ultimo_erro?: string | null
+          api_football_ultimo_sync?: string | null
           chave_pix_admin?: string
           deposito_maximo_centavos?: number
           deposito_maximo_mensal_centavos?: number
@@ -460,6 +520,7 @@ export type Database = {
       }
       partidas: {
         Row: {
+          api_fixture_id: number | null
           bolo_acumulado_centavos: number
           bracket_proximo_id: string | null
           codigo: string | null
@@ -478,10 +539,12 @@ export type Database = {
           resultado: Database["public"]["Enums"]["resultado_partida"] | null
           selecao_casa_id: string | null
           selecao_visitante_id: string | null
+          sincronizada_em: string | null
           status: Database["public"]["Enums"]["status_partida"]
           updated_at: string
         }
         Insert: {
+          api_fixture_id?: number | null
           bolo_acumulado_centavos?: number
           bracket_proximo_id?: string | null
           codigo?: string | null
@@ -500,10 +563,12 @@ export type Database = {
           resultado?: Database["public"]["Enums"]["resultado_partida"] | null
           selecao_casa_id?: string | null
           selecao_visitante_id?: string | null
+          sincronizada_em?: string | null
           status?: Database["public"]["Enums"]["status_partida"]
           updated_at?: string
         }
         Update: {
+          api_fixture_id?: number | null
           bolo_acumulado_centavos?: number
           bracket_proximo_id?: string | null
           codigo?: string | null
@@ -522,6 +587,7 @@ export type Database = {
           resultado?: Database["public"]["Enums"]["resultado_partida"] | null
           selecao_casa_id?: string | null
           selecao_visitante_id?: string | null
+          sincronizada_em?: string | null
           status?: Database["public"]["Enums"]["status_partida"]
           updated_at?: string
         }
@@ -673,6 +739,7 @@ export type Database = {
       }
       selecoes: {
         Row: {
+          api_team_id: number | null
           bandeira_url: string | null
           codigo_iso: string
           created_at: string
@@ -681,6 +748,7 @@ export type Database = {
           nome: string
         }
         Insert: {
+          api_team_id?: number | null
           bandeira_url?: string | null
           codigo_iso: string
           created_at?: string
@@ -689,6 +757,7 @@ export type Database = {
           nome: string
         }
         Update: {
+          api_team_id?: number | null
           bandeira_url?: string | null
           codigo_iso?: string
           created_at?: string
@@ -933,6 +1002,7 @@ export type Database = {
           p_status: Database["public"]["Enums"]["status_partida"]
         }
         Returns: {
+          api_fixture_id: number | null
           bolo_acumulado_centavos: number
           bracket_proximo_id: string | null
           codigo: string | null
@@ -951,6 +1021,7 @@ export type Database = {
           resultado: Database["public"]["Enums"]["resultado_partida"] | null
           selecao_casa_id: string | null
           selecao_visitante_id: string | null
+          sincronizada_em: string | null
           status: Database["public"]["Enums"]["status_partida"]
           updated_at: string
         }
@@ -995,6 +1066,7 @@ export type Database = {
       cancelar_partida: {
         Args: { p_id: string }
         Returns: {
+          api_fixture_id: number | null
           bolo_acumulado_centavos: number
           bracket_proximo_id: string | null
           codigo: string | null
@@ -1013,6 +1085,7 @@ export type Database = {
           resultado: Database["public"]["Enums"]["resultado_partida"] | null
           selecao_casa_id: string | null
           selecao_visitante_id: string | null
+          sincronizada_em: string | null
           status: Database["public"]["Enums"]["status_partida"]
           updated_at: string
         }
@@ -1107,6 +1180,7 @@ export type Database = {
       lancar_resultado_partida: {
         Args: { p_gols_casa: number; p_gols_visitante: number; p_id: string }
         Returns: {
+          api_fixture_id: number | null
           bolo_acumulado_centavos: number
           bracket_proximo_id: string | null
           codigo: string | null
@@ -1125,6 +1199,7 @@ export type Database = {
           resultado: Database["public"]["Enums"]["resultado_partida"] | null
           selecao_casa_id: string | null
           selecao_visitante_id: string | null
+          sincronizada_em: string | null
           status: Database["public"]["Enums"]["status_partida"]
           updated_at: string
         }
@@ -1141,6 +1216,7 @@ export type Database = {
         Returns: undefined
       }
       marcar_notificacoes_lidas: { Args: { p_ids?: string[] }; Returns: number }
+      preparar_para_sync_real: { Args: never; Returns: Json }
       processar_deposito: {
         Args: {
           p_acao: string
