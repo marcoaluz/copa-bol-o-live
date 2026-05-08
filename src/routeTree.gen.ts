@@ -18,6 +18,7 @@ import { Route as MainPerfilRouteImport } from './routes/_main/perfil'
 import { Route as MainHomeRouteImport } from './routes/_main/home'
 import { Route as MainGruposRouteImport } from './routes/_main/grupos'
 import { Route as MainChaveamentoRouteImport } from './routes/_main/chaveamento'
+import { Route as MainAdminRouteImport } from './routes/_main/admin'
 import { Route as MainAdminIndexRouteImport } from './routes/_main/admin.index'
 import { Route as MainAdminPartidasRouteImport } from './routes/_main/admin.partidas'
 
@@ -65,21 +66,27 @@ const MainChaveamentoRoute = MainChaveamentoRouteImport.update({
   path: '/chaveamento',
   getParentRoute: () => MainRoute,
 } as any)
-const MainAdminIndexRoute = MainAdminIndexRouteImport.update({
-  id: '/admin/',
-  path: '/admin/',
+const MainAdminRoute = MainAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => MainRoute,
 } as any)
+const MainAdminIndexRoute = MainAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MainAdminRoute,
+} as any)
 const MainAdminPartidasRoute = MainAdminPartidasRouteImport.update({
-  id: '/admin/partidas',
-  path: '/admin/partidas',
-  getParentRoute: () => MainRoute,
+  id: '/partidas',
+  path: '/partidas',
+  getParentRoute: () => MainAdminRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/admin': typeof MainAdminRouteWithChildren
   '/chaveamento': typeof MainChaveamentoRoute
   '/grupos': typeof MainGruposRoute
   '/home': typeof MainHomeRoute
@@ -106,6 +113,7 @@ export interface FileRoutesById {
   '/_main': typeof MainRouteWithChildren
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/_main/admin': typeof MainAdminRouteWithChildren
   '/_main/chaveamento': typeof MainChaveamentoRoute
   '/_main/grupos': typeof MainGruposRoute
   '/_main/home': typeof MainHomeRoute
@@ -120,6 +128,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/onboarding'
+    | '/admin'
     | '/chaveamento'
     | '/grupos'
     | '/home'
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | '/_main'
     | '/login'
     | '/onboarding'
+    | '/_main/admin'
     | '/_main/chaveamento'
     | '/_main/grupos'
     | '/_main/home'
@@ -226,41 +236,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainChaveamentoRouteImport
       parentRoute: typeof MainRoute
     }
+    '/_main/admin': {
+      id: '/_main/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof MainAdminRouteImport
+      parentRoute: typeof MainRoute
+    }
     '/_main/admin/': {
       id: '/_main/admin/'
-      path: '/admin'
+      path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof MainAdminIndexRouteImport
-      parentRoute: typeof MainRoute
+      parentRoute: typeof MainAdminRoute
     }
     '/_main/admin/partidas': {
       id: '/_main/admin/partidas'
-      path: '/admin/partidas'
+      path: '/partidas'
       fullPath: '/admin/partidas'
       preLoaderRoute: typeof MainAdminPartidasRouteImport
-      parentRoute: typeof MainRoute
+      parentRoute: typeof MainAdminRoute
     }
   }
 }
 
+interface MainAdminRouteChildren {
+  MainAdminPartidasRoute: typeof MainAdminPartidasRoute
+  MainAdminIndexRoute: typeof MainAdminIndexRoute
+}
+
+const MainAdminRouteChildren: MainAdminRouteChildren = {
+  MainAdminPartidasRoute: MainAdminPartidasRoute,
+  MainAdminIndexRoute: MainAdminIndexRoute,
+}
+
+const MainAdminRouteWithChildren = MainAdminRoute._addFileChildren(
+  MainAdminRouteChildren,
+)
+
 interface MainRouteChildren {
+  MainAdminRoute: typeof MainAdminRouteWithChildren
   MainChaveamentoRoute: typeof MainChaveamentoRoute
   MainGruposRoute: typeof MainGruposRoute
   MainHomeRoute: typeof MainHomeRoute
   MainPerfilRoute: typeof MainPerfilRoute
   MainRankingRoute: typeof MainRankingRoute
-  MainAdminPartidasRoute: typeof MainAdminPartidasRoute
-  MainAdminIndexRoute: typeof MainAdminIndexRoute
 }
 
 const MainRouteChildren: MainRouteChildren = {
+  MainAdminRoute: MainAdminRouteWithChildren,
   MainChaveamentoRoute: MainChaveamentoRoute,
   MainGruposRoute: MainGruposRoute,
   MainHomeRoute: MainHomeRoute,
   MainPerfilRoute: MainPerfilRoute,
   MainRankingRoute: MainRankingRoute,
-  MainAdminPartidasRoute: MainAdminPartidasRoute,
-  MainAdminIndexRoute: MainAdminIndexRoute,
 }
 
 const MainRouteWithChildren = MainRoute._addFileChildren(MainRouteChildren)
