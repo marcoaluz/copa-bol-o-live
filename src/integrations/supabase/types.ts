@@ -72,6 +72,67 @@ export type Database = {
           },
         ]
       }
+      apostas_placar: {
+        Row: {
+          created_at: string
+          gols_casa_palpite: number
+          gols_visitante_palpite: number
+          id: string
+          partida_id: string
+          premio_centavos: number
+          status: string
+          updated_at: string
+          usuario_id: string
+          valor_centavos: number
+        }
+        Insert: {
+          created_at?: string
+          gols_casa_palpite: number
+          gols_visitante_palpite: number
+          id?: string
+          partida_id: string
+          premio_centavos?: number
+          status?: string
+          updated_at?: string
+          usuario_id: string
+          valor_centavos: number
+        }
+        Update: {
+          created_at?: string
+          gols_casa_palpite?: number
+          gols_visitante_palpite?: number
+          id?: string
+          partida_id?: string
+          premio_centavos?: number
+          status?: string
+          updated_at?: string
+          usuario_id?: string
+          valor_centavos?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "apostas_placar_partida_id_fkey"
+            columns: ["partida_id"]
+            isOneToOne: false
+            referencedRelation: "partidas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "apostas_placar_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "apostas_placar_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_usuarios"
+            referencedColumns: ["usuario_id"]
+          },
+        ]
+      }
       audit_log: {
         Row: {
           acao: string
@@ -927,6 +988,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      cancelar_aposta_placar: {
+        Args: { p_aposta_id: string }
+        Returns: undefined
+      }
       cancelar_partida: {
         Args: { p_id: string }
         Returns: {
@@ -979,6 +1044,32 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "apostas"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      criar_ou_alterar_aposta_placar: {
+        Args: {
+          p_gols_casa: number
+          p_gols_visitante: number
+          p_partida_id: string
+          p_valor_centavos: number
+        }
+        Returns: {
+          created_at: string
+          gols_casa_palpite: number
+          gols_visitante_palpite: number
+          id: string
+          partida_id: string
+          premio_centavos: number
+          status: string
+          updated_at: string
+          usuario_id: string
+          valor_centavos: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "apostas_placar"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -1116,11 +1207,14 @@ export type Database = {
           apelido: string
           foto_url: string
           lucro_centavos: number
+          pontos_ranking: number
           posicao: number
           taxa_acerto: number
           total_acertos: number
+          total_acertos_placar: number
           total_apostado_centavos: number
           total_apostas: number
+          total_apostas_placar: number
           total_ganho_centavos: number
           usuario_id: string
         }[]
