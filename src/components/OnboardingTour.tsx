@@ -47,7 +47,7 @@ export function OnboardingTour() {
       styles={{
         overlay: { backgroundColor: "rgba(0,0,0,0.6)" },
         tooltip: { backgroundColor: "hsl(var(--card))", color: "hsl(var(--foreground))", borderRadius: 12 },
-        buttonNext: { backgroundColor: "hsl(var(--primary))", color: "hsl(var(--primary-foreground))" },
+        buttonPrimary: { backgroundColor: "hsl(var(--primary))", color: "hsl(var(--primary-foreground))" },
         buttonBack: { color: "hsl(var(--muted-foreground))" },
       }}
     />
