@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Shield, Users, Trophy, Settings, Banknote, Wallet, FileText, ClipboardList,
-  TrendingUp, AlertCircle, MailPlus, ArrowDownCircle, Scale, Bell,
+  TrendingUp, AlertCircle, MailPlus, ArrowDownCircle, Scale, Bell, RefreshCw,
 } from "lucide-react";
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
@@ -31,6 +31,7 @@ const tiles = [
   { icon: ClipboardList, label: "Auditoria", desc: "Log imutável de ações", to: "/admin/auditoria" as const },
   { icon: FileText, label: "Relatórios", desc: "Exportar CSV financeiro", to: "/admin/relatorios" as const },
   { icon: Bell, label: "Notificações", desc: "Avisos por e-mail e Telegram", to: "/admin/notificacoes" as const },
+  { icon: RefreshCw, label: "Sync API", desc: "Dados reais da Copa 2026", to: "/admin/sync" as const },
   { icon: ClipboardList, label: "Checklist", desc: "Pré-lançamento", to: "/admin/checklist" as const },
 ];
 

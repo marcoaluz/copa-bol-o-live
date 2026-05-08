@@ -24,6 +24,7 @@ import { Route as MainAjudaRouteImport } from './routes/_main/ajuda'
 import { Route as MainAdminRouteImport } from './routes/_main/admin'
 import { Route as MainAdminIndexRouteImport } from './routes/_main/admin.index'
 import { Route as MainAdminUsuariosRouteImport } from './routes/_main/admin.usuarios'
+import { Route as MainAdminSyncRouteImport } from './routes/_main/admin.sync'
 import { Route as MainAdminSaquesRouteImport } from './routes/_main/admin.saques'
 import { Route as MainAdminRelatoriosRouteImport } from './routes/_main/admin.relatorios'
 import { Route as MainAdminPartidasRouteImport } from './routes/_main/admin.partidas'
@@ -111,6 +112,11 @@ const MainAdminUsuariosRoute = MainAdminUsuariosRouteImport.update({
   path: '/usuarios',
   getParentRoute: () => MainAdminRoute,
 } as any)
+const MainAdminSyncRoute = MainAdminSyncRouteImport.update({
+  id: '/sync',
+  path: '/sync',
+  getParentRoute: () => MainAdminRoute,
+} as any)
 const MainAdminSaquesRoute = MainAdminSaquesRouteImport.update({
   id: '/saques',
   path: '/saques',
@@ -196,6 +202,7 @@ export interface FileRoutesByFullPath {
   '/admin/partidas': typeof MainAdminPartidasRoute
   '/admin/relatorios': typeof MainAdminRelatoriosRoute
   '/admin/saques': typeof MainAdminSaquesRoute
+  '/admin/sync': typeof MainAdminSyncRoute
   '/admin/usuarios': typeof MainAdminUsuariosRouteWithChildren
   '/admin/': typeof MainAdminIndexRoute
   '/admin/usuarios/$id': typeof MainAdminUsuariosIdRoute
@@ -223,6 +230,7 @@ export interface FileRoutesByTo {
   '/admin/partidas': typeof MainAdminPartidasRoute
   '/admin/relatorios': typeof MainAdminRelatoriosRoute
   '/admin/saques': typeof MainAdminSaquesRoute
+  '/admin/sync': typeof MainAdminSyncRoute
   '/admin/usuarios': typeof MainAdminUsuariosRouteWithChildren
   '/admin': typeof MainAdminIndexRoute
   '/admin/usuarios/$id': typeof MainAdminUsuariosIdRoute
@@ -253,6 +261,7 @@ export interface FileRoutesById {
   '/_main/admin/partidas': typeof MainAdminPartidasRoute
   '/_main/admin/relatorios': typeof MainAdminRelatoriosRoute
   '/_main/admin/saques': typeof MainAdminSaquesRoute
+  '/_main/admin/sync': typeof MainAdminSyncRoute
   '/_main/admin/usuarios': typeof MainAdminUsuariosRouteWithChildren
   '/_main/admin/': typeof MainAdminIndexRoute
   '/_main/admin/usuarios/$id': typeof MainAdminUsuariosIdRoute
@@ -283,6 +292,7 @@ export interface FileRouteTypes {
     | '/admin/partidas'
     | '/admin/relatorios'
     | '/admin/saques'
+    | '/admin/sync'
     | '/admin/usuarios'
     | '/admin/'
     | '/admin/usuarios/$id'
@@ -310,6 +320,7 @@ export interface FileRouteTypes {
     | '/admin/partidas'
     | '/admin/relatorios'
     | '/admin/saques'
+    | '/admin/sync'
     | '/admin/usuarios'
     | '/admin'
     | '/admin/usuarios/$id'
@@ -339,6 +350,7 @@ export interface FileRouteTypes {
     | '/_main/admin/partidas'
     | '/_main/admin/relatorios'
     | '/_main/admin/saques'
+    | '/_main/admin/sync'
     | '/_main/admin/usuarios'
     | '/_main/admin/'
     | '/_main/admin/usuarios/$id'
@@ -461,6 +473,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainAdminUsuariosRouteImport
       parentRoute: typeof MainAdminRoute
     }
+    '/_main/admin/sync': {
+      id: '/_main/admin/sync'
+      path: '/sync'
+      fullPath: '/admin/sync'
+      preLoaderRoute: typeof MainAdminSyncRouteImport
+      parentRoute: typeof MainAdminRoute
+    }
     '/_main/admin/saques': {
       id: '/_main/admin/saques'
       path: '/saques'
@@ -570,6 +589,7 @@ interface MainAdminRouteChildren {
   MainAdminPartidasRoute: typeof MainAdminPartidasRoute
   MainAdminRelatoriosRoute: typeof MainAdminRelatoriosRoute
   MainAdminSaquesRoute: typeof MainAdminSaquesRoute
+  MainAdminSyncRoute: typeof MainAdminSyncRoute
   MainAdminUsuariosRoute: typeof MainAdminUsuariosRouteWithChildren
   MainAdminIndexRoute: typeof MainAdminIndexRoute
 }
@@ -585,6 +605,7 @@ const MainAdminRouteChildren: MainAdminRouteChildren = {
   MainAdminPartidasRoute: MainAdminPartidasRoute,
   MainAdminRelatoriosRoute: MainAdminRelatoriosRoute,
   MainAdminSaquesRoute: MainAdminSaquesRoute,
+  MainAdminSyncRoute: MainAdminSyncRoute,
   MainAdminUsuariosRoute: MainAdminUsuariosRouteWithChildren,
   MainAdminIndexRoute: MainAdminIndexRoute,
 }
