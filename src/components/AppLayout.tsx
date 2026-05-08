@@ -158,7 +158,7 @@ function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 h-16 border-t border-border bg-background/95 backdrop-blur-lg">
-      <div className="grid grid-cols-5 h-full">
+      <div className="grid grid-cols-6 h-full">
         {navItems.map((item) => {
           const active = pathname === item.to;
           return (
