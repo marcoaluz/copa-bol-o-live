@@ -45,14 +45,10 @@ export function OnboardingTour() {
       callback={onCallback}
       locale={{ back: "Voltar", close: "Fechar", last: "Pronto", next: "Próximo", skip: "Pular" }}
       styles={{
-        options: {
-          primaryColor: "hsl(var(--primary))",
-          backgroundColor: "hsl(var(--card))",
-          textColor: "hsl(var(--foreground))",
-          arrowColor: "hsl(var(--card))",
-          overlayColor: "rgba(0,0,0,0.6)",
-          zIndex: 9999,
-        },
+        overlay: { backgroundColor: "rgba(0,0,0,0.6)" },
+        tooltip: { backgroundColor: "hsl(var(--card))", color: "hsl(var(--foreground))", borderRadius: 12 },
+        buttonNext: { backgroundColor: "hsl(var(--primary))", color: "hsl(var(--primary-foreground))" },
+        buttonBack: { color: "hsl(var(--muted-foreground))" },
       }}
     />
   );
