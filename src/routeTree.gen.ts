@@ -9,38 +9,149 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as MainRouteImport } from './routes/_main'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MainRankingRouteImport } from './routes/_main/ranking'
+import { Route as MainPerfilRouteImport } from './routes/_main/perfil'
+import { Route as MainHomeRouteImport } from './routes/_main/home'
+import { Route as MainGruposRouteImport } from './routes/_main/grupos'
+import { Route as MainChaveamentoRouteImport } from './routes/_main/chaveamento'
+import { Route as MainAdminRouteImport } from './routes/_main/admin'
 
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MainRoute = MainRouteImport.update({
+  id: '/_main',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MainRankingRoute = MainRankingRouteImport.update({
+  id: '/ranking',
+  path: '/ranking',
+  getParentRoute: () => MainRoute,
+} as any)
+const MainPerfilRoute = MainPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => MainRoute,
+} as any)
+const MainHomeRoute = MainHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => MainRoute,
+} as any)
+const MainGruposRoute = MainGruposRouteImport.update({
+  id: '/grupos',
+  path: '/grupos',
+  getParentRoute: () => MainRoute,
+} as any)
+const MainChaveamentoRoute = MainChaveamentoRouteImport.update({
+  id: '/chaveamento',
+  path: '/chaveamento',
+  getParentRoute: () => MainRoute,
+} as any)
+const MainAdminRoute = MainAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => MainRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/admin': typeof MainAdminRoute
+  '/chaveamento': typeof MainChaveamentoRoute
+  '/grupos': typeof MainGruposRoute
+  '/home': typeof MainHomeRoute
+  '/perfil': typeof MainPerfilRoute
+  '/ranking': typeof MainRankingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/admin': typeof MainAdminRoute
+  '/chaveamento': typeof MainChaveamentoRoute
+  '/grupos': typeof MainGruposRoute
+  '/home': typeof MainHomeRoute
+  '/perfil': typeof MainPerfilRoute
+  '/ranking': typeof MainRankingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_main': typeof MainRouteWithChildren
+  '/login': typeof LoginRoute
+  '/_main/admin': typeof MainAdminRoute
+  '/_main/chaveamento': typeof MainChaveamentoRoute
+  '/_main/grupos': typeof MainGruposRoute
+  '/_main/home': typeof MainHomeRoute
+  '/_main/perfil': typeof MainPerfilRoute
+  '/_main/ranking': typeof MainRankingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/admin'
+    | '/chaveamento'
+    | '/grupos'
+    | '/home'
+    | '/perfil'
+    | '/ranking'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/admin'
+    | '/chaveamento'
+    | '/grupos'
+    | '/home'
+    | '/perfil'
+    | '/ranking'
+  id:
+    | '__root__'
+    | '/'
+    | '/_main'
+    | '/login'
+    | '/_main/admin'
+    | '/_main/chaveamento'
+    | '/_main/grupos'
+    | '/_main/home'
+    | '/_main/perfil'
+    | '/_main/ranking'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  MainRoute: typeof MainRouteWithChildren
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_main': {
+      id: '/_main'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof MainRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +159,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_main/ranking': {
+      id: '/_main/ranking'
+      path: '/ranking'
+      fullPath: '/ranking'
+      preLoaderRoute: typeof MainRankingRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/perfil': {
+      id: '/_main/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof MainPerfilRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/home': {
+      id: '/_main/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof MainHomeRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/grupos': {
+      id: '/_main/grupos'
+      path: '/grupos'
+      fullPath: '/grupos'
+      preLoaderRoute: typeof MainGruposRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/chaveamento': {
+      id: '/_main/chaveamento'
+      path: '/chaveamento'
+      fullPath: '/chaveamento'
+      preLoaderRoute: typeof MainChaveamentoRouteImport
+      parentRoute: typeof MainRoute
+    }
+    '/_main/admin': {
+      id: '/_main/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof MainAdminRouteImport
+      parentRoute: typeof MainRoute
+    }
   }
 }
 
+interface MainRouteChildren {
+  MainAdminRoute: typeof MainAdminRoute
+  MainChaveamentoRoute: typeof MainChaveamentoRoute
+  MainGruposRoute: typeof MainGruposRoute
+  MainHomeRoute: typeof MainHomeRoute
+  MainPerfilRoute: typeof MainPerfilRoute
+  MainRankingRoute: typeof MainRankingRoute
+}
+
+const MainRouteChildren: MainRouteChildren = {
+  MainAdminRoute: MainAdminRoute,
+  MainChaveamentoRoute: MainChaveamentoRoute,
+  MainGruposRoute: MainGruposRoute,
+  MainHomeRoute: MainHomeRoute,
+  MainPerfilRoute: MainPerfilRoute,
+  MainRankingRoute: MainRankingRoute,
+}
+
+const MainRouteWithChildren = MainRoute._addFileChildren(MainRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  MainRoute: MainRouteWithChildren,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
