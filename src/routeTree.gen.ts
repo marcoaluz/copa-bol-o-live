@@ -13,9 +13,11 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as MainRouteImport } from './routes/_main'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MainRankingRouteImport } from './routes/_main/ranking'
+import { Route as MainPerfilRouteImport } from './routes/_main/perfil'
 import { Route as MainHomeRouteImport } from './routes/_main/home'
 import { Route as MainGruposRouteImport } from './routes/_main/grupos'
 import { Route as MainChaveamentoRouteImport } from './routes/_main/chaveamento'
+import { Route as MainAdminRouteImport } from './routes/_main/admin'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -36,6 +38,11 @@ const MainRankingRoute = MainRankingRouteImport.update({
   path: '/ranking',
   getParentRoute: () => MainRoute,
 } as any)
+const MainPerfilRoute = MainPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => MainRoute,
+} as any)
 const MainHomeRoute = MainHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -51,21 +58,30 @@ const MainChaveamentoRoute = MainChaveamentoRouteImport.update({
   path: '/chaveamento',
   getParentRoute: () => MainRoute,
 } as any)
+const MainAdminRoute = MainAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => MainRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/admin': typeof MainAdminRoute
   '/chaveamento': typeof MainChaveamentoRoute
   '/grupos': typeof MainGruposRoute
   '/home': typeof MainHomeRoute
+  '/perfil': typeof MainPerfilRoute
   '/ranking': typeof MainRankingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/admin': typeof MainAdminRoute
   '/chaveamento': typeof MainChaveamentoRoute
   '/grupos': typeof MainGruposRoute
   '/home': typeof MainHomeRoute
+  '/perfil': typeof MainPerfilRoute
   '/ranking': typeof MainRankingRoute
 }
 export interface FileRoutesById {
@@ -73,24 +89,44 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_main': typeof MainRouteWithChildren
   '/login': typeof LoginRoute
+  '/_main/admin': typeof MainAdminRoute
   '/_main/chaveamento': typeof MainChaveamentoRoute
   '/_main/grupos': typeof MainGruposRoute
   '/_main/home': typeof MainHomeRoute
+  '/_main/perfil': typeof MainPerfilRoute
   '/_main/ranking': typeof MainRankingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/chaveamento' | '/grupos' | '/home' | '/ranking'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/admin'
+    | '/chaveamento'
+    | '/grupos'
+    | '/home'
+    | '/perfil'
+    | '/ranking'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/chaveamento' | '/grupos' | '/home' | '/ranking'
+  to:
+    | '/'
+    | '/login'
+    | '/admin'
+    | '/chaveamento'
+    | '/grupos'
+    | '/home'
+    | '/perfil'
+    | '/ranking'
   id:
     | '__root__'
     | '/'
     | '/_main'
     | '/login'
+    | '/_main/admin'
     | '/_main/chaveamento'
     | '/_main/grupos'
     | '/_main/home'
+    | '/_main/perfil'
     | '/_main/ranking'
   fileRoutesById: FileRoutesById
 }
@@ -130,6 +166,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainRankingRouteImport
       parentRoute: typeof MainRoute
     }
+    '/_main/perfil': {
+      id: '/_main/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof MainPerfilRouteImport
+      parentRoute: typeof MainRoute
+    }
     '/_main/home': {
       id: '/_main/home'
       path: '/home'
@@ -151,20 +194,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainChaveamentoRouteImport
       parentRoute: typeof MainRoute
     }
+    '/_main/admin': {
+      id: '/_main/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof MainAdminRouteImport
+      parentRoute: typeof MainRoute
+    }
   }
 }
 
 interface MainRouteChildren {
+  MainAdminRoute: typeof MainAdminRoute
   MainChaveamentoRoute: typeof MainChaveamentoRoute
   MainGruposRoute: typeof MainGruposRoute
   MainHomeRoute: typeof MainHomeRoute
+  MainPerfilRoute: typeof MainPerfilRoute
   MainRankingRoute: typeof MainRankingRoute
 }
 
 const MainRouteChildren: MainRouteChildren = {
+  MainAdminRoute: MainAdminRoute,
   MainChaveamentoRoute: MainChaveamentoRoute,
   MainGruposRoute: MainGruposRoute,
   MainHomeRoute: MainHomeRoute,
+  MainPerfilRoute: MainPerfilRoute,
   MainRankingRoute: MainRankingRoute,
 }
 
@@ -178,3 +232,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
