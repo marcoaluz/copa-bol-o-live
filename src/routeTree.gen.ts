@@ -19,6 +19,7 @@ import { Route as MainHomeRouteImport } from './routes/_main/home'
 import { Route as MainGruposRouteImport } from './routes/_main/grupos'
 import { Route as MainChaveamentoRouteImport } from './routes/_main/chaveamento'
 import { Route as MainCarteiraRouteImport } from './routes/_main/carteira'
+import { Route as MainAjudaRouteImport } from './routes/_main/ajuda'
 import { Route as MainAdminRouteImport } from './routes/_main/admin'
 import { Route as MainAdminIndexRouteImport } from './routes/_main/admin.index'
 import { Route as MainAdminUsuariosRouteImport } from './routes/_main/admin.usuarios'
@@ -26,6 +27,7 @@ import { Route as MainAdminSaquesRouteImport } from './routes/_main/admin.saques
 import { Route as MainAdminRelatoriosRouteImport } from './routes/_main/admin.relatorios'
 import { Route as MainAdminPartidasRouteImport } from './routes/_main/admin.partidas'
 import { Route as MainAdminConfiguracoesRouteImport } from './routes/_main/admin.configuracoes'
+import { Route as MainAdminChecklistRouteImport } from './routes/_main/admin.checklist'
 import { Route as MainAdminAuditoriaRouteImport } from './routes/_main/admin.auditoria'
 import { Route as ApiPublicHooksSyncPartidasRouteImport } from './routes/api/public/hooks/sync-partidas'
 import { Route as MainAdminUsuariosIdRouteImport } from './routes/_main/admin.usuarios.$id'
@@ -79,6 +81,11 @@ const MainCarteiraRoute = MainCarteiraRouteImport.update({
   path: '/carteira',
   getParentRoute: () => MainRoute,
 } as any)
+const MainAjudaRoute = MainAjudaRouteImport.update({
+  id: '/ajuda',
+  path: '/ajuda',
+  getParentRoute: () => MainRoute,
+} as any)
 const MainAdminRoute = MainAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -114,6 +121,11 @@ const MainAdminConfiguracoesRoute = MainAdminConfiguracoesRouteImport.update({
   path: '/configuracoes',
   getParentRoute: () => MainAdminRoute,
 } as any)
+const MainAdminChecklistRoute = MainAdminChecklistRouteImport.update({
+  id: '/checklist',
+  path: '/checklist',
+  getParentRoute: () => MainAdminRoute,
+} as any)
 const MainAdminAuditoriaRoute = MainAdminAuditoriaRouteImport.update({
   id: '/auditoria',
   path: '/auditoria',
@@ -136,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/admin': typeof MainAdminRouteWithChildren
+  '/ajuda': typeof MainAjudaRoute
   '/carteira': typeof MainCarteiraRoute
   '/chaveamento': typeof MainChaveamentoRoute
   '/grupos': typeof MainGruposRoute
@@ -143,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof MainPerfilRoute
   '/ranking': typeof MainRankingRoute
   '/admin/auditoria': typeof MainAdminAuditoriaRoute
+  '/admin/checklist': typeof MainAdminChecklistRoute
   '/admin/configuracoes': typeof MainAdminConfiguracoesRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
   '/admin/relatorios': typeof MainAdminRelatoriosRoute
@@ -156,6 +170,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/ajuda': typeof MainAjudaRoute
   '/carteira': typeof MainCarteiraRoute
   '/chaveamento': typeof MainChaveamentoRoute
   '/grupos': typeof MainGruposRoute
@@ -163,6 +178,7 @@ export interface FileRoutesByTo {
   '/perfil': typeof MainPerfilRoute
   '/ranking': typeof MainRankingRoute
   '/admin/auditoria': typeof MainAdminAuditoriaRoute
+  '/admin/checklist': typeof MainAdminChecklistRoute
   '/admin/configuracoes': typeof MainAdminConfiguracoesRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
   '/admin/relatorios': typeof MainAdminRelatoriosRoute
@@ -179,6 +195,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/_main/admin': typeof MainAdminRouteWithChildren
+  '/_main/ajuda': typeof MainAjudaRoute
   '/_main/carteira': typeof MainCarteiraRoute
   '/_main/chaveamento': typeof MainChaveamentoRoute
   '/_main/grupos': typeof MainGruposRoute
@@ -186,6 +203,7 @@ export interface FileRoutesById {
   '/_main/perfil': typeof MainPerfilRoute
   '/_main/ranking': typeof MainRankingRoute
   '/_main/admin/auditoria': typeof MainAdminAuditoriaRoute
+  '/_main/admin/checklist': typeof MainAdminChecklistRoute
   '/_main/admin/configuracoes': typeof MainAdminConfiguracoesRoute
   '/_main/admin/partidas': typeof MainAdminPartidasRoute
   '/_main/admin/relatorios': typeof MainAdminRelatoriosRoute
@@ -202,6 +220,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/admin'
+    | '/ajuda'
     | '/carteira'
     | '/chaveamento'
     | '/grupos'
@@ -209,6 +228,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/ranking'
     | '/admin/auditoria'
+    | '/admin/checklist'
     | '/admin/configuracoes'
     | '/admin/partidas'
     | '/admin/relatorios'
@@ -222,6 +242,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/onboarding'
+    | '/ajuda'
     | '/carteira'
     | '/chaveamento'
     | '/grupos'
@@ -229,6 +250,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/ranking'
     | '/admin/auditoria'
+    | '/admin/checklist'
     | '/admin/configuracoes'
     | '/admin/partidas'
     | '/admin/relatorios'
@@ -244,6 +266,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/_main/admin'
+    | '/_main/ajuda'
     | '/_main/carteira'
     | '/_main/chaveamento'
     | '/_main/grupos'
@@ -251,6 +274,7 @@ export interface FileRouteTypes {
     | '/_main/perfil'
     | '/_main/ranking'
     | '/_main/admin/auditoria'
+    | '/_main/admin/checklist'
     | '/_main/admin/configuracoes'
     | '/_main/admin/partidas'
     | '/_main/admin/relatorios'
@@ -341,6 +365,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainCarteiraRouteImport
       parentRoute: typeof MainRoute
     }
+    '/_main/ajuda': {
+      id: '/_main/ajuda'
+      path: '/ajuda'
+      fullPath: '/ajuda'
+      preLoaderRoute: typeof MainAjudaRouteImport
+      parentRoute: typeof MainRoute
+    }
     '/_main/admin': {
       id: '/_main/admin'
       path: '/admin'
@@ -390,6 +421,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainAdminConfiguracoesRouteImport
       parentRoute: typeof MainAdminRoute
     }
+    '/_main/admin/checklist': {
+      id: '/_main/admin/checklist'
+      path: '/checklist'
+      fullPath: '/admin/checklist'
+      preLoaderRoute: typeof MainAdminChecklistRouteImport
+      parentRoute: typeof MainAdminRoute
+    }
     '/_main/admin/auditoria': {
       id: '/_main/admin/auditoria'
       path: '/auditoria'
@@ -427,6 +465,7 @@ const MainAdminUsuariosRouteWithChildren =
 
 interface MainAdminRouteChildren {
   MainAdminAuditoriaRoute: typeof MainAdminAuditoriaRoute
+  MainAdminChecklistRoute: typeof MainAdminChecklistRoute
   MainAdminConfiguracoesRoute: typeof MainAdminConfiguracoesRoute
   MainAdminPartidasRoute: typeof MainAdminPartidasRoute
   MainAdminRelatoriosRoute: typeof MainAdminRelatoriosRoute
@@ -437,6 +476,7 @@ interface MainAdminRouteChildren {
 
 const MainAdminRouteChildren: MainAdminRouteChildren = {
   MainAdminAuditoriaRoute: MainAdminAuditoriaRoute,
+  MainAdminChecklistRoute: MainAdminChecklistRoute,
   MainAdminConfiguracoesRoute: MainAdminConfiguracoesRoute,
   MainAdminPartidasRoute: MainAdminPartidasRoute,
   MainAdminRelatoriosRoute: MainAdminRelatoriosRoute,
@@ -451,6 +491,7 @@ const MainAdminRouteWithChildren = MainAdminRoute._addFileChildren(
 
 interface MainRouteChildren {
   MainAdminRoute: typeof MainAdminRouteWithChildren
+  MainAjudaRoute: typeof MainAjudaRoute
   MainCarteiraRoute: typeof MainCarteiraRoute
   MainChaveamentoRoute: typeof MainChaveamentoRoute
   MainGruposRoute: typeof MainGruposRoute
@@ -461,6 +502,7 @@ interface MainRouteChildren {
 
 const MainRouteChildren: MainRouteChildren = {
   MainAdminRoute: MainAdminRouteWithChildren,
+  MainAjudaRoute: MainAjudaRoute,
   MainCarteiraRoute: MainCarteiraRoute,
   MainChaveamentoRoute: MainChaveamentoRoute,
   MainGruposRoute: MainGruposRoute,
@@ -481,3 +523,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
