@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
+import { NotificationBell } from "@/components/NotificationBell";
 
 const navItems = [
   { to: "/home", label: "Home", icon: Home },
@@ -105,6 +106,7 @@ function Header() {
             <Wallet className="w-4 h-4 text-gold" />
             <span className="text-sm font-semibold tabular-nums">R$ {saldo}</span>
           </div>
+          <NotificationBell />
           <UserMenu />
         </div>
       </div>

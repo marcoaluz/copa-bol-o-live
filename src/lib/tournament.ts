@@ -26,6 +26,7 @@ export type Partida = {
   bracket_proximo_id: string | null;
   ordem_bracket: number | null;
   codigo: string | null;
+  bolo_acumulado_centavos: number;
 };
 
 export type ClassificacaoLinha = {

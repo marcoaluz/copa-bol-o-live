@@ -65,8 +65,71 @@ export type Database = {
           },
         ]
       }
+      config: {
+        Row: {
+          id: number
+          politica_sem_ganhadores: Database["public"]["Enums"]["politica_sem_ganhadores"]
+          taxa_casa_percentual: number
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          politica_sem_ganhadores?: Database["public"]["Enums"]["politica_sem_ganhadores"]
+          taxa_casa_percentual?: number
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          politica_sem_ganhadores?: Database["public"]["Enums"]["politica_sem_ganhadores"]
+          taxa_casa_percentual?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notificacoes: {
+        Row: {
+          created_at: string
+          id: string
+          lida: boolean
+          link: string | null
+          mensagem: string
+          tipo: string
+          titulo: string
+          usuario_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lida?: boolean
+          link?: string | null
+          mensagem: string
+          tipo: string
+          titulo: string
+          usuario_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lida?: boolean
+          link?: string | null
+          mensagem?: string
+          tipo?: string
+          titulo?: string
+          usuario_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notificacoes_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partidas: {
         Row: {
+          bolo_acumulado_centavos: number
           bracket_proximo_id: string | null
           codigo: string | null
           created_at: string
@@ -87,6 +150,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          bolo_acumulado_centavos?: number
           bracket_proximo_id?: string | null
           codigo?: string | null
           created_at?: string
@@ -107,6 +171,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          bolo_acumulado_centavos?: number
           bracket_proximo_id?: string | null
           codigo?: string | null
           created_at?: string
@@ -241,7 +306,7 @@ export type Database = {
           referencia_id: string | null
           saldo_apos_centavos: number
           tipo: Database["public"]["Enums"]["tipo_transacao"]
-          usuario_id: string
+          usuario_id: string | null
           valor_centavos: number
         }
         Insert: {
@@ -251,7 +316,7 @@ export type Database = {
           referencia_id?: string | null
           saldo_apos_centavos: number
           tipo: Database["public"]["Enums"]["tipo_transacao"]
-          usuario_id: string
+          usuario_id?: string | null
           valor_centavos: number
         }
         Update: {
@@ -261,7 +326,7 @@ export type Database = {
           referencia_id?: string | null
           saldo_apos_centavos?: number
           tipo?: Database["public"]["Enums"]["tipo_transacao"]
-          usuario_id?: string
+          usuario_id?: string | null
           valor_centavos?: number
         }
         Relationships: [
@@ -293,7 +358,40 @@ export type Database = {
       }
     }
     Functions: {
+      _assert_admin: { Args: never; Returns: undefined }
+      _self_test_apuracao: { Args: never; Returns: Json }
       agora_servidor: { Args: never; Returns: string }
+      apurar_partida: { Args: { p_id: string }; Returns: Json }
+      cancelar_partida: {
+        Args: { p_id: string }
+        Returns: {
+          bolo_acumulado_centavos: number
+          bracket_proximo_id: string | null
+          codigo: string | null
+          created_at: string
+          data_hora: string
+          estadio: string | null
+          fase: Database["public"]["Enums"]["fase_partida"]
+          gols_casa: number | null
+          gols_visitante: number | null
+          grupo: string | null
+          id: string
+          ordem_bracket: number | null
+          placeholder_casa: string | null
+          placeholder_visitante: string | null
+          resultado: Database["public"]["Enums"]["resultado_partida"] | null
+          selecao_casa_id: string | null
+          selecao_visitante_id: string | null
+          status: Database["public"]["Enums"]["status_partida"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "partidas"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       criar_ou_alterar_aposta: {
         Args: {
           p_palpite: Database["public"]["Enums"]["palpite_aposta"]
@@ -319,6 +417,37 @@ export type Database = {
         }
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      lancar_resultado_partida: {
+        Args: { p_gols_casa: number; p_gols_visitante: number; p_id: string }
+        Returns: {
+          bolo_acumulado_centavos: number
+          bracket_proximo_id: string | null
+          codigo: string | null
+          created_at: string
+          data_hora: string
+          estadio: string | null
+          fase: Database["public"]["Enums"]["fase_partida"]
+          gols_casa: number | null
+          gols_visitante: number | null
+          grupo: string | null
+          id: string
+          ordem_bracket: number | null
+          placeholder_casa: string | null
+          placeholder_visitante: string | null
+          resultado: Database["public"]["Enums"]["resultado_partida"] | null
+          selecao_casa_id: string | null
+          selecao_visitante_id: string | null
+          status: Database["public"]["Enums"]["status_partida"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "partidas"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      marcar_notificacoes_lidas: { Args: { p_ids?: string[] }; Returns: number }
     }
     Enums: {
       fase_partida:
@@ -329,6 +458,7 @@ export type Database = {
         | "terceiro"
         | "final"
       palpite_aposta: "casa" | "empate" | "visitante"
+      politica_sem_ganhadores: "devolver" | "acumular"
       resultado_partida: "casa" | "empate" | "visitante"
       status_aposta: "ativa" | "ganhou" | "perdeu" | "devolvida"
       status_partida: "agendada" | "ao_vivo" | "encerrada" | "cancelada"
@@ -475,6 +605,7 @@ export const Constants = {
         "final",
       ],
       palpite_aposta: ["casa", "empate", "visitante"],
+      politica_sem_ganhadores: ["devolver", "acumular"],
       resultado_partida: ["casa", "empate", "visitante"],
       status_aposta: ["ativa", "ganhou", "perdeu", "devolvida"],
       status_partida: ["agendada", "ao_vivo", "encerrada", "cancelada"],
