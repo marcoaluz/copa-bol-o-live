@@ -587,6 +587,7 @@ export type Database = {
           usuario_id: string
         }[]
       }
+      resgatar_bonus: { Args: { p_tipo: string }; Returns: Json }
     }
     Enums: {
       fase_partida:
