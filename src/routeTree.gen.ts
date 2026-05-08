@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as MainRouteImport } from './routes/_main'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MainHomeRouteImport } from './routes/_main/home'
+import { Route as MainChaveamentoRouteImport } from './routes/_main/chaveamento'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -33,15 +34,22 @@ const MainHomeRoute = MainHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => MainRoute,
 } as any)
+const MainChaveamentoRoute = MainChaveamentoRouteImport.update({
+  id: '/chaveamento',
+  path: '/chaveamento',
+  getParentRoute: () => MainRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/chaveamento': typeof MainChaveamentoRoute
   '/home': typeof MainHomeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/chaveamento': typeof MainChaveamentoRoute
   '/home': typeof MainHomeRoute
 }
 export interface FileRoutesById {
@@ -49,14 +57,21 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_main': typeof MainRouteWithChildren
   '/login': typeof LoginRoute
+  '/_main/chaveamento': typeof MainChaveamentoRoute
   '/_main/home': typeof MainHomeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/home'
+  fullPaths: '/' | '/login' | '/chaveamento' | '/home'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/home'
-  id: '__root__' | '/' | '/_main' | '/login' | '/_main/home'
+  to: '/' | '/login' | '/chaveamento' | '/home'
+  id:
+    | '__root__'
+    | '/'
+    | '/_main'
+    | '/login'
+    | '/_main/chaveamento'
+    | '/_main/home'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -95,14 +110,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainHomeRouteImport
       parentRoute: typeof MainRoute
     }
+    '/_main/chaveamento': {
+      id: '/_main/chaveamento'
+      path: '/chaveamento'
+      fullPath: '/chaveamento'
+      preLoaderRoute: typeof MainChaveamentoRouteImport
+      parentRoute: typeof MainRoute
+    }
   }
 }
 
 interface MainRouteChildren {
+  MainChaveamentoRoute: typeof MainChaveamentoRoute
   MainHomeRoute: typeof MainHomeRoute
 }
 
 const MainRouteChildren: MainRouteChildren = {
+  MainChaveamentoRoute: MainChaveamentoRoute,
   MainHomeRoute: MainHomeRoute,
 }
 
