@@ -779,6 +779,7 @@ export type Database = {
     }
     Functions: {
       _assert_admin: { Args: never; Returns: undefined }
+      _assert_autorizado: { Args: never; Returns: undefined }
       _self_test_apuracao: { Args: never; Returns: Json }
       adicionar_emails_autorizados: {
         Args: { p_emails: string[] }
