@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MainRouteImport } from './routes/_main'
 import { Route as IndexRouteImport } from './routes/index'
@@ -19,6 +20,11 @@ import { Route as MainGruposRouteImport } from './routes/_main/grupos'
 import { Route as MainChaveamentoRouteImport } from './routes/_main/chaveamento'
 import { Route as MainAdminRouteImport } from './routes/_main/admin'
 
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -67,6 +73,7 @@ const MainAdminRoute = MainAdminRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/admin': typeof MainAdminRoute
   '/chaveamento': typeof MainChaveamentoRoute
   '/grupos': typeof MainGruposRoute
@@ -77,6 +84,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/admin': typeof MainAdminRoute
   '/chaveamento': typeof MainChaveamentoRoute
   '/grupos': typeof MainGruposRoute
@@ -89,6 +97,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_main': typeof MainRouteWithChildren
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/_main/admin': typeof MainAdminRoute
   '/_main/chaveamento': typeof MainChaveamentoRoute
   '/_main/grupos': typeof MainGruposRoute
@@ -101,6 +110,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/onboarding'
     | '/admin'
     | '/chaveamento'
     | '/grupos'
@@ -111,6 +121,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/onboarding'
     | '/admin'
     | '/chaveamento'
     | '/grupos'
@@ -122,6 +133,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_main'
     | '/login'
+    | '/onboarding'
     | '/_main/admin'
     | '/_main/chaveamento'
     | '/_main/grupos'
@@ -134,10 +146,18 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MainRoute: typeof MainRouteWithChildren
   LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -228,6 +248,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MainRoute: MainRouteWithChildren,
   LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
