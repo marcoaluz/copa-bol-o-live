@@ -24,6 +24,7 @@ import { Route as MainAdminIndexRouteImport } from './routes/_main/admin.index'
 import { Route as MainAdminUsuariosRouteImport } from './routes/_main/admin.usuarios'
 import { Route as MainAdminSaquesRouteImport } from './routes/_main/admin.saques'
 import { Route as MainAdminPartidasRouteImport } from './routes/_main/admin.partidas'
+import { Route as MainAdminConfiguracoesRouteImport } from './routes/_main/admin.configuracoes'
 import { Route as ApiPublicHooksSyncPartidasRouteImport } from './routes/api/public/hooks/sync-partidas'
 import { Route as MainAdminUsuariosIdRouteImport } from './routes/_main/admin.usuarios.$id'
 
@@ -101,6 +102,11 @@ const MainAdminPartidasRoute = MainAdminPartidasRouteImport.update({
   path: '/partidas',
   getParentRoute: () => MainAdminRoute,
 } as any)
+const MainAdminConfiguracoesRoute = MainAdminConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => MainAdminRoute,
+} as any)
 const ApiPublicHooksSyncPartidasRoute =
   ApiPublicHooksSyncPartidasRouteImport.update({
     id: '/api/public/hooks/sync-partidas',
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/home': typeof MainHomeRoute
   '/perfil': typeof MainPerfilRoute
   '/ranking': typeof MainRankingRoute
+  '/admin/configuracoes': typeof MainAdminConfiguracoesRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
   '/admin/saques': typeof MainAdminSaquesRoute
   '/admin/usuarios': typeof MainAdminUsuariosRouteWithChildren
@@ -141,6 +148,7 @@ export interface FileRoutesByTo {
   '/home': typeof MainHomeRoute
   '/perfil': typeof MainPerfilRoute
   '/ranking': typeof MainRankingRoute
+  '/admin/configuracoes': typeof MainAdminConfiguracoesRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
   '/admin/saques': typeof MainAdminSaquesRoute
   '/admin/usuarios': typeof MainAdminUsuariosRouteWithChildren
@@ -161,6 +169,7 @@ export interface FileRoutesById {
   '/_main/home': typeof MainHomeRoute
   '/_main/perfil': typeof MainPerfilRoute
   '/_main/ranking': typeof MainRankingRoute
+  '/_main/admin/configuracoes': typeof MainAdminConfiguracoesRoute
   '/_main/admin/partidas': typeof MainAdminPartidasRoute
   '/_main/admin/saques': typeof MainAdminSaquesRoute
   '/_main/admin/usuarios': typeof MainAdminUsuariosRouteWithChildren
@@ -181,6 +190,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/perfil'
     | '/ranking'
+    | '/admin/configuracoes'
     | '/admin/partidas'
     | '/admin/saques'
     | '/admin/usuarios'
@@ -198,6 +208,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/perfil'
     | '/ranking'
+    | '/admin/configuracoes'
     | '/admin/partidas'
     | '/admin/saques'
     | '/admin/usuarios'
@@ -217,6 +228,7 @@ export interface FileRouteTypes {
     | '/_main/home'
     | '/_main/perfil'
     | '/_main/ranking'
+    | '/_main/admin/configuracoes'
     | '/_main/admin/partidas'
     | '/_main/admin/saques'
     | '/_main/admin/usuarios'
@@ -340,6 +352,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainAdminPartidasRouteImport
       parentRoute: typeof MainAdminRoute
     }
+    '/_main/admin/configuracoes': {
+      id: '/_main/admin/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/admin/configuracoes'
+      preLoaderRoute: typeof MainAdminConfiguracoesRouteImport
+      parentRoute: typeof MainAdminRoute
+    }
     '/api/public/hooks/sync-partidas': {
       id: '/api/public/hooks/sync-partidas'
       path: '/api/public/hooks/sync-partidas'
@@ -369,6 +388,7 @@ const MainAdminUsuariosRouteWithChildren =
   MainAdminUsuariosRoute._addFileChildren(MainAdminUsuariosRouteChildren)
 
 interface MainAdminRouteChildren {
+  MainAdminConfiguracoesRoute: typeof MainAdminConfiguracoesRoute
   MainAdminPartidasRoute: typeof MainAdminPartidasRoute
   MainAdminSaquesRoute: typeof MainAdminSaquesRoute
   MainAdminUsuariosRoute: typeof MainAdminUsuariosRouteWithChildren
@@ -376,6 +396,7 @@ interface MainAdminRouteChildren {
 }
 
 const MainAdminRouteChildren: MainAdminRouteChildren = {
+  MainAdminConfiguracoesRoute: MainAdminConfiguracoesRoute,
   MainAdminPartidasRoute: MainAdminPartidasRoute,
   MainAdminSaquesRoute: MainAdminSaquesRoute,
   MainAdminUsuariosRoute: MainAdminUsuariosRouteWithChildren,
