@@ -18,6 +18,7 @@ import { Route as MainPerfilRouteImport } from './routes/_main/perfil'
 import { Route as MainHomeRouteImport } from './routes/_main/home'
 import { Route as MainGruposRouteImport } from './routes/_main/grupos'
 import { Route as MainChaveamentoRouteImport } from './routes/_main/chaveamento'
+import { Route as MainCarteiraRouteImport } from './routes/_main/carteira'
 import { Route as MainAdminRouteImport } from './routes/_main/admin'
 import { Route as MainAdminIndexRouteImport } from './routes/_main/admin.index'
 import { Route as MainAdminPartidasRouteImport } from './routes/_main/admin.partidas'
@@ -67,6 +68,11 @@ const MainChaveamentoRoute = MainChaveamentoRouteImport.update({
   path: '/chaveamento',
   getParentRoute: () => MainRoute,
 } as any)
+const MainCarteiraRoute = MainCarteiraRouteImport.update({
+  id: '/carteira',
+  path: '/carteira',
+  getParentRoute: () => MainRoute,
+} as any)
 const MainAdminRoute = MainAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/admin': typeof MainAdminRouteWithChildren
+  '/carteira': typeof MainCarteiraRoute
   '/chaveamento': typeof MainChaveamentoRoute
   '/grupos': typeof MainGruposRoute
   '/home': typeof MainHomeRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/carteira': typeof MainCarteiraRoute
   '/chaveamento': typeof MainChaveamentoRoute
   '/grupos': typeof MainGruposRoute
   '/home': typeof MainHomeRoute
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/_main/admin': typeof MainAdminRouteWithChildren
+  '/_main/carteira': typeof MainCarteiraRoute
   '/_main/chaveamento': typeof MainChaveamentoRoute
   '/_main/grupos': typeof MainGruposRoute
   '/_main/home': typeof MainHomeRoute
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/admin'
+    | '/carteira'
     | '/chaveamento'
     | '/grupos'
     | '/home'
@@ -152,6 +162,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/onboarding'
+    | '/carteira'
     | '/chaveamento'
     | '/grupos'
     | '/home'
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/_main/admin'
+    | '/_main/carteira'
     | '/_main/chaveamento'
     | '/_main/grupos'
     | '/_main/home'
@@ -250,6 +262,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainChaveamentoRouteImport
       parentRoute: typeof MainRoute
     }
+    '/_main/carteira': {
+      id: '/_main/carteira'
+      path: '/carteira'
+      fullPath: '/carteira'
+      preLoaderRoute: typeof MainCarteiraRouteImport
+      parentRoute: typeof MainRoute
+    }
     '/_main/admin': {
       id: '/_main/admin'
       path: '/admin'
@@ -297,6 +316,7 @@ const MainAdminRouteWithChildren = MainAdminRoute._addFileChildren(
 
 interface MainRouteChildren {
   MainAdminRoute: typeof MainAdminRouteWithChildren
+  MainCarteiraRoute: typeof MainCarteiraRoute
   MainChaveamentoRoute: typeof MainChaveamentoRoute
   MainGruposRoute: typeof MainGruposRoute
   MainHomeRoute: typeof MainHomeRoute
@@ -306,6 +326,7 @@ interface MainRouteChildren {
 
 const MainRouteChildren: MainRouteChildren = {
   MainAdminRoute: MainAdminRouteWithChildren,
+  MainCarteiraRoute: MainCarteiraRoute,
   MainChaveamentoRoute: MainChaveamentoRoute,
   MainGruposRoute: MainGruposRoute,
   MainHomeRoute: MainHomeRoute,
@@ -325,3 +346,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

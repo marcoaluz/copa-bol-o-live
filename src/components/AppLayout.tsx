@@ -102,10 +102,13 @@ function Header() {
       <div className="h-full px-4 lg:px-6 flex items-center justify-between gap-4">
         <Logo />
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-border">
-            <Wallet className="w-4 h-4 text-gold" />
-            <span className="text-sm font-semibold tabular-nums">R$ {saldo}</span>
-          </div>
+            <Link
+              to="/carteira"
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-border hover:border-gold/50 transition-colors"
+            >
+              <Wallet className="w-4 h-4 text-gold" />
+              <span className="text-sm font-semibold tabular-nums">R$ {saldo}</span>
+            </Link>
           <NotificationBell />
           <UserMenu />
         </div>
