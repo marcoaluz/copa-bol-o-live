@@ -11,6 +11,9 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
 import { NotificationBell } from "@/components/NotificationBell";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { AlertTriangle } from "lucide-react";
 
 const navItems = [
   { to: "/home", label: "Home", icon: Home },
@@ -180,9 +183,20 @@ function BottomNav() {
 }
 
 export function AppLayout() {
+  const { data: cfg } = useQuery({
+    queryKey: ["config", "manutencao"],
+    queryFn: async () => (await supabase.from("config").select("manutencao_ativa, manutencao_mensagem").eq("id", 1).single()).data as any,
+    refetchInterval: 60000,
+  });
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
+      {cfg?.manutencao_ativa && (
+        <div className="bg-destructive/15 border-b border-destructive/40 text-destructive px-4 py-2 text-xs sm:text-sm flex items-center gap-2 justify-center">
+          <AlertTriangle className="w-4 h-4 shrink-0" />
+          <span>{cfg.manutencao_mensagem || "Sistema em manutenção. Apostas temporariamente bloqueadas."}</span>
+        </div>
+      )}
       <div className="flex flex-1 w-full">
         <Sidebar />
         <main className="flex-1 pb-20 lg:pb-8 px-4 lg:px-8 py-6 max-w-7xl mx-auto w-full">
