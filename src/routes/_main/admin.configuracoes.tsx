@@ -33,6 +33,7 @@ type Cfg = {
   deposito_minimo_centavos: number;
   deposito_maximo_centavos: number;
   deposito_maximo_mensal_centavos: number;
+  saldo_bancario_declarado_centavos: number;
 };
 
 function Page() {
@@ -146,6 +147,19 @@ function Page() {
                 onChange={(e) => setReais("deposito_maximo_mensal_centavos", e.target.value)} />
             </div>
           </div>
+        </div>
+      </Card>
+
+      <Card className="bg-card border-border rounded-xl shadow-card p-5 mb-4">
+        <h3 className="font-semibold mb-1">Conciliação bancária</h3>
+        <p className="text-xs text-muted-foreground mb-4">
+          Informe o saldo atual da conta usada para receber PIX. O painel de
+          custódia alerta quando o saldo dos usuários supera esse valor.
+        </p>
+        <div>
+          <Label>Saldo bancário declarado (R$)</Label>
+          <Input type="number" step="0.01" value={reais(form.saldo_bancario_declarado_centavos ?? 0)}
+            onChange={(e) => setReais("saldo_bancario_declarado_centavos", e.target.value)} />
         </div>
       </Card>
 
