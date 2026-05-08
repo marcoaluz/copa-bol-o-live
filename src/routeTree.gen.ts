@@ -23,6 +23,7 @@ import { Route as MainAdminRouteImport } from './routes/_main/admin'
 import { Route as MainAdminIndexRouteImport } from './routes/_main/admin.index'
 import { Route as MainAdminUsuariosRouteImport } from './routes/_main/admin.usuarios'
 import { Route as MainAdminSaquesRouteImport } from './routes/_main/admin.saques'
+import { Route as MainAdminRelatoriosRouteImport } from './routes/_main/admin.relatorios'
 import { Route as MainAdminPartidasRouteImport } from './routes/_main/admin.partidas'
 import { Route as MainAdminConfiguracoesRouteImport } from './routes/_main/admin.configuracoes'
 import { Route as MainAdminAuditoriaRouteImport } from './routes/_main/admin.auditoria'
@@ -98,6 +99,11 @@ const MainAdminSaquesRoute = MainAdminSaquesRouteImport.update({
   path: '/saques',
   getParentRoute: () => MainAdminRoute,
 } as any)
+const MainAdminRelatoriosRoute = MainAdminRelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => MainAdminRoute,
+} as any)
 const MainAdminPartidasRoute = MainAdminPartidasRouteImport.update({
   id: '/partidas',
   path: '/partidas',
@@ -139,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/admin/auditoria': typeof MainAdminAuditoriaRoute
   '/admin/configuracoes': typeof MainAdminConfiguracoesRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
+  '/admin/relatorios': typeof MainAdminRelatoriosRoute
   '/admin/saques': typeof MainAdminSaquesRoute
   '/admin/usuarios': typeof MainAdminUsuariosRouteWithChildren
   '/admin/': typeof MainAdminIndexRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/admin/auditoria': typeof MainAdminAuditoriaRoute
   '/admin/configuracoes': typeof MainAdminConfiguracoesRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
+  '/admin/relatorios': typeof MainAdminRelatoriosRoute
   '/admin/saques': typeof MainAdminSaquesRoute
   '/admin/usuarios': typeof MainAdminUsuariosRouteWithChildren
   '/admin': typeof MainAdminIndexRoute
@@ -180,6 +188,7 @@ export interface FileRoutesById {
   '/_main/admin/auditoria': typeof MainAdminAuditoriaRoute
   '/_main/admin/configuracoes': typeof MainAdminConfiguracoesRoute
   '/_main/admin/partidas': typeof MainAdminPartidasRoute
+  '/_main/admin/relatorios': typeof MainAdminRelatoriosRoute
   '/_main/admin/saques': typeof MainAdminSaquesRoute
   '/_main/admin/usuarios': typeof MainAdminUsuariosRouteWithChildren
   '/_main/admin/': typeof MainAdminIndexRoute
@@ -202,6 +211,7 @@ export interface FileRouteTypes {
     | '/admin/auditoria'
     | '/admin/configuracoes'
     | '/admin/partidas'
+    | '/admin/relatorios'
     | '/admin/saques'
     | '/admin/usuarios'
     | '/admin/'
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/admin/auditoria'
     | '/admin/configuracoes'
     | '/admin/partidas'
+    | '/admin/relatorios'
     | '/admin/saques'
     | '/admin/usuarios'
     | '/admin'
@@ -242,6 +253,7 @@ export interface FileRouteTypes {
     | '/_main/admin/auditoria'
     | '/_main/admin/configuracoes'
     | '/_main/admin/partidas'
+    | '/_main/admin/relatorios'
     | '/_main/admin/saques'
     | '/_main/admin/usuarios'
     | '/_main/admin/'
@@ -357,6 +369,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainAdminSaquesRouteImport
       parentRoute: typeof MainAdminRoute
     }
+    '/_main/admin/relatorios': {
+      id: '/_main/admin/relatorios'
+      path: '/relatorios'
+      fullPath: '/admin/relatorios'
+      preLoaderRoute: typeof MainAdminRelatoriosRouteImport
+      parentRoute: typeof MainAdminRoute
+    }
     '/_main/admin/partidas': {
       id: '/_main/admin/partidas'
       path: '/partidas'
@@ -410,6 +429,7 @@ interface MainAdminRouteChildren {
   MainAdminAuditoriaRoute: typeof MainAdminAuditoriaRoute
   MainAdminConfiguracoesRoute: typeof MainAdminConfiguracoesRoute
   MainAdminPartidasRoute: typeof MainAdminPartidasRoute
+  MainAdminRelatoriosRoute: typeof MainAdminRelatoriosRoute
   MainAdminSaquesRoute: typeof MainAdminSaquesRoute
   MainAdminUsuariosRoute: typeof MainAdminUsuariosRouteWithChildren
   MainAdminIndexRoute: typeof MainAdminIndexRoute
@@ -419,6 +439,7 @@ const MainAdminRouteChildren: MainAdminRouteChildren = {
   MainAdminAuditoriaRoute: MainAdminAuditoriaRoute,
   MainAdminConfiguracoesRoute: MainAdminConfiguracoesRoute,
   MainAdminPartidasRoute: MainAdminPartidasRoute,
+  MainAdminRelatoriosRoute: MainAdminRelatoriosRoute,
   MainAdminSaquesRoute: MainAdminSaquesRoute,
   MainAdminUsuariosRoute: MainAdminUsuariosRouteWithChildren,
   MainAdminIndexRoute: MainAdminIndexRoute,
