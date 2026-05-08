@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Save } from "lucide-react";
@@ -34,6 +35,10 @@ type Cfg = {
   deposito_maximo_centavos: number;
   deposito_maximo_mensal_centavos: number;
   saldo_bancario_declarado_centavos: number;
+  notif_email_ativo: boolean;
+  notif_email_destino: string;
+  notif_telegram_ativo: boolean;
+  notif_eventos: Record<string, boolean>;
 };
 
 function Page() {
@@ -160,6 +165,77 @@ function Page() {
           <Label>Saldo bancário declarado (R$)</Label>
           <Input type="number" step="0.01" value={reais(form.saldo_bancario_declarado_centavos ?? 0)}
             onChange={(e) => setReais("saldo_bancario_declarado_centavos", e.target.value)} />
+        </div>
+      </Card>
+
+      <Card className="bg-card border-border rounded-xl shadow-card p-5 mb-4">
+        <h3 className="font-semibold mb-1">Notificações de admin</h3>
+        <p className="text-xs text-muted-foreground mb-4">
+          Receba avisos imediatos quando houver depósitos, saques ou novos
+          usuários. Configure os canais e os tipos de evento.
+        </p>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <Label className="block">E-mail (Resend)</Label>
+              <p className="text-xs text-muted-foreground">Notificações no seu inbox</p>
+            </div>
+            <Switch
+              checked={form.notif_email_ativo}
+              onCheckedChange={(v) => setForm({ ...form, notif_email_ativo: v })}
+            />
+          </div>
+
+          {form.notif_email_ativo && (
+            <div>
+              <Label>E-mail destino</Label>
+              <Input
+                type="email"
+                value={form.notif_email_destino ?? ""}
+                onChange={(e) => setForm({ ...form, notif_email_destino: e.target.value })}
+                placeholder="seu-email@exemplo.com"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Use o mesmo e-mail cadastrado na sua conta Resend (sandbox).
+              </p>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between pt-2 border-t border-border">
+            <div>
+              <Label className="block">Telegram</Label>
+              <p className="text-xs text-muted-foreground">Push instantâneo no celular</p>
+            </div>
+            <Switch
+              checked={form.notif_telegram_ativo}
+              onCheckedChange={(v) => setForm({ ...form, notif_telegram_ativo: v })}
+            />
+          </div>
+
+          <div className="pt-2 border-t border-border">
+            <Label className="block mb-2">Eventos para notificar</Label>
+            <div className="space-y-2">
+              {[
+                { key: "deposito_pendente", label: "Novo depósito aguardando confirmação" },
+                { key: "saque_pendente", label: "Novo saque solicitado" },
+                { key: "novo_usuario", label: "Novo usuário cadastrado" },
+              ].map((evt) => (
+                <label key={evt.key} className="flex items-center gap-2 text-sm cursor-pointer">
+                  <Checkbox
+                    checked={!!form.notif_eventos?.[evt.key]}
+                    onCheckedChange={(v) =>
+                      setForm({
+                        ...form,
+                        notif_eventos: { ...(form.notif_eventos ?? {}), [evt.key]: !!v },
+                      })
+                    }
+                  />
+                  {evt.label}
+                </label>
+              ))}
+            </div>
+          </div>
         </div>
       </Card>
 
