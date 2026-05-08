@@ -14,13 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          aceitou_risco_em: string | null
+          aceitou_termos_em: string | null
+          apelido: string | null
+          cpf: string | null
+          created_at: string
+          data_nascimento: string | null
+          id: string
+          is_admin: boolean
+          nome_completo: string | null
+          saldo_centavos: number
+          updated_at: string
+        }
+        Insert: {
+          aceitou_risco_em?: string | null
+          aceitou_termos_em?: string | null
+          apelido?: string | null
+          cpf?: string | null
+          created_at?: string
+          data_nascimento?: string | null
+          id: string
+          is_admin?: boolean
+          nome_completo?: string | null
+          saldo_centavos?: number
+          updated_at?: string
+        }
+        Update: {
+          aceitou_risco_em?: string | null
+          aceitou_termos_em?: string | null
+          apelido?: string | null
+          cpf?: string | null
+          created_at?: string
+          data_nascimento?: string | null
+          id?: string
+          is_admin?: boolean
+          nome_completo?: string | null
+          saldo_centavos?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
