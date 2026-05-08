@@ -55,3 +55,21 @@ responsabilidade por perdas sofridas.
 
 _Ao marcar o checkbox correspondente no cadastro, registro de forma
 inequívoca minha ciência e concordância com este Termo._
+
+## Bolão privado entre amigos
+
+Você reconhece e concorda que:
+
+- Este é um bolão privado entre conhecidos, organizado sem fim lucrativo,
+  com acesso restrito por convite.
+- Não é uma plataforma comercial de apostas e não opera sob licença
+  da Secretaria de Prêmios e Apostas (SPA/MF).
+- Os pagamentos (depósitos e saques) ocorrem por PIX direto entre
+  os participantes e o organizador, fora da plataforma.
+- O organizador atua como custodiante temporário dos valores e se
+  compromete a redistribuir 100% do que é apostado entre os ganhadores
+  (sem taxa da casa).
+- O participante reconhece que apostas envolvem risco de perda total e
+  se compromete a apostar apenas valores que possa perder.
+- Disputas são resolvidas diretamente entre os participantes; o app é
+  apenas um livro-razão da contabilidade do bolão.
