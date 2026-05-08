@@ -19,6 +19,7 @@ import { Route as MainHomeRouteImport } from './routes/_main/home'
 import { Route as MainGruposRouteImport } from './routes/_main/grupos'
 import { Route as MainChaveamentoRouteImport } from './routes/_main/chaveamento'
 import { Route as MainAdminRouteImport } from './routes/_main/admin'
+import { Route as MainAdminPartidasRouteImport } from './routes/_main/admin.partidas'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -69,28 +70,35 @@ const MainAdminRoute = MainAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => MainRoute,
 } as any)
+const MainAdminPartidasRoute = MainAdminPartidasRouteImport.update({
+  id: '/partidas',
+  path: '/partidas',
+  getParentRoute: () => MainAdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
-  '/admin': typeof MainAdminRoute
+  '/admin': typeof MainAdminRouteWithChildren
   '/chaveamento': typeof MainChaveamentoRoute
   '/grupos': typeof MainGruposRoute
   '/home': typeof MainHomeRoute
   '/perfil': typeof MainPerfilRoute
   '/ranking': typeof MainRankingRoute
+  '/admin/partidas': typeof MainAdminPartidasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
-  '/admin': typeof MainAdminRoute
+  '/admin': typeof MainAdminRouteWithChildren
   '/chaveamento': typeof MainChaveamentoRoute
   '/grupos': typeof MainGruposRoute
   '/home': typeof MainHomeRoute
   '/perfil': typeof MainPerfilRoute
   '/ranking': typeof MainRankingRoute
+  '/admin/partidas': typeof MainAdminPartidasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,12 +106,13 @@ export interface FileRoutesById {
   '/_main': typeof MainRouteWithChildren
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
-  '/_main/admin': typeof MainAdminRoute
+  '/_main/admin': typeof MainAdminRouteWithChildren
   '/_main/chaveamento': typeof MainChaveamentoRoute
   '/_main/grupos': typeof MainGruposRoute
   '/_main/home': typeof MainHomeRoute
   '/_main/perfil': typeof MainPerfilRoute
   '/_main/ranking': typeof MainRankingRoute
+  '/_main/admin/partidas': typeof MainAdminPartidasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/perfil'
     | '/ranking'
+    | '/admin/partidas'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/perfil'
     | '/ranking'
+    | '/admin/partidas'
   id:
     | '__root__'
     | '/'
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/_main/home'
     | '/_main/perfil'
     | '/_main/ranking'
+    | '/_main/admin/partidas'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -221,11 +233,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainAdminRouteImport
       parentRoute: typeof MainRoute
     }
+    '/_main/admin/partidas': {
+      id: '/_main/admin/partidas'
+      path: '/partidas'
+      fullPath: '/admin/partidas'
+      preLoaderRoute: typeof MainAdminPartidasRouteImport
+      parentRoute: typeof MainAdminRoute
+    }
   }
 }
 
+interface MainAdminRouteChildren {
+  MainAdminPartidasRoute: typeof MainAdminPartidasRoute
+}
+
+const MainAdminRouteChildren: MainAdminRouteChildren = {
+  MainAdminPartidasRoute: MainAdminPartidasRoute,
+}
+
+const MainAdminRouteWithChildren = MainAdminRoute._addFileChildren(
+  MainAdminRouteChildren,
+)
+
 interface MainRouteChildren {
-  MainAdminRoute: typeof MainAdminRoute
+  MainAdminRoute: typeof MainAdminRouteWithChildren
   MainChaveamentoRoute: typeof MainChaveamentoRoute
   MainGruposRoute: typeof MainGruposRoute
   MainHomeRoute: typeof MainHomeRoute
@@ -234,7 +265,7 @@ interface MainRouteChildren {
 }
 
 const MainRouteChildren: MainRouteChildren = {
-  MainAdminRoute: MainAdminRoute,
+  MainAdminRoute: MainAdminRouteWithChildren,
   MainChaveamentoRoute: MainChaveamentoRoute,
   MainGruposRoute: MainGruposRoute,
   MainHomeRoute: MainHomeRoute,
