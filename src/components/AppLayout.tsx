@@ -1,4 +1,4 @@
-import { Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { Home, Trophy, Users, BarChart3, User, Shield, Wallet, ChevronDown, LogOut, Settings } from "lucide-react";
 import {
   DropdownMenu,
@@ -8,7 +8,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/hooks/use-auth";
 
 const navItems = [
   { to: "/home", label: "Home", icon: Home },
@@ -33,31 +34,56 @@ function Logo() {
 }
 
 function UserMenu() {
+  const { user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
+  const nome = profile?.nome_completo || user?.user_metadata?.full_name || "Usuário";
+  const email = user?.email ?? "";
+  const avatarUrl = user?.user_metadata?.avatar_url as string | undefined;
+  const initials = nome
+    .split(" ")
+    .map((n: string) => n[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex items-center gap-2 rounded-full p-1 pr-2 hover:bg-surface-elevated transition-colors">
         <Avatar className="w-8 h-8 border-2 border-primary">
-          <AvatarFallback className="bg-surface-elevated text-foreground text-xs font-semibold">JD</AvatarFallback>
+          {avatarUrl && <AvatarImage src={avatarUrl} alt={nome} />}
+          <AvatarFallback className="bg-surface-elevated text-foreground text-xs font-semibold">{initials || "U"}</AvatarFallback>
         </Avatar>
         <ChevronDown className="w-4 h-4 text-muted-foreground hidden sm:block" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56 bg-card border-border">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-semibold">João da Silva</p>
-            <p className="text-xs text-muted-foreground">joao@email.com</p>
+            <p className="text-sm font-semibold truncate">{nome}</p>
+            <p className="text-xs text-muted-foreground truncate">{email}</p>
+            {profile?.apelido && (
+              <p className="text-xs text-gold">@{profile.apelido}</p>
+            )}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link to="/perfil" className="cursor-pointer"><User className="w-4 h-4 mr-2" /> Meu perfil</Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link to="/admin" className="cursor-pointer"><Settings className="w-4 h-4 mr-2" /> Admin</Link>
-        </DropdownMenuItem>
+        {profile?.is_admin && (
+          <DropdownMenuItem asChild>
+            <Link to="/admin" className="cursor-pointer"><Settings className="w-4 h-4 mr-2" /> Admin</Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link to="/login" className="cursor-pointer text-destructive"><LogOut className="w-4 h-4 mr-2" /> Sair</Link>
+        <DropdownMenuItem
+          onClick={async () => {
+            await signOut();
+            navigate({ to: "/login" });
+          }}
+          className="cursor-pointer text-destructive"
+        >
+          <LogOut className="w-4 h-4 mr-2" /> Sair
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -65,6 +91,11 @@ function UserMenu() {
 }
 
 function Header() {
+  const { profile } = useAuth();
+  const saldo = ((profile?.saldo_centavos ?? 0) / 100).toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
   return (
     <header className="sticky top-0 z-40 h-16 border-b border-border bg-background/80 backdrop-blur-lg">
       <div className="h-full px-4 lg:px-6 flex items-center justify-between gap-4">
@@ -72,7 +103,7 @@ function Header() {
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-border">
             <Wallet className="w-4 h-4 text-gold" />
-            <span className="text-sm font-semibold tabular-nums">R$ 0,00</span>
+            <span className="text-sm font-semibold tabular-nums">R$ {saldo}</span>
           </div>
           <UserMenu />
         </div>
