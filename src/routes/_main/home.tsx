@@ -4,11 +4,12 @@ import { PageHeader } from "@/components/PageHeader";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, Trophy } from "lucide-react";
+import { Clock, Trophy, Radio } from "lucide-react";
 import { TeamLabel } from "@/components/TeamLabel";
 import { MatchDetailDialog } from "@/components/MatchDetailDialog";
 import { useSelecoes, usePartidas, selecaoMap, FASE_LABEL, type Partida } from "@/lib/tournament";
 import { useApostasEncerradas } from "@/components/CountdownPartida";
+import { useRealtimePartidas, usePlacarFlash, minutoPartida } from "@/lib/realtime-partidas";
 
 export const Route = createFileRoute("/_main/home")({
   head: () => ({ meta: [{ title: "Home — Copa Bolão 2026" }] }),
@@ -46,6 +47,7 @@ function fmtHora(d: string) {
 }
 
 function HomePage() {
+  useRealtimePartidas();
   const { data: selecoes } = useSelecoes();
   const { data: partidas, isLoading } = usePartidas();
   const sMap = useMemo(() => selecaoMap(selecoes), [selecoes]);
@@ -60,19 +62,21 @@ function HomePage() {
     const dayAfter = new Date(today.getTime() + 2 * 86400000);
     const weekEnd = new Date(today.getTime() + 7 * 86400000);
 
+    const ao_vivo: Partida[] = [];
     const hoje: Partida[] = [];
     const amanha: Partida[] = [];
     const semana: Partida[] = [];
     const proximas: Partida[] = [];
 
     partidas?.forEach((p) => {
+      if (p.status === "ao_vivo") { ao_vivo.push(p); return; }
       const dt = new Date(p.data_hora);
       if (dt >= today && dt < tomorrow) hoje.push(p);
       else if (dt >= tomorrow && dt < dayAfter) amanha.push(p);
       else if (dt >= dayAfter && dt < weekEnd) semana.push(p);
       else if (dt >= weekEnd) proximas.push(p);
     });
-    return { hoje, amanha, semana, proximas: proximas.slice(0, 6) };
+    return { ao_vivo, hoje, amanha, semana, proximas: proximas.slice(0, 6) };
   }, [partidas, now]);
 
   const openDetail = (p: Partida) => {
@@ -88,6 +92,9 @@ function HomePage() {
         <div className="text-muted-foreground text-sm">Carregando partidas…</div>
       ) : (
         <div className="space-y-8">
+          {buckets.ao_vivo.length > 0 && (
+            <LiveSection partidas={buckets.ao_vivo} sMap={sMap} onOpen={openDetail} />
+          )}
           <Section title="Hoje" partidas={buckets.hoje} sMap={sMap} now={now} onOpen={openDetail} emptyText="Sem jogos hoje." />
           <Section title="Amanhã" partidas={buckets.amanha} sMap={sMap} now={now} onOpen={openDetail} emptyText="Sem jogos amanhã." />
           <Section title="Esta semana" partidas={buckets.semana} sMap={sMap} now={now} onOpen={openDetail} emptyText="Nada nos próximos 7 dias." />
@@ -99,6 +106,52 @@ function HomePage() {
 
       <MatchDetailDialog partida={selected} sMap={sMap} open={open} onOpenChange={setOpen} />
     </div>
+  );
+}
+
+function LiveSection({
+  partidas, sMap, onOpen,
+}: { partidas: Partida[]; sMap: Record<string, any>; onOpen: (p: Partida) => void; }) {
+  return (
+    <section className="rounded-2xl border border-destructive/40 bg-destructive/5 p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <Radio className="w-4 h-4 text-destructive pulse-live" />
+        <h2 className="font-display text-2xl tracking-wider text-destructive">AO VIVO</h2>
+        <Badge variant="destructive" className="pulse-live">{partidas.length}</Badge>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {partidas.map((p) => <LiveMatchCard key={p.id} partida={p} sMap={sMap} onOpen={onOpen} />)}
+      </div>
+    </section>
+  );
+}
+
+function LiveMatchCard({
+  partida, sMap, onOpen,
+}: { partida: Partida; sMap: Record<string, any>; onOpen: (p: Partida) => void; }) {
+  const casa = partida.selecao_casa_id ? sMap[partida.selecao_casa_id] : null;
+  const visit = partida.selecao_visitante_id ? sMap[partida.selecao_visitante_id] : null;
+  const placar = `${partida.gols_casa ?? 0}-${partida.gols_visitante ?? 0}`;
+  const flash = usePlacarFlash(partida.id, placar);
+  const [, setTick] = useState(0);
+  useEffect(() => { const id = setInterval(() => setTick((x) => x + 1), 30_000); return () => clearInterval(id); }, []);
+  return (
+    <Card
+      onClick={() => onOpen(partida)}
+      className={`cursor-pointer p-4 rounded-xl border-destructive/40 bg-card hover:border-destructive transition-colors ${flash ? "flash-gold" : ""}`}
+    >
+      <div className="flex items-center justify-between mb-3 text-xs">
+        <Badge variant="destructive" className="pulse-live">AO VIVO · {minutoPartida(partida.data_hora)}</Badge>
+        <span className="text-muted-foreground">{partida.grupo ? `Grupo ${partida.grupo}` : FASE_LABEL[partida.fase]}</span>
+      </div>
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+        <TeamLabel selecao={casa} placeholder={partida.placeholder_casa} />
+        <span className="font-display text-4xl text-gold tabular-nums px-2">
+          {partida.gols_casa ?? 0} - {partida.gols_visitante ?? 0}
+        </span>
+        <TeamLabel selecao={visit} placeholder={partida.placeholder_visitante} align="right" />
+      </div>
+    </Card>
   );
 }
 
@@ -153,9 +206,11 @@ function MatchCard({
   const visitante = partida.selecao_visitante_id ? sMap[partida.selecao_visitante_id] : null;
   const encerrada = partida.status === "encerrada";
   const aoVivo = partida.status === "ao_vivo";
+  const placar = `${partida.gols_casa ?? 0}-${partida.gols_visitante ?? 0}`;
+  const flash = usePlacarFlash(partida.id, placar);
   return (
     <Card
-      className="bg-card border-border p-4 rounded-xl shadow-card hover:border-primary/50 transition-colors cursor-pointer"
+      className={`bg-card border-border p-4 rounded-xl shadow-card hover:border-primary/50 transition-colors cursor-pointer ${flash ? "flash-gold" : ""}`}
       onClick={() => onOpen(partida)}
     >
       <div className="flex items-center justify-between mb-3">
@@ -166,7 +221,7 @@ function MatchCard({
           <Clock className="w-3 h-3" />
           {fmtHora(partida.data_hora)}
           {!encerrada && !aoVivo && <span className="text-gold ml-1">· {countdown(partida.data_hora, now)}</span>}
-          {aoVivo && <span className="text-destructive ml-1 font-bold">· AO VIVO</span>}
+          {aoVivo && <span className="text-destructive ml-1 font-bold pulse-live">· AO VIVO</span>}
         </div>
       </div>
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">

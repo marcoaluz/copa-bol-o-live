@@ -65,6 +65,44 @@ export type Database = {
           },
         ]
       }
+      audit_log: {
+        Row: {
+          acao: string
+          created_at: string
+          dados: Json | null
+          fonte: string
+          id: string
+          partida_id: string | null
+          usuario_id: string | null
+        }
+        Insert: {
+          acao: string
+          created_at?: string
+          dados?: Json | null
+          fonte: string
+          id?: string
+          partida_id?: string | null
+          usuario_id?: string | null
+        }
+        Update: {
+          acao?: string
+          created_at?: string
+          dados?: Json | null
+          fonte?: string
+          id?: string
+          partida_id?: string | null
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_log_partida_id_fkey"
+            columns: ["partida_id"]
+            isOneToOne: false
+            referencedRelation: "partidas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       config: {
         Row: {
           id: number
@@ -135,6 +173,7 @@ export type Database = {
           created_at: string
           data_hora: string
           estadio: string | null
+          external_id: string | null
           fase: Database["public"]["Enums"]["fase_partida"]
           gols_casa: number | null
           gols_visitante: number | null
@@ -156,6 +195,7 @@ export type Database = {
           created_at?: string
           data_hora: string
           estadio?: string | null
+          external_id?: string | null
           fase: Database["public"]["Enums"]["fase_partida"]
           gols_casa?: number | null
           gols_visitante?: number | null
@@ -177,6 +217,7 @@ export type Database = {
           created_at?: string
           data_hora?: string
           estadio?: string | null
+          external_id?: string | null
           fase?: Database["public"]["Enums"]["fase_partida"]
           gols_casa?: number | null
           gols_visitante?: number | null
@@ -362,6 +403,43 @@ export type Database = {
       _self_test_apuracao: { Args: never; Returns: Json }
       agora_servidor: { Args: never; Returns: string }
       apurar_partida: { Args: { p_id: string }; Returns: Json }
+      atualizar_partida_externa: {
+        Args: {
+          p_dados?: Json
+          p_external_id: string
+          p_gols_casa?: number
+          p_gols_visitante?: number
+          p_status: Database["public"]["Enums"]["status_partida"]
+        }
+        Returns: {
+          bolo_acumulado_centavos: number
+          bracket_proximo_id: string | null
+          codigo: string | null
+          created_at: string
+          data_hora: string
+          estadio: string | null
+          external_id: string | null
+          fase: Database["public"]["Enums"]["fase_partida"]
+          gols_casa: number | null
+          gols_visitante: number | null
+          grupo: string | null
+          id: string
+          ordem_bracket: number | null
+          placeholder_casa: string | null
+          placeholder_visitante: string | null
+          resultado: Database["public"]["Enums"]["resultado_partida"] | null
+          selecao_casa_id: string | null
+          selecao_visitante_id: string | null
+          status: Database["public"]["Enums"]["status_partida"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "partidas"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       cancelar_partida: {
         Args: { p_id: string }
         Returns: {
@@ -371,6 +449,7 @@ export type Database = {
           created_at: string
           data_hora: string
           estadio: string | null
+          external_id: string | null
           fase: Database["public"]["Enums"]["fase_partida"]
           gols_casa: number | null
           gols_visitante: number | null
@@ -426,6 +505,7 @@ export type Database = {
           created_at: string
           data_hora: string
           estadio: string | null
+          external_id: string | null
           fase: Database["public"]["Enums"]["fase_partida"]
           gols_casa: number | null
           gols_visitante: number | null
