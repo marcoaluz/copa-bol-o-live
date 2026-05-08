@@ -6,9 +6,10 @@ import { useAuth } from "@/hooks/use-auth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Wallet, Gift, CalendarDays, Coins, AlertCircle, ArrowDownCircle, ArrowUpCircle, Trophy, RefreshCw, Send, Clock, CheckCircle2, XCircle } from "lucide-react";
+import { Wallet, Gift, CalendarDays, Coins, AlertCircle, ArrowDownCircle, ArrowUpCircle, Trophy, RefreshCw, Send, Clock, CheckCircle2, XCircle, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { SolicitarSaqueDialog } from "@/components/SolicitarSaqueDialog";
+import { SolicitarDepositoDialog } from "@/components/SolicitarDepositoDialog";
 
 export const Route = createFileRoute("/_main/carteira")({
   component: CarteiraPage,
@@ -91,6 +92,7 @@ function CarteiraPage() {
   const { profile, refreshProfile } = useAuth();
   const qc = useQueryClient();
   const [saqueOpen, setSaqueOpen] = useState(false);
+  const [depositoOpen, setDepositoOpen] = useState(false);
 
   const { data: transacoes, refetch } = useQuery({
     queryKey: ["transacoes", profile?.id],
@@ -118,6 +120,23 @@ function CarteiraPage() {
     },
   });
 
+  const { data: depositos, refetch: refetchDepositos } = useQuery({
+    queryKey: ["depositos", profile?.id],
+    enabled: !!profile?.id,
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("depositos")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(5);
+      if (error) throw error;
+      return data as Array<{
+        id: string; valor_centavos: number; codigo_referencia: string;
+        status: string; created_at: string; motivo_rejeicao: string | null;
+      }>;
+    },
+  });
+
   const ultimoDiario = transacoes?.find(
     (t) => t.tipo === "bonus" && t.descricao === "Bônus diário",
   );
@@ -138,7 +157,7 @@ function CarteiraPage() {
           <h1 className="font-display text-3xl">Carteira</h1>
         </div>
         <p className="text-muted-foreground">
-          Suas moedas virtuais para apostar no bolão. Sem dinheiro real envolvido.
+          Seu saldo do bolão. Depósito e acerto via PIX manual.
         </p>
       </header>
 
@@ -157,11 +176,71 @@ function CarteiraPage() {
       <div className="rounded-xl border border-border/50 bg-surface/40 p-4 flex gap-3">
         <AlertCircle className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" />
         <div className="text-sm text-muted-foreground">
-          <strong className="text-foreground">Bolão entre amigos.</strong> As moedas desta carteira são virtuais —
-          não podem ser compradas, sacadas ou trocadas por dinheiro real. Use os bônus para participar das apostas
-          e disputar o ranking. Reposição diária e semanal garante que ninguém fique de fora.
+          <strong className="text-foreground">Bolão privado entre amigos.</strong> Você deposita
+          via PIX para o organizador e o saldo é liberado após confirmação manual. 100% do que é
+          apostado volta para os ganhadores.
         </div>
       </div>
+
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-xl">Depositar</h2>
+          <Button onClick={() => setDepositoOpen(true)} className="bg-gradient-primary shadow-glow">
+            <Plus className="w-4 h-4 mr-2" /> Depositar via PIX
+          </Button>
+        </div>
+        <Card className="divide-y divide-border">
+          {!depositos?.length && (
+            <div className="p-6 text-center text-muted-foreground text-sm">
+              Nenhum depósito ainda. Faça seu primeiro PIX para começar.
+            </div>
+          )}
+          {depositos?.map((d) => {
+            const cor =
+              d.status === "confirmado" ? "text-green-500"
+              : d.status === "rejeitado" ? "text-destructive"
+              : "text-gold";
+            const Icon =
+              d.status === "confirmado" ? CheckCircle2
+              : d.status === "rejeitado" ? XCircle
+              : Clock;
+            const label =
+              d.status === "aguardando_pagamento" ? "Aguardando PIX"
+              : d.status === "aguardando_confirmacao" ? "Aguardando confirmação"
+              : d.status === "confirmado" ? "Confirmado"
+              : d.status === "rejeitado" ? "Rejeitado"
+              : d.status;
+            return (
+              <div key={d.id} className="flex items-center gap-4 p-4">
+                <div className={`w-10 h-10 rounded-full bg-surface-elevated flex items-center justify-center ${cor}`}>
+                  <Icon className="w-5 h-5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm">R$ {formatBRL(d.valor_centavos)}</p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    <code>{d.codigo_referencia}</code>
+                  </p>
+                  {d.motivo_rejeicao && (
+                    <p className="text-xs text-destructive mt-1">Motivo: {d.motivo_rejeicao}</p>
+                  )}
+                </div>
+                <div className="text-right">
+                  <Badge variant="secondary" className={`uppercase ${cor}`}>{label}</Badge>
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    {new Date(d.created_at).toLocaleDateString("pt-BR")}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </Card>
+      </section>
+
+      <SolicitarDepositoDialog
+        open={depositoOpen}
+        onOpenChange={(v) => { setDepositoOpen(v); if (!v) refetchDepositos(); }}
+        onConfirmed={() => refetchDepositos()}
+      />
 
       <section className="space-y-4">
         <h2 className="font-display text-xl">Resgatar bônus</h2>
