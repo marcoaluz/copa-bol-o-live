@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as MainRouteImport } from './routes/_main'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MainHomeRouteImport } from './routes/_main/home'
+import { Route as MainGruposRouteImport } from './routes/_main/grupos'
 import { Route as MainChaveamentoRouteImport } from './routes/_main/chaveamento'
 
 const LoginRoute = LoginRouteImport.update({
@@ -34,6 +35,11 @@ const MainHomeRoute = MainHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => MainRoute,
 } as any)
+const MainGruposRoute = MainGruposRouteImport.update({
+  id: '/grupos',
+  path: '/grupos',
+  getParentRoute: () => MainRoute,
+} as any)
 const MainChaveamentoRoute = MainChaveamentoRouteImport.update({
   id: '/chaveamento',
   path: '/chaveamento',
@@ -44,12 +50,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/chaveamento': typeof MainChaveamentoRoute
+  '/grupos': typeof MainGruposRoute
   '/home': typeof MainHomeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/chaveamento': typeof MainChaveamentoRoute
+  '/grupos': typeof MainGruposRoute
   '/home': typeof MainHomeRoute
 }
 export interface FileRoutesById {
@@ -58,19 +66,21 @@ export interface FileRoutesById {
   '/_main': typeof MainRouteWithChildren
   '/login': typeof LoginRoute
   '/_main/chaveamento': typeof MainChaveamentoRoute
+  '/_main/grupos': typeof MainGruposRoute
   '/_main/home': typeof MainHomeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/chaveamento' | '/home'
+  fullPaths: '/' | '/login' | '/chaveamento' | '/grupos' | '/home'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/chaveamento' | '/home'
+  to: '/' | '/login' | '/chaveamento' | '/grupos' | '/home'
   id:
     | '__root__'
     | '/'
     | '/_main'
     | '/login'
     | '/_main/chaveamento'
+    | '/_main/grupos'
     | '/_main/home'
   fileRoutesById: FileRoutesById
 }
@@ -110,6 +120,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainHomeRouteImport
       parentRoute: typeof MainRoute
     }
+    '/_main/grupos': {
+      id: '/_main/grupos'
+      path: '/grupos'
+      fullPath: '/grupos'
+      preLoaderRoute: typeof MainGruposRouteImport
+      parentRoute: typeof MainRoute
+    }
     '/_main/chaveamento': {
       id: '/_main/chaveamento'
       path: '/chaveamento'
@@ -122,11 +139,13 @@ declare module '@tanstack/react-router' {
 
 interface MainRouteChildren {
   MainChaveamentoRoute: typeof MainChaveamentoRoute
+  MainGruposRoute: typeof MainGruposRoute
   MainHomeRoute: typeof MainHomeRoute
 }
 
 const MainRouteChildren: MainRouteChildren = {
   MainChaveamentoRoute: MainChaveamentoRoute,
+  MainGruposRoute: MainGruposRoute,
   MainHomeRoute: MainHomeRoute,
 }
 
