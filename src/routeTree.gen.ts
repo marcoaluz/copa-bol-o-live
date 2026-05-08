@@ -25,6 +25,7 @@ import { Route as MainAdminUsuariosRouteImport } from './routes/_main/admin.usua
 import { Route as MainAdminSaquesRouteImport } from './routes/_main/admin.saques'
 import { Route as MainAdminPartidasRouteImport } from './routes/_main/admin.partidas'
 import { Route as ApiPublicHooksSyncPartidasRouteImport } from './routes/api/public/hooks/sync-partidas'
+import { Route as MainAdminUsuariosIdRouteImport } from './routes/_main/admin.usuarios.$id'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -106,6 +107,11 @@ const ApiPublicHooksSyncPartidasRoute =
     path: '/api/public/hooks/sync-partidas',
     getParentRoute: () => rootRouteImport,
   } as any)
+const MainAdminUsuariosIdRoute = MainAdminUsuariosIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => MainAdminUsuariosRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -120,8 +126,9 @@ export interface FileRoutesByFullPath {
   '/ranking': typeof MainRankingRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
   '/admin/saques': typeof MainAdminSaquesRoute
-  '/admin/usuarios': typeof MainAdminUsuariosRoute
+  '/admin/usuarios': typeof MainAdminUsuariosRouteWithChildren
   '/admin/': typeof MainAdminIndexRoute
+  '/admin/usuarios/$id': typeof MainAdminUsuariosIdRoute
   '/api/public/hooks/sync-partidas': typeof ApiPublicHooksSyncPartidasRoute
 }
 export interface FileRoutesByTo {
@@ -136,8 +143,9 @@ export interface FileRoutesByTo {
   '/ranking': typeof MainRankingRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
   '/admin/saques': typeof MainAdminSaquesRoute
-  '/admin/usuarios': typeof MainAdminUsuariosRoute
+  '/admin/usuarios': typeof MainAdminUsuariosRouteWithChildren
   '/admin': typeof MainAdminIndexRoute
+  '/admin/usuarios/$id': typeof MainAdminUsuariosIdRoute
   '/api/public/hooks/sync-partidas': typeof ApiPublicHooksSyncPartidasRoute
 }
 export interface FileRoutesById {
@@ -155,8 +163,9 @@ export interface FileRoutesById {
   '/_main/ranking': typeof MainRankingRoute
   '/_main/admin/partidas': typeof MainAdminPartidasRoute
   '/_main/admin/saques': typeof MainAdminSaquesRoute
-  '/_main/admin/usuarios': typeof MainAdminUsuariosRoute
+  '/_main/admin/usuarios': typeof MainAdminUsuariosRouteWithChildren
   '/_main/admin/': typeof MainAdminIndexRoute
+  '/_main/admin/usuarios/$id': typeof MainAdminUsuariosIdRoute
   '/api/public/hooks/sync-partidas': typeof ApiPublicHooksSyncPartidasRoute
 }
 export interface FileRouteTypes {
@@ -176,6 +185,7 @@ export interface FileRouteTypes {
     | '/admin/saques'
     | '/admin/usuarios'
     | '/admin/'
+    | '/admin/usuarios/$id'
     | '/api/public/hooks/sync-partidas'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -192,6 +202,7 @@ export interface FileRouteTypes {
     | '/admin/saques'
     | '/admin/usuarios'
     | '/admin'
+    | '/admin/usuarios/$id'
     | '/api/public/hooks/sync-partidas'
   id:
     | '__root__'
@@ -210,6 +221,7 @@ export interface FileRouteTypes {
     | '/_main/admin/saques'
     | '/_main/admin/usuarios'
     | '/_main/admin/'
+    | '/_main/admin/usuarios/$id'
     | '/api/public/hooks/sync-partidas'
   fileRoutesById: FileRoutesById
 }
@@ -335,20 +347,38 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksSyncPartidasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_main/admin/usuarios/$id': {
+      id: '/_main/admin/usuarios/$id'
+      path: '/$id'
+      fullPath: '/admin/usuarios/$id'
+      preLoaderRoute: typeof MainAdminUsuariosIdRouteImport
+      parentRoute: typeof MainAdminUsuariosRoute
+    }
   }
 }
+
+interface MainAdminUsuariosRouteChildren {
+  MainAdminUsuariosIdRoute: typeof MainAdminUsuariosIdRoute
+}
+
+const MainAdminUsuariosRouteChildren: MainAdminUsuariosRouteChildren = {
+  MainAdminUsuariosIdRoute: MainAdminUsuariosIdRoute,
+}
+
+const MainAdminUsuariosRouteWithChildren =
+  MainAdminUsuariosRoute._addFileChildren(MainAdminUsuariosRouteChildren)
 
 interface MainAdminRouteChildren {
   MainAdminPartidasRoute: typeof MainAdminPartidasRoute
   MainAdminSaquesRoute: typeof MainAdminSaquesRoute
-  MainAdminUsuariosRoute: typeof MainAdminUsuariosRoute
+  MainAdminUsuariosRoute: typeof MainAdminUsuariosRouteWithChildren
   MainAdminIndexRoute: typeof MainAdminIndexRoute
 }
 
 const MainAdminRouteChildren: MainAdminRouteChildren = {
   MainAdminPartidasRoute: MainAdminPartidasRoute,
   MainAdminSaquesRoute: MainAdminSaquesRoute,
-  MainAdminUsuariosRoute: MainAdminUsuariosRoute,
+  MainAdminUsuariosRoute: MainAdminUsuariosRouteWithChildren,
   MainAdminIndexRoute: MainAdminIndexRoute,
 }
 
