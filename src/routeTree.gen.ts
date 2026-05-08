@@ -25,6 +25,7 @@ import { Route as MainAdminUsuariosRouteImport } from './routes/_main/admin.usua
 import { Route as MainAdminSaquesRouteImport } from './routes/_main/admin.saques'
 import { Route as MainAdminPartidasRouteImport } from './routes/_main/admin.partidas'
 import { Route as MainAdminConfiguracoesRouteImport } from './routes/_main/admin.configuracoes'
+import { Route as MainAdminAuditoriaRouteImport } from './routes/_main/admin.auditoria'
 import { Route as ApiPublicHooksSyncPartidasRouteImport } from './routes/api/public/hooks/sync-partidas'
 import { Route as MainAdminUsuariosIdRouteImport } from './routes/_main/admin.usuarios.$id'
 
@@ -107,6 +108,11 @@ const MainAdminConfiguracoesRoute = MainAdminConfiguracoesRouteImport.update({
   path: '/configuracoes',
   getParentRoute: () => MainAdminRoute,
 } as any)
+const MainAdminAuditoriaRoute = MainAdminAuditoriaRouteImport.update({
+  id: '/auditoria',
+  path: '/auditoria',
+  getParentRoute: () => MainAdminRoute,
+} as any)
 const ApiPublicHooksSyncPartidasRoute =
   ApiPublicHooksSyncPartidasRouteImport.update({
     id: '/api/public/hooks/sync-partidas',
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/home': typeof MainHomeRoute
   '/perfil': typeof MainPerfilRoute
   '/ranking': typeof MainRankingRoute
+  '/admin/auditoria': typeof MainAdminAuditoriaRoute
   '/admin/configuracoes': typeof MainAdminConfiguracoesRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
   '/admin/saques': typeof MainAdminSaquesRoute
@@ -148,6 +155,7 @@ export interface FileRoutesByTo {
   '/home': typeof MainHomeRoute
   '/perfil': typeof MainPerfilRoute
   '/ranking': typeof MainRankingRoute
+  '/admin/auditoria': typeof MainAdminAuditoriaRoute
   '/admin/configuracoes': typeof MainAdminConfiguracoesRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
   '/admin/saques': typeof MainAdminSaquesRoute
@@ -169,6 +177,7 @@ export interface FileRoutesById {
   '/_main/home': typeof MainHomeRoute
   '/_main/perfil': typeof MainPerfilRoute
   '/_main/ranking': typeof MainRankingRoute
+  '/_main/admin/auditoria': typeof MainAdminAuditoriaRoute
   '/_main/admin/configuracoes': typeof MainAdminConfiguracoesRoute
   '/_main/admin/partidas': typeof MainAdminPartidasRoute
   '/_main/admin/saques': typeof MainAdminSaquesRoute
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/perfil'
     | '/ranking'
+    | '/admin/auditoria'
     | '/admin/configuracoes'
     | '/admin/partidas'
     | '/admin/saques'
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/perfil'
     | '/ranking'
+    | '/admin/auditoria'
     | '/admin/configuracoes'
     | '/admin/partidas'
     | '/admin/saques'
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/_main/home'
     | '/_main/perfil'
     | '/_main/ranking'
+    | '/_main/admin/auditoria'
     | '/_main/admin/configuracoes'
     | '/_main/admin/partidas'
     | '/_main/admin/saques'
@@ -359,6 +371,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainAdminConfiguracoesRouteImport
       parentRoute: typeof MainAdminRoute
     }
+    '/_main/admin/auditoria': {
+      id: '/_main/admin/auditoria'
+      path: '/auditoria'
+      fullPath: '/admin/auditoria'
+      preLoaderRoute: typeof MainAdminAuditoriaRouteImport
+      parentRoute: typeof MainAdminRoute
+    }
     '/api/public/hooks/sync-partidas': {
       id: '/api/public/hooks/sync-partidas'
       path: '/api/public/hooks/sync-partidas'
@@ -388,6 +407,7 @@ const MainAdminUsuariosRouteWithChildren =
   MainAdminUsuariosRoute._addFileChildren(MainAdminUsuariosRouteChildren)
 
 interface MainAdminRouteChildren {
+  MainAdminAuditoriaRoute: typeof MainAdminAuditoriaRoute
   MainAdminConfiguracoesRoute: typeof MainAdminConfiguracoesRoute
   MainAdminPartidasRoute: typeof MainAdminPartidasRoute
   MainAdminSaquesRoute: typeof MainAdminSaquesRoute
@@ -396,6 +416,7 @@ interface MainAdminRouteChildren {
 }
 
 const MainAdminRouteChildren: MainAdminRouteChildren = {
+  MainAdminAuditoriaRoute: MainAdminAuditoriaRoute,
   MainAdminConfiguracoesRoute: MainAdminConfiguracoesRoute,
   MainAdminPartidasRoute: MainAdminPartidasRoute,
   MainAdminSaquesRoute: MainAdminSaquesRoute,
