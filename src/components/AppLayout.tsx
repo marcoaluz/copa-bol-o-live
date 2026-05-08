@@ -1,5 +1,5 @@
 import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
-import { Home, Trophy, Users, BarChart3, User, Shield, Wallet, ChevronDown, LogOut, Settings } from "lucide-react";
+import { Home, Trophy, Users, BarChart3, User, Shield, Wallet, ChevronDown, LogOut, Settings, Coins } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +17,7 @@ const navItems = [
   { to: "/chaveamento", label: "Chaveamento", icon: Trophy },
   { to: "/grupos", label: "Grupos", icon: Users },
   { to: "/ranking", label: "Ranking", icon: BarChart3 },
+  { to: "/carteira", label: "Carteira", icon: Coins },
   { to: "/perfil", label: "Perfil", icon: User },
 ] as const;
 
@@ -102,10 +103,13 @@ function Header() {
       <div className="h-full px-4 lg:px-6 flex items-center justify-between gap-4">
         <Logo />
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-border">
-            <Wallet className="w-4 h-4 text-gold" />
-            <span className="text-sm font-semibold tabular-nums">R$ {saldo}</span>
-          </div>
+            <Link
+              to="/carteira"
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-border hover:border-gold/50 transition-colors"
+            >
+              <Wallet className="w-4 h-4 text-gold" />
+              <span className="text-sm font-semibold tabular-nums">R$ {saldo}</span>
+            </Link>
           <NotificationBell />
           <UserMenu />
         </div>
@@ -154,7 +158,7 @@ function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 h-16 border-t border-border bg-background/95 backdrop-blur-lg">
-      <div className="grid grid-cols-5 h-full">
+      <div className="grid grid-cols-6 h-full">
         {navItems.map((item) => {
           const active = pathname === item.to;
           return (

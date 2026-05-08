@@ -587,6 +587,7 @@ export type Database = {
           usuario_id: string
         }[]
       }
+      resgatar_bonus: { Args: { p_tipo: string }; Returns: Json }
     }
     Enums: {
       fase_partida:
@@ -608,6 +609,7 @@ export type Database = {
         | "premio"
         | "saque"
         | "ajuste_admin"
+        | "bonus"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -755,6 +757,7 @@ export const Constants = {
         "premio",
         "saque",
         "ajuste_admin",
+        "bonus",
       ],
     },
   },
