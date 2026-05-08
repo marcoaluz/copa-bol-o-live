@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Joyride, type Step, STATUS, type Status } from "react-joyride";
+import { Joyride, type EventData, type Step, STATUS } from "react-joyride";
 import { useAuth } from "@/hooks/use-auth";
 
 const KEY = "tour_v1_done";
@@ -26,7 +26,7 @@ export function OnboardingTour() {
     } catch { /* ignore */ }
   }, [user]);
 
-  function onCallback(data: { status: Status }) {
+  function onCallback(data: EventData) {
     if (data.status === STATUS.FINISHED || data.status === STATUS.SKIPPED) {
       try { localStorage.setItem(KEY, "1"); } catch { /* ignore */ }
       setRun(false);
