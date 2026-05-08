@@ -14,6 +14,105 @@ export type Database = {
   }
   public: {
     Tables: {
+      partidas: {
+        Row: {
+          bracket_proximo_id: string | null
+          codigo: string | null
+          created_at: string
+          data_hora: string
+          estadio: string | null
+          fase: Database["public"]["Enums"]["fase_partida"]
+          gols_casa: number | null
+          gols_visitante: number | null
+          grupo: string | null
+          id: string
+          ordem_bracket: number | null
+          placeholder_casa: string | null
+          placeholder_visitante: string | null
+          resultado: Database["public"]["Enums"]["resultado_partida"] | null
+          selecao_casa_id: string | null
+          selecao_visitante_id: string | null
+          status: Database["public"]["Enums"]["status_partida"]
+          updated_at: string
+        }
+        Insert: {
+          bracket_proximo_id?: string | null
+          codigo?: string | null
+          created_at?: string
+          data_hora: string
+          estadio?: string | null
+          fase: Database["public"]["Enums"]["fase_partida"]
+          gols_casa?: number | null
+          gols_visitante?: number | null
+          grupo?: string | null
+          id?: string
+          ordem_bracket?: number | null
+          placeholder_casa?: string | null
+          placeholder_visitante?: string | null
+          resultado?: Database["public"]["Enums"]["resultado_partida"] | null
+          selecao_casa_id?: string | null
+          selecao_visitante_id?: string | null
+          status?: Database["public"]["Enums"]["status_partida"]
+          updated_at?: string
+        }
+        Update: {
+          bracket_proximo_id?: string | null
+          codigo?: string | null
+          created_at?: string
+          data_hora?: string
+          estadio?: string | null
+          fase?: Database["public"]["Enums"]["fase_partida"]
+          gols_casa?: number | null
+          gols_visitante?: number | null
+          grupo?: string | null
+          id?: string
+          ordem_bracket?: number | null
+          placeholder_casa?: string | null
+          placeholder_visitante?: string | null
+          resultado?: Database["public"]["Enums"]["resultado_partida"] | null
+          selecao_casa_id?: string | null
+          selecao_visitante_id?: string | null
+          status?: Database["public"]["Enums"]["status_partida"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partidas_bracket_proximo_id_fkey"
+            columns: ["bracket_proximo_id"]
+            isOneToOne: false
+            referencedRelation: "partidas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partidas_selecao_casa_id_fkey"
+            columns: ["selecao_casa_id"]
+            isOneToOne: false
+            referencedRelation: "classificacao_grupos"
+            referencedColumns: ["selecao_id"]
+          },
+          {
+            foreignKeyName: "partidas_selecao_casa_id_fkey"
+            columns: ["selecao_casa_id"]
+            isOneToOne: false
+            referencedRelation: "selecoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partidas_selecao_visitante_id_fkey"
+            columns: ["selecao_visitante_id"]
+            isOneToOne: false
+            referencedRelation: "classificacao_grupos"
+            referencedColumns: ["selecao_id"]
+          },
+          {
+            foreignKeyName: "partidas_selecao_visitante_id_fkey"
+            columns: ["selecao_visitante_id"]
+            isOneToOne: false
+            referencedRelation: "selecoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           aceitou_risco_em: string | null
@@ -56,15 +155,64 @@ export type Database = {
         }
         Relationships: []
       }
+      selecoes: {
+        Row: {
+          bandeira_url: string | null
+          codigo_iso: string
+          created_at: string
+          grupo: string | null
+          id: string
+          nome: string
+        }
+        Insert: {
+          bandeira_url?: string | null
+          codigo_iso: string
+          created_at?: string
+          grupo?: string | null
+          id?: string
+          nome: string
+        }
+        Update: {
+          bandeira_url?: string | null
+          codigo_iso?: string
+          created_at?: string
+          grupo?: string | null
+          id?: string
+          nome?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      classificacao_grupos: {
+        Row: {
+          derrotas: number | null
+          empates: number | null
+          gc: number | null
+          gp: number | null
+          grupo: string | null
+          jogos: number | null
+          pontos: number | null
+          selecao_id: string | null
+          sg: number | null
+          vitorias: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      fase_partida:
+        | "grupos"
+        | "oitavas"
+        | "quartas"
+        | "semi"
+        | "terceiro"
+        | "final"
+      resultado_partida: "casa" | "empate" | "visitante"
+      status_partida: "agendada" | "ao_vivo" | "encerrada" | "cancelada"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -191,6 +339,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      fase_partida: [
+        "grupos",
+        "oitavas",
+        "quartas",
+        "semi",
+        "terceiro",
+        "final",
+      ],
+      resultado_partida: ["casa", "empate", "visitante"],
+      status_partida: ["agendada", "ao_vivo", "encerrada", "cancelada"],
+    },
   },
 } as const
