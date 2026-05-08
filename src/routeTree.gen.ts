@@ -21,9 +21,14 @@ import { Route as MainChaveamentoRouteImport } from './routes/_main/chaveamento'
 import { Route as MainCarteiraRouteImport } from './routes/_main/carteira'
 import { Route as MainAdminRouteImport } from './routes/_main/admin'
 import { Route as MainAdminIndexRouteImport } from './routes/_main/admin.index'
+import { Route as MainAdminUsuariosRouteImport } from './routes/_main/admin.usuarios'
 import { Route as MainAdminSaquesRouteImport } from './routes/_main/admin.saques'
+import { Route as MainAdminRelatoriosRouteImport } from './routes/_main/admin.relatorios'
 import { Route as MainAdminPartidasRouteImport } from './routes/_main/admin.partidas'
+import { Route as MainAdminConfiguracoesRouteImport } from './routes/_main/admin.configuracoes'
+import { Route as MainAdminAuditoriaRouteImport } from './routes/_main/admin.auditoria'
 import { Route as ApiPublicHooksSyncPartidasRouteImport } from './routes/api/public/hooks/sync-partidas'
+import { Route as MainAdminUsuariosIdRouteImport } from './routes/_main/admin.usuarios.$id'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -84,14 +89,34 @@ const MainAdminIndexRoute = MainAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => MainAdminRoute,
 } as any)
+const MainAdminUsuariosRoute = MainAdminUsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => MainAdminRoute,
+} as any)
 const MainAdminSaquesRoute = MainAdminSaquesRouteImport.update({
   id: '/saques',
   path: '/saques',
   getParentRoute: () => MainAdminRoute,
 } as any)
+const MainAdminRelatoriosRoute = MainAdminRelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => MainAdminRoute,
+} as any)
 const MainAdminPartidasRoute = MainAdminPartidasRouteImport.update({
   id: '/partidas',
   path: '/partidas',
+  getParentRoute: () => MainAdminRoute,
+} as any)
+const MainAdminConfiguracoesRoute = MainAdminConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => MainAdminRoute,
+} as any)
+const MainAdminAuditoriaRoute = MainAdminAuditoriaRouteImport.update({
+  id: '/auditoria',
+  path: '/auditoria',
   getParentRoute: () => MainAdminRoute,
 } as any)
 const ApiPublicHooksSyncPartidasRoute =
@@ -100,6 +125,11 @@ const ApiPublicHooksSyncPartidasRoute =
     path: '/api/public/hooks/sync-partidas',
     getParentRoute: () => rootRouteImport,
   } as any)
+const MainAdminUsuariosIdRoute = MainAdminUsuariosIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => MainAdminUsuariosRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -112,9 +142,14 @@ export interface FileRoutesByFullPath {
   '/home': typeof MainHomeRoute
   '/perfil': typeof MainPerfilRoute
   '/ranking': typeof MainRankingRoute
+  '/admin/auditoria': typeof MainAdminAuditoriaRoute
+  '/admin/configuracoes': typeof MainAdminConfiguracoesRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
+  '/admin/relatorios': typeof MainAdminRelatoriosRoute
   '/admin/saques': typeof MainAdminSaquesRoute
+  '/admin/usuarios': typeof MainAdminUsuariosRouteWithChildren
   '/admin/': typeof MainAdminIndexRoute
+  '/admin/usuarios/$id': typeof MainAdminUsuariosIdRoute
   '/api/public/hooks/sync-partidas': typeof ApiPublicHooksSyncPartidasRoute
 }
 export interface FileRoutesByTo {
@@ -127,9 +162,14 @@ export interface FileRoutesByTo {
   '/home': typeof MainHomeRoute
   '/perfil': typeof MainPerfilRoute
   '/ranking': typeof MainRankingRoute
+  '/admin/auditoria': typeof MainAdminAuditoriaRoute
+  '/admin/configuracoes': typeof MainAdminConfiguracoesRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
+  '/admin/relatorios': typeof MainAdminRelatoriosRoute
   '/admin/saques': typeof MainAdminSaquesRoute
+  '/admin/usuarios': typeof MainAdminUsuariosRouteWithChildren
   '/admin': typeof MainAdminIndexRoute
+  '/admin/usuarios/$id': typeof MainAdminUsuariosIdRoute
   '/api/public/hooks/sync-partidas': typeof ApiPublicHooksSyncPartidasRoute
 }
 export interface FileRoutesById {
@@ -145,9 +185,14 @@ export interface FileRoutesById {
   '/_main/home': typeof MainHomeRoute
   '/_main/perfil': typeof MainPerfilRoute
   '/_main/ranking': typeof MainRankingRoute
+  '/_main/admin/auditoria': typeof MainAdminAuditoriaRoute
+  '/_main/admin/configuracoes': typeof MainAdminConfiguracoesRoute
   '/_main/admin/partidas': typeof MainAdminPartidasRoute
+  '/_main/admin/relatorios': typeof MainAdminRelatoriosRoute
   '/_main/admin/saques': typeof MainAdminSaquesRoute
+  '/_main/admin/usuarios': typeof MainAdminUsuariosRouteWithChildren
   '/_main/admin/': typeof MainAdminIndexRoute
+  '/_main/admin/usuarios/$id': typeof MainAdminUsuariosIdRoute
   '/api/public/hooks/sync-partidas': typeof ApiPublicHooksSyncPartidasRoute
 }
 export interface FileRouteTypes {
@@ -163,9 +208,14 @@ export interface FileRouteTypes {
     | '/home'
     | '/perfil'
     | '/ranking'
+    | '/admin/auditoria'
+    | '/admin/configuracoes'
     | '/admin/partidas'
+    | '/admin/relatorios'
     | '/admin/saques'
+    | '/admin/usuarios'
     | '/admin/'
+    | '/admin/usuarios/$id'
     | '/api/public/hooks/sync-partidas'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -178,9 +228,14 @@ export interface FileRouteTypes {
     | '/home'
     | '/perfil'
     | '/ranking'
+    | '/admin/auditoria'
+    | '/admin/configuracoes'
     | '/admin/partidas'
+    | '/admin/relatorios'
     | '/admin/saques'
+    | '/admin/usuarios'
     | '/admin'
+    | '/admin/usuarios/$id'
     | '/api/public/hooks/sync-partidas'
   id:
     | '__root__'
@@ -195,9 +250,14 @@ export interface FileRouteTypes {
     | '/_main/home'
     | '/_main/perfil'
     | '/_main/ranking'
+    | '/_main/admin/auditoria'
+    | '/_main/admin/configuracoes'
     | '/_main/admin/partidas'
+    | '/_main/admin/relatorios'
     | '/_main/admin/saques'
+    | '/_main/admin/usuarios'
     | '/_main/admin/'
+    | '/_main/admin/usuarios/$id'
     | '/api/public/hooks/sync-partidas'
   fileRoutesById: FileRoutesById
 }
@@ -295,11 +355,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainAdminIndexRouteImport
       parentRoute: typeof MainAdminRoute
     }
+    '/_main/admin/usuarios': {
+      id: '/_main/admin/usuarios'
+      path: '/usuarios'
+      fullPath: '/admin/usuarios'
+      preLoaderRoute: typeof MainAdminUsuariosRouteImport
+      parentRoute: typeof MainAdminRoute
+    }
     '/_main/admin/saques': {
       id: '/_main/admin/saques'
       path: '/saques'
       fullPath: '/admin/saques'
       preLoaderRoute: typeof MainAdminSaquesRouteImport
+      parentRoute: typeof MainAdminRoute
+    }
+    '/_main/admin/relatorios': {
+      id: '/_main/admin/relatorios'
+      path: '/relatorios'
+      fullPath: '/admin/relatorios'
+      preLoaderRoute: typeof MainAdminRelatoriosRouteImport
       parentRoute: typeof MainAdminRoute
     }
     '/_main/admin/partidas': {
@@ -309,6 +383,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainAdminPartidasRouteImport
       parentRoute: typeof MainAdminRoute
     }
+    '/_main/admin/configuracoes': {
+      id: '/_main/admin/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/admin/configuracoes'
+      preLoaderRoute: typeof MainAdminConfiguracoesRouteImport
+      parentRoute: typeof MainAdminRoute
+    }
+    '/_main/admin/auditoria': {
+      id: '/_main/admin/auditoria'
+      path: '/auditoria'
+      fullPath: '/admin/auditoria'
+      preLoaderRoute: typeof MainAdminAuditoriaRouteImport
+      parentRoute: typeof MainAdminRoute
+    }
     '/api/public/hooks/sync-partidas': {
       id: '/api/public/hooks/sync-partidas'
       path: '/api/public/hooks/sync-partidas'
@@ -316,18 +404,44 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksSyncPartidasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_main/admin/usuarios/$id': {
+      id: '/_main/admin/usuarios/$id'
+      path: '/$id'
+      fullPath: '/admin/usuarios/$id'
+      preLoaderRoute: typeof MainAdminUsuariosIdRouteImport
+      parentRoute: typeof MainAdminUsuariosRoute
+    }
   }
 }
 
+interface MainAdminUsuariosRouteChildren {
+  MainAdminUsuariosIdRoute: typeof MainAdminUsuariosIdRoute
+}
+
+const MainAdminUsuariosRouteChildren: MainAdminUsuariosRouteChildren = {
+  MainAdminUsuariosIdRoute: MainAdminUsuariosIdRoute,
+}
+
+const MainAdminUsuariosRouteWithChildren =
+  MainAdminUsuariosRoute._addFileChildren(MainAdminUsuariosRouteChildren)
+
 interface MainAdminRouteChildren {
+  MainAdminAuditoriaRoute: typeof MainAdminAuditoriaRoute
+  MainAdminConfiguracoesRoute: typeof MainAdminConfiguracoesRoute
   MainAdminPartidasRoute: typeof MainAdminPartidasRoute
+  MainAdminRelatoriosRoute: typeof MainAdminRelatoriosRoute
   MainAdminSaquesRoute: typeof MainAdminSaquesRoute
+  MainAdminUsuariosRoute: typeof MainAdminUsuariosRouteWithChildren
   MainAdminIndexRoute: typeof MainAdminIndexRoute
 }
 
 const MainAdminRouteChildren: MainAdminRouteChildren = {
+  MainAdminAuditoriaRoute: MainAdminAuditoriaRoute,
+  MainAdminConfiguracoesRoute: MainAdminConfiguracoesRoute,
   MainAdminPartidasRoute: MainAdminPartidasRoute,
+  MainAdminRelatoriosRoute: MainAdminRelatoriosRoute,
   MainAdminSaquesRoute: MainAdminSaquesRoute,
+  MainAdminUsuariosRoute: MainAdminUsuariosRouteWithChildren,
   MainAdminIndexRoute: MainAdminIndexRoute,
 }
 

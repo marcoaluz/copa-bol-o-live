@@ -113,21 +113,39 @@ export type Database = {
       config: {
         Row: {
           id: number
+          manutencao_ativa: boolean
+          manutencao_mensagem: string | null
           politica_sem_ganhadores: Database["public"]["Enums"]["politica_sem_ganhadores"]
           taxa_casa_percentual: number
           updated_at: string
+          valor_maximo_aposta_centavos: number
+          valor_maximo_saque_diario_centavos: number
+          valor_minimo_aposta_centavos: number
+          valor_minimo_saque_centavos: number
         }
         Insert: {
           id?: number
+          manutencao_ativa?: boolean
+          manutencao_mensagem?: string | null
           politica_sem_ganhadores?: Database["public"]["Enums"]["politica_sem_ganhadores"]
           taxa_casa_percentual?: number
           updated_at?: string
+          valor_maximo_aposta_centavos?: number
+          valor_maximo_saque_diario_centavos?: number
+          valor_minimo_aposta_centavos?: number
+          valor_minimo_saque_centavos?: number
         }
         Update: {
           id?: number
+          manutencao_ativa?: boolean
+          manutencao_mensagem?: string | null
           politica_sem_ganhadores?: Database["public"]["Enums"]["politica_sem_ganhadores"]
           taxa_casa_percentual?: number
           updated_at?: string
+          valor_maximo_aposta_centavos?: number
+          valor_maximo_saque_diario_centavos?: number
+          valor_minimo_aposta_centavos?: number
+          valor_minimo_saque_centavos?: number
         }
         Relationships: []
       }
@@ -290,6 +308,9 @@ export type Database = {
           aceitou_termos_em: string | null
           anonimo: boolean
           apelido: string | null
+          bloqueado: boolean
+          bloqueado_em: string | null
+          bloqueado_motivo: string | null
           cpf: string | null
           created_at: string
           data_nascimento: string | null
@@ -305,6 +326,9 @@ export type Database = {
           aceitou_termos_em?: string | null
           anonimo?: boolean
           apelido?: string | null
+          bloqueado?: boolean
+          bloqueado_em?: string | null
+          bloqueado_motivo?: string | null
           cpf?: string | null
           created_at?: string
           data_nascimento?: string | null
@@ -320,6 +344,9 @@ export type Database = {
           aceitou_termos_em?: string | null
           anonimo?: boolean
           apelido?: string | null
+          bloqueado?: boolean
+          bloqueado_em?: string | null
+          bloqueado_motivo?: string | null
           cpf?: string | null
           created_at?: string
           data_nascimento?: string | null
@@ -494,7 +521,32 @@ export type Database = {
     Functions: {
       _assert_admin: { Args: never; Returns: undefined }
       _self_test_apuracao: { Args: never; Returns: Json }
+      admin_dashboard_stats: { Args: never; Returns: Json }
+      admin_receita_diaria: {
+        Args: { p_dias?: number }
+        Returns: {
+          apostado: number
+          dia: string
+          premios: number
+          taxa: number
+        }[]
+      }
+      admin_top_partidas: {
+        Args: { p_limite?: number }
+        Returns: {
+          bolo_centavos: number
+          codigo: string
+          data_hora: string
+          fase: Database["public"]["Enums"]["fase_partida"]
+          partida_id: string
+          qtd_apostas: number
+        }[]
+      }
       agora_servidor: { Args: never; Returns: string }
+      ajustar_saldo_usuario: {
+        Args: { p_delta_centavos: number; p_motivo: string; p_user_id: string }
+        Returns: number
+      }
       apurar_partida: { Args: { p_id: string }; Returns: Json }
       atualizar_partida_externa: {
         Args: {
@@ -529,6 +581,33 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "partidas"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      bloquear_usuario: {
+        Args: { p_motivo: string; p_user_id: string }
+        Returns: {
+          aceitou_risco_em: string | null
+          aceitou_termos_em: string | null
+          anonimo: boolean
+          apelido: string | null
+          bloqueado: boolean
+          bloqueado_em: string | null
+          bloqueado_motivo: string | null
+          cpf: string | null
+          created_at: string
+          data_nascimento: string | null
+          foto_url: string | null
+          id: string
+          is_admin: boolean
+          nome_completo: string | null
+          saldo_centavos: number
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -584,6 +663,33 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "apostas"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      desbloquear_usuario: {
+        Args: { p_user_id: string }
+        Returns: {
+          aceitou_risco_em: string | null
+          aceitou_termos_em: string | null
+          anonimo: boolean
+          apelido: string | null
+          bloqueado: boolean
+          bloqueado_em: string | null
+          bloqueado_motivo: string | null
+          cpf: string | null
+          created_at: string
+          data_nascimento: string | null
+          foto_url: string | null
+          id: string
+          is_admin: boolean
+          nome_completo: string | null
+          saldo_centavos: number
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
           isOneToOne: true
           isSetofReturn: false
         }
