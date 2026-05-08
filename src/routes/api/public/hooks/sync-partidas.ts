@@ -77,8 +77,8 @@ export const Route = createFileRoute("/api/public/hooks/sync-partidas")({
           const { data: upd, error: upErr } = await supabaseAdmin.rpc("atualizar_partida_externa", {
             p_external_id: p.external_id!,
             p_status: novoStatus,
-            p_gols_casa: gc,
-            p_gols_visitante: gv,
+            p_gols_casa: gc ?? undefined,
+            p_gols_visitante: gv ?? undefined,
             p_dados: { source: "thesportsdb", strStatus: ev.strStatus } as any,
           });
           if (upErr) resultados.push({ id: p.id, error: upErr.message });
