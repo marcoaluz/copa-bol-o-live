@@ -63,6 +63,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "apostas_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_usuarios"
+            referencedColumns: ["usuario_id"]
+          },
         ]
       }
       audit_log: {
@@ -162,6 +169,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notificacoes_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_usuarios"
+            referencedColumns: ["usuario_id"]
           },
         ]
       }
@@ -274,10 +288,12 @@ export type Database = {
         Row: {
           aceitou_risco_em: string | null
           aceitou_termos_em: string | null
+          anonimo: boolean
           apelido: string | null
           cpf: string | null
           created_at: string
           data_nascimento: string | null
+          foto_url: string | null
           id: string
           is_admin: boolean
           nome_completo: string | null
@@ -287,10 +303,12 @@ export type Database = {
         Insert: {
           aceitou_risco_em?: string | null
           aceitou_termos_em?: string | null
+          anonimo?: boolean
           apelido?: string | null
           cpf?: string | null
           created_at?: string
           data_nascimento?: string | null
+          foto_url?: string | null
           id: string
           is_admin?: boolean
           nome_completo?: string | null
@@ -300,10 +318,12 @@ export type Database = {
         Update: {
           aceitou_risco_em?: string | null
           aceitou_termos_em?: string | null
+          anonimo?: boolean
           apelido?: string | null
           cpf?: string | null
           created_at?: string
           data_nascimento?: string | null
+          foto_url?: string | null
           id?: string
           is_admin?: boolean
           nome_completo?: string | null
@@ -378,6 +398,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "transacoes_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "ranking_usuarios"
+            referencedColumns: ["usuario_id"]
+          },
         ]
       }
     }
@@ -394,6 +421,21 @@ export type Database = {
           selecao_id: string | null
           sg: number | null
           vitorias: number | null
+        }
+        Relationships: []
+      }
+      ranking_usuarios: {
+        Row: {
+          anonimo: boolean | null
+          apelido: string | null
+          foto_url: string | null
+          lucro_centavos: number | null
+          taxa_acerto: number | null
+          total_acertos: number | null
+          total_apostado_centavos: number | null
+          total_apostas: number | null
+          total_ganho_centavos: number | null
+          usuario_id: string | null
         }
         Relationships: []
       }
@@ -495,6 +537,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      estatisticas_usuario: { Args: { p_uid?: string }; Returns: Json }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       lancar_resultado_partida: {
         Args: { p_gols_casa: number; p_gols_visitante: number; p_id: string }
@@ -528,6 +571,22 @@ export type Database = {
         }
       }
       marcar_notificacoes_lidas: { Args: { p_ids?: string[] }; Returns: number }
+      ranking_filtrado: {
+        Args: { p_filtro?: string }
+        Returns: {
+          anonimo: boolean
+          apelido: string
+          foto_url: string
+          lucro_centavos: number
+          posicao: number
+          taxa_acerto: number
+          total_acertos: number
+          total_apostado_centavos: number
+          total_apostas: number
+          total_ganho_centavos: number
+          usuario_id: string
+        }[]
+      }
     }
     Enums: {
       fase_partida:
