@@ -27,6 +27,7 @@ import { Route as MainAdminUsuariosRouteImport } from './routes/_main/admin.usua
 import { Route as MainAdminSaquesRouteImport } from './routes/_main/admin.saques'
 import { Route as MainAdminRelatoriosRouteImport } from './routes/_main/admin.relatorios'
 import { Route as MainAdminPartidasRouteImport } from './routes/_main/admin.partidas'
+import { Route as MainAdminConvitesRouteImport } from './routes/_main/admin.convites'
 import { Route as MainAdminConfiguracoesRouteImport } from './routes/_main/admin.configuracoes'
 import { Route as MainAdminChecklistRouteImport } from './routes/_main/admin.checklist'
 import { Route as MainAdminAuditoriaRouteImport } from './routes/_main/admin.auditoria'
@@ -122,6 +123,11 @@ const MainAdminPartidasRoute = MainAdminPartidasRouteImport.update({
   path: '/partidas',
   getParentRoute: () => MainAdminRoute,
 } as any)
+const MainAdminConvitesRoute = MainAdminConvitesRouteImport.update({
+  id: '/convites',
+  path: '/convites',
+  getParentRoute: () => MainAdminRoute,
+} as any)
 const MainAdminConfiguracoesRoute = MainAdminConfiguracoesRouteImport.update({
   id: '/configuracoes',
   path: '/configuracoes',
@@ -165,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/admin/auditoria': typeof MainAdminAuditoriaRoute
   '/admin/checklist': typeof MainAdminChecklistRoute
   '/admin/configuracoes': typeof MainAdminConfiguracoesRoute
+  '/admin/convites': typeof MainAdminConvitesRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
   '/admin/relatorios': typeof MainAdminRelatoriosRoute
   '/admin/saques': typeof MainAdminSaquesRoute
@@ -188,6 +195,7 @@ export interface FileRoutesByTo {
   '/admin/auditoria': typeof MainAdminAuditoriaRoute
   '/admin/checklist': typeof MainAdminChecklistRoute
   '/admin/configuracoes': typeof MainAdminConfiguracoesRoute
+  '/admin/convites': typeof MainAdminConvitesRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
   '/admin/relatorios': typeof MainAdminRelatoriosRoute
   '/admin/saques': typeof MainAdminSaquesRoute
@@ -214,6 +222,7 @@ export interface FileRoutesById {
   '/_main/admin/auditoria': typeof MainAdminAuditoriaRoute
   '/_main/admin/checklist': typeof MainAdminChecklistRoute
   '/_main/admin/configuracoes': typeof MainAdminConfiguracoesRoute
+  '/_main/admin/convites': typeof MainAdminConvitesRoute
   '/_main/admin/partidas': typeof MainAdminPartidasRoute
   '/_main/admin/relatorios': typeof MainAdminRelatoriosRoute
   '/_main/admin/saques': typeof MainAdminSaquesRoute
@@ -240,6 +249,7 @@ export interface FileRouteTypes {
     | '/admin/auditoria'
     | '/admin/checklist'
     | '/admin/configuracoes'
+    | '/admin/convites'
     | '/admin/partidas'
     | '/admin/relatorios'
     | '/admin/saques'
@@ -263,6 +273,7 @@ export interface FileRouteTypes {
     | '/admin/auditoria'
     | '/admin/checklist'
     | '/admin/configuracoes'
+    | '/admin/convites'
     | '/admin/partidas'
     | '/admin/relatorios'
     | '/admin/saques'
@@ -288,6 +299,7 @@ export interface FileRouteTypes {
     | '/_main/admin/auditoria'
     | '/_main/admin/checklist'
     | '/_main/admin/configuracoes'
+    | '/_main/admin/convites'
     | '/_main/admin/partidas'
     | '/_main/admin/relatorios'
     | '/_main/admin/saques'
@@ -434,6 +446,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainAdminPartidasRouteImport
       parentRoute: typeof MainAdminRoute
     }
+    '/_main/admin/convites': {
+      id: '/_main/admin/convites'
+      path: '/convites'
+      fullPath: '/admin/convites'
+      preLoaderRoute: typeof MainAdminConvitesRouteImport
+      parentRoute: typeof MainAdminRoute
+    }
     '/_main/admin/configuracoes': {
       id: '/_main/admin/configuracoes'
       path: '/configuracoes'
@@ -487,6 +506,7 @@ interface MainAdminRouteChildren {
   MainAdminAuditoriaRoute: typeof MainAdminAuditoriaRoute
   MainAdminChecklistRoute: typeof MainAdminChecklistRoute
   MainAdminConfiguracoesRoute: typeof MainAdminConfiguracoesRoute
+  MainAdminConvitesRoute: typeof MainAdminConvitesRoute
   MainAdminPartidasRoute: typeof MainAdminPartidasRoute
   MainAdminRelatoriosRoute: typeof MainAdminRelatoriosRoute
   MainAdminSaquesRoute: typeof MainAdminSaquesRoute
@@ -498,6 +518,7 @@ const MainAdminRouteChildren: MainAdminRouteChildren = {
   MainAdminAuditoriaRoute: MainAdminAuditoriaRoute,
   MainAdminChecklistRoute: MainAdminChecklistRoute,
   MainAdminConfiguracoesRoute: MainAdminConfiguracoesRoute,
+  MainAdminConvitesRoute: MainAdminConvitesRoute,
   MainAdminPartidasRoute: MainAdminPartidasRoute,
   MainAdminRelatoriosRoute: MainAdminRelatoriosRoute,
   MainAdminSaquesRoute: MainAdminSaquesRoute,

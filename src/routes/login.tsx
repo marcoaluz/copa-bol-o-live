@@ -87,6 +87,10 @@ function LoginPage() {
           />
           .
         </p>
+
+        <p className="mt-6 text-[11px] text-muted-foreground/70 uppercase tracking-[0.2em]">
+          Bolão privado — acesso somente por convite
+        </p>
       </div>
     </div>
   );

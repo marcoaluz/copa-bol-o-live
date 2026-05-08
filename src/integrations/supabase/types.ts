@@ -613,6 +613,45 @@ export type Database = {
           },
         ]
       }
+      usuarios_autorizados: {
+        Row: {
+          convidado_por: string | null
+          convite_aceito: boolean
+          created_at: string
+          email: string
+          observacao: string | null
+        }
+        Insert: {
+          convidado_por?: string | null
+          convite_aceito?: boolean
+          created_at?: string
+          email: string
+          observacao?: string | null
+        }
+        Update: {
+          convidado_por?: string | null
+          convite_aceito?: boolean
+          created_at?: string
+          email?: string
+          observacao?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usuarios_autorizados_convidado_por_fkey"
+            columns: ["convidado_por"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "usuarios_autorizados_convidado_por_fkey"
+            columns: ["convidado_por"]
+            isOneToOne: false
+            referencedRelation: "ranking_usuarios"
+            referencedColumns: ["usuario_id"]
+          },
+        ]
+      }
     }
     Views: {
       classificacao_grupos: {
@@ -649,6 +688,10 @@ export type Database = {
     Functions: {
       _assert_admin: { Args: never; Returns: undefined }
       _self_test_apuracao: { Args: never; Returns: Json }
+      adicionar_emails_autorizados: {
+        Args: { p_emails: string[] }
+        Returns: number
+      }
       admin_dashboard_stats: { Args: never; Returns: Json }
       admin_receita_diaria: {
         Args: { p_dias?: number }
@@ -822,6 +865,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      email_esta_autorizado: { Args: never; Returns: boolean }
       estatisticas_usuario: { Args: { p_uid?: string }; Returns: Json }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       lancar_resultado_partida: {
@@ -855,6 +899,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      marcar_convite_aceito: { Args: never; Returns: undefined }
       marcar_notificacoes_lidas: { Args: { p_ids?: string[] }; Returns: number }
       processar_saque: {
         Args: {
@@ -902,6 +947,7 @@ export type Database = {
           usuario_id: string
         }[]
       }
+      remover_email_autorizado: { Args: { p_email: string }; Returns: boolean }
       resgatar_bonus: { Args: { p_tipo: string }; Returns: Json }
       solicitar_saque: {
         Args: {

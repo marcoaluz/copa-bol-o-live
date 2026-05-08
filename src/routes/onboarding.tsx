@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Trophy, AlertTriangle } from "lucide-react";
+import { Trophy, AlertTriangle, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,12 +25,31 @@ function OnboardingPage() {
   const [aceitouRisco, setAceitouRisco] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [erroIdade, setErroIdade] = useState(false);
+  const [naoAutorizado, setNaoAutorizado] = useState(false);
+  const [verificandoAcesso, setVerificandoAcesso] = useState(true);
 
   useEffect(() => {
     if (loading) return;
     if (!user) navigate({ to: "/login" });
     else if (isOnboarded(profile)) navigate({ to: "/home" });
   }, [user, profile, loading, navigate]);
+
+  useEffect(() => {
+    if (loading || !user) return;
+    let cancel = false;
+    (async () => {
+      const { data, error } = await (supabase as any).rpc("email_esta_autorizado");
+      if (cancel) return;
+      if (error || !data) {
+        setNaoAutorizado(true);
+        await supabase.auth.signOut();
+      } else {
+        await (supabase as any).rpc("marcar_convite_aceito");
+      }
+      setVerificandoAcesso(false);
+    })();
+    return () => { cancel = true; };
+  }, [user, loading]);
 
   const podeEnviar =
     aceitouTermos &&
@@ -91,6 +110,30 @@ function OnboardingPage() {
           </p>
           <Button onClick={() => navigate({ to: "/login" })} variant="outline">Voltar ao login</Button>
         </div>
+      </div>
+    );
+  }
+
+  if (naoAutorizado) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-6 bg-gradient-pitch">
+        <div className="max-w-md text-center bg-card border border-gold/40 rounded-2xl p-8">
+          <Lock className="w-12 h-12 text-gold mx-auto mb-4" />
+          <h1 className="font-display text-3xl tracking-wider mb-2">Acesso restrito</h1>
+          <p className="text-muted-foreground mb-6">
+            Este é um bolão privado entre amigos. Peça um convite ao organizador
+            para acessar.
+          </p>
+          <Button onClick={() => navigate({ to: "/login" })} variant="outline">Voltar ao login</Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (verificandoAcesso) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-pitch">
+        <Trophy className="w-8 h-8 text-primary animate-pulse" />
       </div>
     );
   }
