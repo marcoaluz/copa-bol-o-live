@@ -27,6 +27,7 @@ import { Route as MainAdminUsuariosRouteImport } from './routes/_main/admin.usua
 import { Route as MainAdminSaquesRouteImport } from './routes/_main/admin.saques'
 import { Route as MainAdminRelatoriosRouteImport } from './routes/_main/admin.relatorios'
 import { Route as MainAdminPartidasRouteImport } from './routes/_main/admin.partidas'
+import { Route as MainAdminNotificacoesRouteImport } from './routes/_main/admin.notificacoes'
 import { Route as MainAdminDepositosRouteImport } from './routes/_main/admin.depositos'
 import { Route as MainAdminCustodiaRouteImport } from './routes/_main/admin.custodia'
 import { Route as MainAdminConvitesRouteImport } from './routes/_main/admin.convites'
@@ -125,6 +126,11 @@ const MainAdminPartidasRoute = MainAdminPartidasRouteImport.update({
   path: '/partidas',
   getParentRoute: () => MainAdminRoute,
 } as any)
+const MainAdminNotificacoesRoute = MainAdminNotificacoesRouteImport.update({
+  id: '/notificacoes',
+  path: '/notificacoes',
+  getParentRoute: () => MainAdminRoute,
+} as any)
 const MainAdminDepositosRoute = MainAdminDepositosRouteImport.update({
   id: '/depositos',
   path: '/depositos',
@@ -186,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/admin/convites': typeof MainAdminConvitesRoute
   '/admin/custodia': typeof MainAdminCustodiaRoute
   '/admin/depositos': typeof MainAdminDepositosRoute
+  '/admin/notificacoes': typeof MainAdminNotificacoesRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
   '/admin/relatorios': typeof MainAdminRelatoriosRoute
   '/admin/saques': typeof MainAdminSaquesRoute
@@ -212,6 +219,7 @@ export interface FileRoutesByTo {
   '/admin/convites': typeof MainAdminConvitesRoute
   '/admin/custodia': typeof MainAdminCustodiaRoute
   '/admin/depositos': typeof MainAdminDepositosRoute
+  '/admin/notificacoes': typeof MainAdminNotificacoesRoute
   '/admin/partidas': typeof MainAdminPartidasRoute
   '/admin/relatorios': typeof MainAdminRelatoriosRoute
   '/admin/saques': typeof MainAdminSaquesRoute
@@ -241,6 +249,7 @@ export interface FileRoutesById {
   '/_main/admin/convites': typeof MainAdminConvitesRoute
   '/_main/admin/custodia': typeof MainAdminCustodiaRoute
   '/_main/admin/depositos': typeof MainAdminDepositosRoute
+  '/_main/admin/notificacoes': typeof MainAdminNotificacoesRoute
   '/_main/admin/partidas': typeof MainAdminPartidasRoute
   '/_main/admin/relatorios': typeof MainAdminRelatoriosRoute
   '/_main/admin/saques': typeof MainAdminSaquesRoute
@@ -270,6 +279,7 @@ export interface FileRouteTypes {
     | '/admin/convites'
     | '/admin/custodia'
     | '/admin/depositos'
+    | '/admin/notificacoes'
     | '/admin/partidas'
     | '/admin/relatorios'
     | '/admin/saques'
@@ -296,6 +306,7 @@ export interface FileRouteTypes {
     | '/admin/convites'
     | '/admin/custodia'
     | '/admin/depositos'
+    | '/admin/notificacoes'
     | '/admin/partidas'
     | '/admin/relatorios'
     | '/admin/saques'
@@ -324,6 +335,7 @@ export interface FileRouteTypes {
     | '/_main/admin/convites'
     | '/_main/admin/custodia'
     | '/_main/admin/depositos'
+    | '/_main/admin/notificacoes'
     | '/_main/admin/partidas'
     | '/_main/admin/relatorios'
     | '/_main/admin/saques'
@@ -470,6 +482,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainAdminPartidasRouteImport
       parentRoute: typeof MainAdminRoute
     }
+    '/_main/admin/notificacoes': {
+      id: '/_main/admin/notificacoes'
+      path: '/notificacoes'
+      fullPath: '/admin/notificacoes'
+      preLoaderRoute: typeof MainAdminNotificacoesRouteImport
+      parentRoute: typeof MainAdminRoute
+    }
     '/_main/admin/depositos': {
       id: '/_main/admin/depositos'
       path: '/depositos'
@@ -547,6 +566,7 @@ interface MainAdminRouteChildren {
   MainAdminConvitesRoute: typeof MainAdminConvitesRoute
   MainAdminCustodiaRoute: typeof MainAdminCustodiaRoute
   MainAdminDepositosRoute: typeof MainAdminDepositosRoute
+  MainAdminNotificacoesRoute: typeof MainAdminNotificacoesRoute
   MainAdminPartidasRoute: typeof MainAdminPartidasRoute
   MainAdminRelatoriosRoute: typeof MainAdminRelatoriosRoute
   MainAdminSaquesRoute: typeof MainAdminSaquesRoute
@@ -561,6 +581,7 @@ const MainAdminRouteChildren: MainAdminRouteChildren = {
   MainAdminConvitesRoute: MainAdminConvitesRoute,
   MainAdminCustodiaRoute: MainAdminCustodiaRoute,
   MainAdminDepositosRoute: MainAdminDepositosRoute,
+  MainAdminNotificacoesRoute: MainAdminNotificacoesRoute,
   MainAdminPartidasRoute: MainAdminPartidasRoute,
   MainAdminRelatoriosRoute: MainAdminRelatoriosRoute,
   MainAdminSaquesRoute: MainAdminSaquesRoute,

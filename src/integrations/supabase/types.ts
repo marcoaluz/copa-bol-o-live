@@ -177,6 +177,10 @@ export type Database = {
           manutencao_ativa: boolean
           manutencao_mensagem: string | null
           nome_admin_recebedor: string
+          notif_email_ativo: boolean
+          notif_email_destino: string
+          notif_eventos: Json
+          notif_telegram_ativo: boolean
           politica_sem_ganhadores: Database["public"]["Enums"]["politica_sem_ganhadores"]
           saldo_bancario_declarado_centavos: number
           taxa_casa_percentual: number
@@ -195,6 +199,10 @@ export type Database = {
           manutencao_ativa?: boolean
           manutencao_mensagem?: string | null
           nome_admin_recebedor?: string
+          notif_email_ativo?: boolean
+          notif_email_destino?: string
+          notif_eventos?: Json
+          notif_telegram_ativo?: boolean
           politica_sem_ganhadores?: Database["public"]["Enums"]["politica_sem_ganhadores"]
           saldo_bancario_declarado_centavos?: number
           taxa_casa_percentual?: number
@@ -213,6 +221,10 @@ export type Database = {
           manutencao_ativa?: boolean
           manutencao_mensagem?: string | null
           nome_admin_recebedor?: string
+          notif_email_ativo?: boolean
+          notif_email_destino?: string
+          notif_eventos?: Json
+          notif_telegram_ativo?: boolean
           politica_sem_ganhadores?: Database["public"]["Enums"]["politica_sem_ganhadores"]
           saldo_bancario_declarado_centavos?: number
           taxa_casa_percentual?: number
@@ -345,6 +357,45 @@ export type Database = {
             referencedColumns: ["usuario_id"]
           },
         ]
+      }
+      notificacoes_admin: {
+        Row: {
+          canais_enviados: string[]
+          canais_falharam: string[]
+          created_at: string
+          enviada_em: string | null
+          evento: string
+          id: string
+          payload: Json
+          status: string
+          tentativas: number
+          ultimo_erro: string | null
+        }
+        Insert: {
+          canais_enviados?: string[]
+          canais_falharam?: string[]
+          created_at?: string
+          enviada_em?: string | null
+          evento: string
+          id?: string
+          payload: Json
+          status?: string
+          tentativas?: number
+          ultimo_erro?: string | null
+        }
+        Update: {
+          canais_enviados?: string[]
+          canais_falharam?: string[]
+          created_at?: string
+          enviada_em?: string | null
+          evento?: string
+          id?: string
+          payload?: Json
+          status?: string
+          tentativas?: number
+          ultimo_erro?: string | null
+        }
+        Relationships: []
       }
       partidas: {
         Row: {
