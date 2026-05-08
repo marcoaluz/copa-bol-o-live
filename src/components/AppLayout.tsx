@@ -1,5 +1,5 @@
 import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
-import { Home, Trophy, Users, BarChart3, User, Shield, Wallet, ChevronDown, LogOut, Settings } from "lucide-react";
+import { Home, Trophy, Users, BarChart3, User, Shield, Wallet, ChevronDown, LogOut, Settings, Coins } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +17,7 @@ const navItems = [
   { to: "/chaveamento", label: "Chaveamento", icon: Trophy },
   { to: "/grupos", label: "Grupos", icon: Users },
   { to: "/ranking", label: "Ranking", icon: BarChart3 },
+  { to: "/carteira", label: "Carteira", icon: Coins },
   { to: "/perfil", label: "Perfil", icon: User },
 ] as const;
 
