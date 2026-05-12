@@ -9,7 +9,15 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { MailPlus, Trash2, Users, AlertTriangle, RefreshCw } from "lucide-react";
+import { MailPlus, Trash2, Users, AlertTriangle, RefreshCw, Send, MessageCircle, Mail, Copy } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_main/admin/convites")({
@@ -49,6 +57,21 @@ function ConvitesPage() {
   const [filtro, setFiltro] = useState<"todos" | "aceitos" | "pendentes">("todos");
   const [busca, setBusca] = useState("");
   const [ultimaAtualizacao, setUltimaAtualizacao] = useState<Date>(() => new Date());
+  const [convitesParaCompartilhar, setConvitesParaCompartilhar] = useState<string[]>([]);
+  const [nomesPersonalizados, setNomesPersonalizados] = useState<Record<string, string>>({});
+
+  const { data: cfg } = useQuery({
+    queryKey: ["config", "convite"],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("config")
+        .select("app_url_publica, convite_template")
+        .eq("id", 1)
+        .single();
+      if (error) throw error;
+      return data as { app_url_publica: string; convite_template: string };
+    },
+  });
 
   useEffect(() => {
     if (profile && !profile.is_admin) navigate({ to: "/home" });
@@ -84,9 +107,11 @@ function ConvitesPage() {
       if (error) throw error;
       return data as number;
     },
-    onSuccess: (qtd) => {
+    onSuccess: (qtd, variables) => {
       toast.success(`${qtd} e-mail(s) autorizado(s)`);
       setRaw("");
+      setConvitesParaCompartilhar(variables);
+      setNomesPersonalizados({});
       qc.invalidateQueries({ queryKey: ["admin", "convites"] });
       refetch();
     },
