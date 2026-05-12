@@ -339,6 +339,16 @@ function ConvitesPage() {
                   <Badge variant="outline">Pendente</Badge>
                 )}
                 <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setConvitesParaCompartilhar([a.email]);
+                    setNomesPersonalizados({});
+                  }}
+                >
+                  <Send className="w-3.5 h-3.5 mr-1" /> Reenviar
+                </Button>
+                <Button
                   size="icon"
                   variant="ghost"
                   onClick={() => {
@@ -353,6 +363,94 @@ function ConvitesPage() {
           </div>
         )}
       </Card>
+
+      <Dialog
+        open={convitesParaCompartilhar.length > 0}
+        onOpenChange={(open) => {
+          if (!open) setConvitesParaCompartilhar([]);
+        }}
+      >
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Send className="w-5 h-5 text-gold" />
+              Convidar {convitesParaCompartilhar.length} amigo(s)
+            </DialogTitle>
+            <DialogDescription>
+              Eles já estão autorizados a entrar. Compartilhe a mensagem para que saibam como acessar.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            {convitesParaCompartilhar.map((email) => {
+              const nome = nomesPersonalizados[email] ?? "";
+              const msg = gerarMensagem(email, nome, cfg);
+              return (
+                <div
+                  key={email}
+                  className="rounded-lg border border-border bg-surface/50 p-4 space-y-3"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-medium truncate">{email}</p>
+                    <Badge className="bg-primary/15 text-primary border-primary/30 shrink-0">
+                      Autorizado
+                    </Badge>
+                  </div>
+
+                  <div>
+                    <label className="text-xs text-muted-foreground">Nome do amigo (opcional)</label>
+                    <Input
+                      value={nome}
+                      onChange={(e) =>
+                        setNomesPersonalizados({
+                          ...nomesPersonalizados,
+                          [email]: e.target.value,
+                        })
+                      }
+                      placeholder="Ex: João"
+                      className="mt-1"
+                    />
+                    <p className="text-[11px] text-muted-foreground mt-1">
+                      Substitui {"{nome}"} na mensagem. Se vazio, usa parte do e-mail.
+                    </p>
+                  </div>
+
+                  <div className="rounded-md bg-background border border-border p-3 max-h-48 overflow-y-auto">
+                    <pre className="text-xs whitespace-pre-wrap font-sans text-foreground/90">
+                      {msg}
+                    </pre>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      className="bg-gradient-primary"
+                      onClick={() => abrirWhatsApp(msg)}
+                    >
+                      <MessageCircle className="w-4 h-4 mr-1" />
+                      WhatsApp
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => abrirEmail(email, msg)}>
+                      <Mail className="w-4 h-4 mr-1" />
+                      E-mail
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => copiarMensagem(msg)}>
+                      <Copy className="w-4 h-4 mr-1" />
+                      Copiar
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConvitesParaCompartilhar([])}>
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
