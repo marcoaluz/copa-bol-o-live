@@ -241,6 +241,38 @@ function Page() {
         </div>
       </Card>
 
+      <Card className="bg-card border-border rounded-xl shadow-card p-5 mb-4">
+        <h3 className="font-semibold mb-1">Convite de novos usuários</h3>
+        <p className="text-xs text-muted-foreground mb-4">
+          Configure a URL pública e o template da mensagem de convite.
+        </p>
+        <div className="space-y-4">
+          <div>
+            <Label>URL pública do app</Label>
+            <Input
+              value={form.app_url_publica ?? ""}
+              onChange={(e) => setForm({ ...form, app_url_publica: e.target.value })}
+              placeholder="https://copa-bolao-live.lovable.app"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              URL para onde os amigos vão acessar. Inclua https://
+            </p>
+          </div>
+          <div>
+            <Label>Mensagem do convite (template)</Label>
+            <Textarea
+              value={form.convite_template ?? ""}
+              onChange={(e) => setForm({ ...form, convite_template: e.target.value })}
+              rows={10}
+              className="font-mono text-sm"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Variáveis disponíveis: <code>{"{nome}"}</code>, <code>{"{url}"}</code>, <code>{"{email}"}</code>
+            </p>
+          </div>
+        </div>
+      </Card>
+
       <Button className="bg-gradient-primary" disabled={m.isPending} onClick={() => m.mutate(form)}>
         <Save className="w-4 h-4 mr-2" /> Salvar configurações
       </Button>
