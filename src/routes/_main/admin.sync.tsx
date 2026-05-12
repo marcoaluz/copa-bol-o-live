@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
-import { ArrowLeft, RefreshCw, Trash2, AlertTriangle, AlertCircle, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { ArrowLeft, RefreshCw, Trash2, AlertTriangle, Info, CheckCircle2, XCircle, Clock } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_main/admin/sync")({
@@ -49,16 +49,6 @@ function AdminSyncPage() {
     },
   });
 
-  const [leagueId, setLeagueId] = useState("");
-  const [season, setSeason] = useState("");
-
-  useEffect(() => {
-    if (cfg) {
-      setLeagueId(String(cfg.api_football_league_id ?? 1));
-      setSeason(String(cfg.api_football_season ?? 2026));
-    }
-  }, [cfg]);
-
   const syncMut = useMutation({
     mutationFn: async () => {
       const { data, error } = await supabase.functions.invoke("sync-copa-2026", { body: {} });
@@ -84,21 +74,6 @@ function AdminSyncPage() {
       toast.success("Configuração salva");
       qc.invalidateQueries({ queryKey: ["config", "sync"] });
     },
-  });
-
-  const updateLeagueMut = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.from("config").update({
-        api_football_league_id: parseInt(leagueId),
-        api_football_season: parseInt(season),
-      } as any).eq("id", 1);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Liga/temporada atualizada");
-      qc.invalidateQueries({ queryKey: ["config", "sync"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
   });
 
   const resetMut = useMutation({
@@ -129,7 +104,19 @@ function AdminSyncPage() {
       <Link to="/admin" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-3">
         <ArrowLeft className="w-4 h-4" /> Voltar ao admin
       </Link>
-      <PageHeader title="Sincronização API-Football" subtitle="Dados reais da Copa do Mundo 2026" />
+      <PageHeader title="Sincronização OpenFootball" subtitle="Dados reais da Copa do Mundo 2026" />
+
+      <Card className="bg-blue-500/10 border-blue-500/30 rounded-xl p-4 mb-4">
+        <div className="flex gap-3 text-sm">
+          <Info className="w-5 h-5 shrink-0 mt-0.5 text-blue-400" />
+          <div>
+            <strong>Fonte: OpenFootball</strong> — dados públicos da Copa 2026
+            hospedados no GitHub. Grátis, sem chave, sem limite de requests.
+            Atualizações de placares acontecem algumas horas após cada partida.
+            Durante os jogos, lance resultados manualmente em /admin/partidas.
+          </div>
+        </div>
+      </Card>
 
       <Card className="bg-card border-border rounded-xl p-5 shadow-card mb-4">
         <div className="flex items-start justify-between gap-4 mb-4">
@@ -142,40 +129,6 @@ function AdminSyncPage() {
             onCheckedChange={(v) => toggleMut.mutate(v)}
           />
         </div>
-
-        <div className="grid sm:grid-cols-2 gap-3 mb-3">
-          <div>
-            <Label className="text-xs">Liga (league.id)</Label>
-            <Input value={leagueId} onChange={(e) => setLeagueId(e.target.value)} />
-            <p className="text-[11px] text-muted-foreground mt-1">World Cup geralmente é id=1</p>
-          </div>
-          <div>
-            <Label className="text-xs">Temporada (year)</Label>
-            <Input value={season} onChange={(e) => setSeason(e.target.value)} />
-          </div>
-        </div>
-        <div className="bg-gold/10 border border-gold/30 rounded-lg p-3 text-sm flex gap-2 mt-3 mb-3">
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-gold" />
-          <div>
-            <strong>Plano free da API-Football:</strong> só permite temporadas
-            de 2022 a 2024. Para testar com dados reais agora, use season=2022
-            (Copa do Catar). Quando a Copa 2026 começar, será necessário trocar
-            para uma API que cubra 2026 (ex.: TheSportsDB).
-          </div>
-        </div>
-        <div className="flex flex-wrap gap-2 mb-3">
-          <Button type="button" variant="outline" size="sm"
-            onClick={() => { setLeagueId("1"); setSeason("2022"); }}>
-            Copa 2022 (Catar) — testar
-          </Button>
-          <Button type="button" variant="outline" size="sm"
-            onClick={() => { setLeagueId("1"); setSeason("2026"); }}>
-            Copa 2026 (precisa plano pago)
-          </Button>
-        </div>
-        <Button variant="outline" size="sm" onClick={() => updateLeagueMut.mutate()}>
-          Salvar liga/temporada
-        </Button>
       </Card>
 
       <Card className="bg-card border-border rounded-xl p-5 shadow-card mb-4">
