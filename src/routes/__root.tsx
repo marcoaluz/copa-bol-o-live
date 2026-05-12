@@ -108,6 +108,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Copa Bolão 2026" },
       { name: "twitter:description", content: "Bolão entre amigos da Copa 2026 — apostas, ranking e premiação via PIX manual." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/a8f6165e-70c8-4507-b8e1-bffe97dbfdd6" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/a8f6165e-70c8-4507-b8e1-bffe97dbfdd6" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
