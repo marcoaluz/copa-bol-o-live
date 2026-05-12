@@ -246,6 +246,16 @@ function AdminSyncPage() {
                       {" "}{l.requests_consumidos} requests
                     </p>
                   )}
+                  {l.status === "sucesso" && (l.partidas_puladas ?? 0) > 0 && (
+                    <div className="text-xs text-gold mt-1">
+                      <p>⚠ {l.partidas_puladas} partida(s) pulada(s) por time não mapeado.</p>
+                      {Array.isArray(l.times_nao_mapeados) && l.times_nao_mapeados.length > 0 && (
+                        <p className="text-muted-foreground break-words">
+                          {l.times_nao_mapeados.join(" · ")}
+                        </p>
+                      )}
+                    </div>
+                  )}
                   {l.erro && (
                     <p className="text-xs text-destructive mt-1 break-words">
                       {l.erro.includes("Free plans")
