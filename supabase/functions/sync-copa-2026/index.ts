@@ -89,6 +89,19 @@ async function sincronizarTimes(leagueId: number, season: number) {
 async function sincronizarPartidas(leagueId: number, season: number) {
   let inseridas = 0;
   let atualizadas = 0;
+  let puladas = 0;
+  const naoMapeados = new Set<string>();
+
+  // Carrega Map<api_team_id, selecao_id> uma única vez
+  const { data: todasSelecoes } = await supa
+    .from("selecoes")
+    .select("id, api_team_id")
+    .limit(10000);
+  const mapaTimes = new Map<number, string>();
+  for (const s of todasSelecoes ?? []) {
+    if (s.api_team_id != null) mapaTimes.set(Number(s.api_team_id), s.id);
+  }
+
   const data = await apiFetch("/fixtures", {
     league: leagueId.toString(),
     season: season.toString(),
@@ -100,18 +113,23 @@ async function sincronizarPartidas(leagueId: number, season: number) {
     const teams = item.teams;
     const goals = item.goals;
 
-    const { data: casa } = await supa
-      .from("selecoes").select("id").eq("api_team_id", teams.home.id).maybeSingle();
-    const { data: visit } = await supa
-      .from("selecoes").select("id").eq("api_team_id", teams.away.id).maybeSingle();
-    if (!casa || !visit) continue;
+    const casaId = mapaTimes.get(Number(teams.home?.id));
+    const visitId = mapaTimes.get(Number(teams.away?.id));
+    if (!casaId || !visitId) {
+      puladas++;
+      if (!casaId && teams.home?.name) naoMapeados.add(`casa: ${teams.home.name}`);
+      if (!visitId && teams.away?.name) naoMapeados.add(`visitante: ${teams.away.name}`);
+      console.warn(`[sync] partida ${fixture.id} pulada — time não mapeado`,
+        { casa: teams.home?.name, visitante: teams.away?.name });
+      continue;
+    }
 
     const fase = mapFase(league.round ?? "");
     const grupo = extrairGrupo(league.round ?? "");
 
     if (fase === "grupos" && grupo) {
-      await supa.from("selecoes").update({ grupo }).eq("id", casa.id).is("grupo", null);
-      await supa.from("selecoes").update({ grupo }).eq("id", visit.id).is("grupo", null);
+      await supa.from("selecoes").update({ grupo }).eq("id", casaId).is("grupo", null);
+      await supa.from("selecoes").update({ grupo }).eq("id", visitId).is("grupo", null);
     }
 
     const status = mapStatus(fixture.status.short);
@@ -122,8 +140,8 @@ async function sincronizarPartidas(leagueId: number, season: number) {
     const payload: Record<string, unknown> = {
       fase,
       grupo,
-      selecao_casa_id: casa.id,
-      selecao_visitante_id: visit.id,
+      selecao_casa_id: casaId,
+      selecao_visitante_id: visitId,
       data_hora: fixture.date,
       estadio: fixture.venue?.name ?? null,
       status,
@@ -156,7 +174,7 @@ async function sincronizarPartidas(leagueId: number, season: number) {
       inseridas++;
     }
   }
-  return { inseridas, atualizadas };
+  return { inseridas, atualizadas, puladas, naoMapeados: Array.from(naoMapeados) };
 }
 
 Deno.serve(async (req) => {
@@ -205,6 +223,8 @@ Deno.serve(async (req) => {
       finalizado_em: new Date().toISOString(),
       partidas_inseridas: sPartidas.inseridas,
       partidas_atualizadas: sPartidas.atualizadas,
+      partidas_puladas: sPartidas.puladas,
+      times_nao_mapeados: sPartidas.naoMapeados,
       selecoes_inseridas: sTimes.inseridas,
       selecoes_atualizadas: sTimes.atualizadas,
       requests_consumidos: requestsConsumidos,
