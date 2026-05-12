@@ -12,7 +12,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Lock, Unlock, Wallet, Search } from "lucide-react";
+import { ArrowLeft, Lock, Unlock, Wallet, Search, KeyRound, Copy, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_main/admin/usuarios")({
@@ -28,6 +28,7 @@ function Page() {
   const [filtro, setFiltro] = useState<"todos" | "ativos" | "bloqueados" | "comSaldo">("todos");
   const [ajuste, setAjuste] = useState<{ id: string; nome: string } | null>(null);
   const [bloqueio, setBloqueio] = useState<{ id: string; nome: string } | null>(null);
+  const [reset, setReset] = useState<{ id: string; nome: string } | null>(null);
   const qc = useQueryClient();
 
   const { data: users } = useQuery({
@@ -109,6 +110,9 @@ function Page() {
               <Button size="sm" variant="outline" onClick={() => setAjuste({ id: u.id, nome: u.nome_completo || u.apelido || "" })}>
                 <Wallet className="w-3 h-3 mr-1" /> Ajustar
               </Button>
+              <Button size="sm" variant="outline" onClick={() => setReset({ id: u.id, nome: u.nome_completo || u.apelido || "" })}>
+                <KeyRound className="w-3 h-3 mr-1" /> Resetar senha
+              </Button>
               {u.bloqueado ? (
                 <Button size="sm" variant="outline" onClick={() => mUnblock.mutate(u.id)}>
                   <Unlock className="w-3 h-3 mr-1" /> Desbloquear
@@ -126,6 +130,7 @@ function Page() {
 
       <AjustarSaldoDialog data={ajuste} onClose={() => setAjuste(null)} onSubmit={(v, m) => ajuste && mAjuste.mutate({ id: ajuste.id, valor: v, motivo: m })} loading={mAjuste.isPending} />
       <BloquearDialog data={bloqueio} onClose={() => setBloqueio(null)} onSubmit={(m) => bloqueio && mBlock.mutate({ id: bloqueio.id, motivo: m })} loading={mBlock.isPending} />
+      <ResetarSenhaDialog data={reset} onClose={() => setReset(null)} />
     </div>
   );
 }
@@ -174,6 +179,87 @@ function BloquearDialog({ data, onClose, onSubmit, loading }: { data: { id: stri
             if (motivo.trim().length < 3) { toast.error("Informe motivo"); return; }
             onSubmit(motivo.trim());
           }}>Bloquear</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ResetarSenhaDialog({ data, onClose }: { data: { id: string; nome: string } | null; onClose: () => void }) {
+  const [novaSenha, setNovaSenha] = useState("");
+  const [link, setLink] = useState<string | null>(null);
+  const [busy, setBusy] = useState<"" | "senha" | "link">("");
+
+  const reset = () => { setNovaSenha(""); setLink(null); setBusy(""); };
+
+  const definirSenha = async () => {
+    if (!data) return;
+    if (novaSenha.length < 6) { toast.error("Mínimo 6 caracteres"); return; }
+    setBusy("senha");
+    const { data: res, error } = await supabase.functions.invoke("admin-resetar-senha", {
+      body: { acao: "definir_senha", usuario_id: data.id, nova_senha: novaSenha },
+    });
+    setBusy("");
+    if (error || (res as any)?.erro) { toast.error((res as any)?.erro || error?.message || "Falhou"); return; }
+    toast.success("Senha definida! Envie por WhatsApp ao usuário.");
+    setNovaSenha("");
+  };
+
+  const gerarLink = async () => {
+    if (!data) return;
+    setBusy("link");
+    const { data: res, error } = await supabase.functions.invoke("admin-resetar-senha", {
+      body: { acao: "gerar_link", usuario_id: data.id },
+    });
+    setBusy("");
+    if (error || (res as any)?.erro) { toast.error((res as any)?.erro || error?.message || "Falhou"); return; }
+    setLink((res as any)?.link ?? null);
+    toast.success("Link gerado (válido por 1h)");
+  };
+
+  const copiar = async (s: string) => {
+    try { await navigator.clipboard.writeText(s); toast.success("Copiado"); } catch { toast.error("Não foi possível copiar"); }
+  };
+
+  return (
+    <Dialog open={!!data} onOpenChange={(o) => { if (!o) { reset(); onClose(); } }}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Resetar senha — {data?.nome}</DialogTitle>
+          <DialogDescription>
+            Defina uma senha temporária ou gere um link de recuperação para enviar ao usuário.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <div className="space-y-2 border border-border rounded-md p-3">
+            <p className="text-xs font-medium">Opção A — Definir senha temporária</p>
+            <Input type="text" placeholder="Mínimo 6 caracteres" value={novaSenha} onChange={(e) => setNovaSenha(e.target.value)} />
+            <Button size="sm" disabled={busy === "senha"} onClick={definirSenha} className="w-full">
+              {busy === "senha" && <Loader2 className="w-3 h-3 mr-1 animate-spin" />}
+              Definir senha
+            </Button>
+          </div>
+
+          <div className="space-y-2 border border-border rounded-md p-3">
+            <p className="text-xs font-medium">Opção B — Gerar link de recuperação (1h)</p>
+            <Button size="sm" variant="outline" disabled={busy === "link"} onClick={gerarLink} className="w-full">
+              {busy === "link" && <Loader2 className="w-3 h-3 mr-1 animate-spin" />}
+              Gerar link
+            </Button>
+            {link && (
+              <div className="space-y-2">
+                <Textarea readOnly value={link} className="text-xs font-mono" rows={3} />
+                <Button size="sm" variant="outline" onClick={() => copiar(link)} className="w-full">
+                  <Copy className="w-3 h-3 mr-1" /> Copiar link
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => { reset(); onClose(); }}>Fechar</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
