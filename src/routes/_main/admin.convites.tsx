@@ -9,7 +9,15 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { MailPlus, Trash2, Users, AlertTriangle, RefreshCw } from "lucide-react";
+import { MailPlus, Trash2, Users, AlertTriangle, RefreshCw, Send, MessageCircle, Mail, Copy } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_main/admin/convites")({
@@ -41,6 +49,34 @@ function parseEmails(raw: string): { validos: string[]; invalidos: string[] } {
   return { validos, invalidos };
 }
 
+function gerarMensagem(
+  email: string,
+  nome: string,
+  cfg: { app_url_publica?: string; convite_template?: string } | null | undefined,
+): string {
+  const nomeUsado = nome.trim() || email.split("@")[0];
+  return (cfg?.convite_template ?? "")
+    .replace(/\{nome\}/g, nomeUsado)
+    .replace(/\{url\}/g, cfg?.app_url_publica ?? "")
+    .replace(/\{email\}/g, email);
+}
+
+function copiarMensagem(msg: string) {
+  navigator.clipboard.writeText(msg);
+  toast.success("Mensagem copiada");
+}
+
+function abrirWhatsApp(msg: string) {
+  const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+function abrirEmail(email: string, msg: string) {
+  const assunto = "Te convidei pro Bolão da Copa 2026 🏆";
+  const url = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(msg)}`;
+  window.location.href = url;
+}
+
 function ConvitesPage() {
   const { profile } = useAuth();
   const navigate = useNavigate();
@@ -49,6 +85,21 @@ function ConvitesPage() {
   const [filtro, setFiltro] = useState<"todos" | "aceitos" | "pendentes">("todos");
   const [busca, setBusca] = useState("");
   const [ultimaAtualizacao, setUltimaAtualizacao] = useState<Date>(() => new Date());
+  const [convitesParaCompartilhar, setConvitesParaCompartilhar] = useState<string[]>([]);
+  const [nomesPersonalizados, setNomesPersonalizados] = useState<Record<string, string>>({});
+
+  const { data: cfg } = useQuery({
+    queryKey: ["config", "convite"],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("config")
+        .select("app_url_publica, convite_template")
+        .eq("id", 1)
+        .single();
+      if (error) throw error;
+      return data as { app_url_publica: string; convite_template: string };
+    },
+  });
 
   useEffect(() => {
     if (profile && !profile.is_admin) navigate({ to: "/home" });
@@ -84,9 +135,11 @@ function ConvitesPage() {
       if (error) throw error;
       return data as number;
     },
-    onSuccess: (qtd) => {
+    onSuccess: (qtd, variables) => {
       toast.success(`${qtd} e-mail(s) autorizado(s)`);
       setRaw("");
+      setConvitesParaCompartilhar(variables);
+      setNomesPersonalizados({});
       qc.invalidateQueries({ queryKey: ["admin", "convites"] });
       refetch();
     },
@@ -286,6 +339,16 @@ function ConvitesPage() {
                   <Badge variant="outline">Pendente</Badge>
                 )}
                 <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setConvitesParaCompartilhar([a.email]);
+                    setNomesPersonalizados({});
+                  }}
+                >
+                  <Send className="w-3.5 h-3.5 mr-1" /> Reenviar
+                </Button>
+                <Button
                   size="icon"
                   variant="ghost"
                   onClick={() => {
@@ -300,6 +363,94 @@ function ConvitesPage() {
           </div>
         )}
       </Card>
+
+      <Dialog
+        open={convitesParaCompartilhar.length > 0}
+        onOpenChange={(open) => {
+          if (!open) setConvitesParaCompartilhar([]);
+        }}
+      >
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Send className="w-5 h-5 text-gold" />
+              Convidar {convitesParaCompartilhar.length} amigo(s)
+            </DialogTitle>
+            <DialogDescription>
+              Eles já estão autorizados a entrar. Compartilhe a mensagem para que saibam como acessar.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            {convitesParaCompartilhar.map((email) => {
+              const nome = nomesPersonalizados[email] ?? "";
+              const msg = gerarMensagem(email, nome, cfg);
+              return (
+                <div
+                  key={email}
+                  className="rounded-lg border border-border bg-surface/50 p-4 space-y-3"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-medium truncate">{email}</p>
+                    <Badge className="bg-primary/15 text-primary border-primary/30 shrink-0">
+                      Autorizado
+                    </Badge>
+                  </div>
+
+                  <div>
+                    <label className="text-xs text-muted-foreground">Nome do amigo (opcional)</label>
+                    <Input
+                      value={nome}
+                      onChange={(e) =>
+                        setNomesPersonalizados({
+                          ...nomesPersonalizados,
+                          [email]: e.target.value,
+                        })
+                      }
+                      placeholder="Ex: João"
+                      className="mt-1"
+                    />
+                    <p className="text-[11px] text-muted-foreground mt-1">
+                      Substitui {"{nome}"} na mensagem. Se vazio, usa parte do e-mail.
+                    </p>
+                  </div>
+
+                  <div className="rounded-md bg-background border border-border p-3 max-h-48 overflow-y-auto">
+                    <pre className="text-xs whitespace-pre-wrap font-sans text-foreground/90">
+                      {msg}
+                    </pre>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      className="bg-gradient-primary"
+                      onClick={() => abrirWhatsApp(msg)}
+                    >
+                      <MessageCircle className="w-4 h-4 mr-1" />
+                      WhatsApp
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => abrirEmail(email, msg)}>
+                      <Mail className="w-4 h-4 mr-1" />
+                      E-mail
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => copiarMensagem(msg)}>
+                      <Copy className="w-4 h-4 mr-1" />
+                      Copiar
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConvitesParaCompartilhar([])}>
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

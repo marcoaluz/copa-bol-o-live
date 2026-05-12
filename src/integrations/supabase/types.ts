@@ -286,7 +286,9 @@ export type Database = {
           api_football_sync_ativo: boolean
           api_football_ultimo_erro: string | null
           api_football_ultimo_sync: string | null
+          app_url_publica: string
           chave_pix_admin: string
+          convite_template: string
           deposito_maximo_centavos: number
           deposito_maximo_mensal_centavos: number
           deposito_minimo_centavos: number
@@ -313,7 +315,9 @@ export type Database = {
           api_football_sync_ativo?: boolean
           api_football_ultimo_erro?: string | null
           api_football_ultimo_sync?: string | null
+          app_url_publica?: string
           chave_pix_admin?: string
+          convite_template?: string
           deposito_maximo_centavos?: number
           deposito_maximo_mensal_centavos?: number
           deposito_minimo_centavos?: number
@@ -340,7 +344,9 @@ export type Database = {
           api_football_sync_ativo?: boolean
           api_football_ultimo_erro?: string | null
           api_football_ultimo_sync?: string | null
+          app_url_publica?: string
           chave_pix_admin?: string
+          convite_template?: string
           deposito_maximo_centavos?: number
           deposito_maximo_mensal_centavos?: number
           deposito_minimo_centavos?: number
