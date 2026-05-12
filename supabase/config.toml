@@ -1,1 +1,4 @@
 project_id = "zhaoowunnogglyvpikcb"
+
+[functions.admin-resetar-senha]
+verify_jwt = false

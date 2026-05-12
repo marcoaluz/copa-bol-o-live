@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MainRouteImport } from './routes/_main'
@@ -38,6 +39,11 @@ import { Route as MainAdminAuditoriaRouteImport } from './routes/_main/admin.aud
 import { Route as ApiPublicHooksSyncPartidasRouteImport } from './routes/api/public/hooks/sync-partidas'
 import { Route as MainAdminUsuariosIdRouteImport } from './routes/_main/admin.usuarios.$id'
 
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/admin': typeof MainAdminRouteWithChildren
   '/ajuda': typeof MainAjudaRoute
   '/carteira': typeof MainCarteiraRoute
@@ -212,6 +219,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/ajuda': typeof MainAjudaRoute
   '/carteira': typeof MainCarteiraRoute
   '/chaveamento': typeof MainChaveamentoRoute
@@ -242,6 +250,7 @@ export interface FileRoutesById {
   '/_main': typeof MainRouteWithChildren
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/_main/admin': typeof MainAdminRouteWithChildren
   '/_main/ajuda': typeof MainAjudaRoute
   '/_main/carteira': typeof MainCarteiraRoute
@@ -273,6 +282,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/onboarding'
+    | '/reset-password'
     | '/admin'
     | '/ajuda'
     | '/carteira'
@@ -302,6 +312,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/onboarding'
+    | '/reset-password'
     | '/ajuda'
     | '/carteira'
     | '/chaveamento'
@@ -331,6 +342,7 @@ export interface FileRouteTypes {
     | '/_main'
     | '/login'
     | '/onboarding'
+    | '/reset-password'
     | '/_main/admin'
     | '/_main/ajuda'
     | '/_main/carteira'
@@ -362,12 +374,20 @@ export interface RootRouteChildren {
   MainRoute: typeof MainRouteWithChildren
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ApiSitemapDotxmlRoute: typeof ApiSitemapDotxmlRoute
   ApiPublicHooksSyncPartidasRoute: typeof ApiPublicHooksSyncPartidasRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/onboarding': {
       id: '/onboarding'
       path: '/onboarding'
@@ -643,6 +663,7 @@ const rootRouteChildren: RootRouteChildren = {
   MainRoute: MainRouteWithChildren,
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ApiSitemapDotxmlRoute: ApiSitemapDotxmlRoute,
   ApiPublicHooksSyncPartidasRoute: ApiPublicHooksSyncPartidasRoute,
 }
