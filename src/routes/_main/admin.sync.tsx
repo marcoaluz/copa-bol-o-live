@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
-import { ArrowLeft, RefreshCw, Trash2, AlertTriangle, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { ArrowLeft, RefreshCw, Trash2, AlertTriangle, AlertCircle, CheckCircle2, XCircle, Clock } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_main/admin/sync")({
@@ -154,6 +154,25 @@ function AdminSyncPage() {
             <Input value={season} onChange={(e) => setSeason(e.target.value)} />
           </div>
         </div>
+        <div className="bg-gold/10 border border-gold/30 rounded-lg p-3 text-sm flex gap-2 mt-3 mb-3">
+          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-gold" />
+          <div>
+            <strong>Plano free da API-Football:</strong> só permite temporadas
+            de 2022 a 2024. Para testar com dados reais agora, use season=2022
+            (Copa do Catar). Quando a Copa 2026 começar, será necessário trocar
+            para uma API que cubra 2026 (ex.: TheSportsDB).
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2 mb-3">
+          <Button type="button" variant="outline" size="sm"
+            onClick={() => { setLeagueId("1"); setSeason("2022"); }}>
+            Copa 2022 (Catar) — testar
+          </Button>
+          <Button type="button" variant="outline" size="sm"
+            onClick={() => { setLeagueId("1"); setSeason("2026"); }}>
+            Copa 2026 (precisa plano pago)
+          </Button>
+        </div>
         <Button variant="outline" size="sm" onClick={() => updateLeagueMut.mutate()}>
           Salvar liga/temporada
         </Button>
@@ -228,7 +247,11 @@ function AdminSyncPage() {
                     </p>
                   )}
                   {l.erro && (
-                    <p className="text-xs text-destructive mt-1 break-words">{l.erro}</p>
+                    <p className="text-xs text-destructive mt-1 break-words">
+                      {l.erro.includes("Free plans")
+                        ? "Plano gratuito da API-Football não cobre essa temporada. Use season entre 2022 e 2024 para testes, ou contrate plano pago para 2026."
+                        : l.erro}
+                    </p>
                   )}
                 </div>
               </div>
