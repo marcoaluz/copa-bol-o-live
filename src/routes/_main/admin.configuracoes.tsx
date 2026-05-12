@@ -39,6 +39,8 @@ type Cfg = {
   notif_email_destino: string;
   notif_telegram_ativo: boolean;
   notif_eventos: Record<string, boolean>;
+  app_url_publica: string;
+  convite_template: string;
 };
 
 function Page() {
