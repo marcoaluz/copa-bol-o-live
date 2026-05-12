@@ -49,6 +49,34 @@ function parseEmails(raw: string): { validos: string[]; invalidos: string[] } {
   return { validos, invalidos };
 }
 
+function gerarMensagem(
+  email: string,
+  nome: string,
+  cfg: { app_url_publica?: string; convite_template?: string } | null | undefined,
+): string {
+  const nomeUsado = nome.trim() || email.split("@")[0];
+  return (cfg?.convite_template ?? "")
+    .replace(/\{nome\}/g, nomeUsado)
+    .replace(/\{url\}/g, cfg?.app_url_publica ?? "")
+    .replace(/\{email\}/g, email);
+}
+
+function copiarMensagem(msg: string) {
+  navigator.clipboard.writeText(msg);
+  toast.success("Mensagem copiada");
+}
+
+function abrirWhatsApp(msg: string) {
+  const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+function abrirEmail(email: string, msg: string) {
+  const assunto = "Te convidei pro Bolão da Copa 2026 🏆";
+  const url = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(msg)}`;
+  window.location.href = url;
+}
+
 function ConvitesPage() {
   const { profile } = useAuth();
   const navigate = useNavigate();
