@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { MailPlus, Trash2, Users } from "lucide-react";
+import { MailPlus, Trash2, Users, AlertTriangle, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_main/admin/convites")({
@@ -25,6 +25,22 @@ type Autorizado = {
   created_at: string;
 };
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function parseEmails(raw: string): { validos: string[]; invalidos: string[] } {
+  const linhas = raw.split(/[\s,;]+/).map((s) => s.trim().toLowerCase()).filter(Boolean);
+  const validos: string[] = [];
+  const invalidos: string[] = [];
+  const seen = new Set<string>();
+  for (const l of linhas) {
+    if (seen.has(l)) continue;
+    seen.add(l);
+    if (EMAIL_REGEX.test(l)) validos.push(l);
+    else invalidos.push(l);
+  }
+  return { validos, invalidos };
+}
+
 function ConvitesPage() {
   const { profile } = useAuth();
   const navigate = useNavigate();
@@ -32,12 +48,13 @@ function ConvitesPage() {
   const [raw, setRaw] = useState("");
   const [filtro, setFiltro] = useState<"todos" | "aceitos" | "pendentes">("todos");
   const [busca, setBusca] = useState("");
+  const [ultimaAtualizacao, setUltimaAtualizacao] = useState<Date>(() => new Date());
 
   useEffect(() => {
     if (profile && !profile.is_admin) navigate({ to: "/home" });
   }, [profile, navigate]);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error, refetch, isFetching, dataUpdatedAt } = useQuery({
     queryKey: ["admin", "convites"],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
@@ -49,6 +66,16 @@ function ConvitesPage() {
     },
   });
 
+  useEffect(() => {
+    if (isError && error) {
+      toast.error(`Erro ao carregar lista: ${(error as Error).message}`);
+    }
+  }, [isError, error]);
+
+  useEffect(() => {
+    if (dataUpdatedAt) setUltimaAtualizacao(new Date(dataUpdatedAt));
+  }, [dataUpdatedAt]);
+
   const adicionar = useMutation({
     mutationFn: async (emails: string[]) => {
       const { data, error } = await (supabase as any).rpc("adicionar_emails_autorizados", {
@@ -57,10 +84,11 @@ function ConvitesPage() {
       if (error) throw error;
       return data as number;
     },
-    onSuccess: (n) => {
-      toast.success(`${n} e-mail(s) adicionado(s) à allowlist.`);
+    onSuccess: (qtd) => {
+      toast.success(`${qtd} e-mail(s) autorizado(s)`);
       setRaw("");
       qc.invalidateQueries({ queryKey: ["admin", "convites"] });
+      refetch();
     },
     onError: (e: any) => toast.error(e.message ?? "Erro ao adicionar"),
   });
@@ -94,16 +122,21 @@ function ConvitesPage() {
     return list;
   }, [data, filtro, busca]);
 
+  const parsed = useMemo(() => parseEmails(raw), [raw]);
+
   const handleAdd = () => {
-    const emails = raw
-      .split(/[\s,;]+/)
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
-    if (emails.length === 0) {
+    if (parsed.invalidos.length > 0) {
+      toast.error("Corrija os e-mails inválidos antes de adicionar.");
+      return;
+    }
+    if (parsed.validos.length === 0) {
       toast.error("Cole pelo menos um e-mail.");
       return;
     }
-    adicionar.mutate(emails);
+    if (parsed.validos.length <= 2) {
+      if (!confirm(`Confirmar autorização de:\n${parsed.validos.join("\n")}`)) return;
+    }
+    adicionar.mutate(parsed.validos);
   };
 
   return (
@@ -114,6 +147,22 @@ function ConvitesPage() {
         <Kpi label="Total" value={stats.total} />
         <Kpi label="Aceitos" value={stats.aceitos} />
         <Kpi label="Pendentes" value={stats.pendentes} accent />
+      </div>
+
+      <div className="flex items-center justify-end gap-2 -mt-4 mb-4 text-[11px] text-muted-foreground">
+        <span>
+          Última atualização: {ultimaAtualizacao.toLocaleTimeString("pt-BR")}
+        </span>
+        <span>·</span>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          disabled={isFetching}
+          className="inline-flex items-center gap-1 hover:text-foreground underline-offset-2 hover:underline disabled:opacity-50"
+        >
+          <RefreshCw className={`w-3 h-3 ${isFetching ? "animate-spin" : ""}`} />
+          Atualizar
+        </button>
       </div>
 
       <Card className="bg-card border-border rounded-xl p-5 shadow-card mb-6">
@@ -129,12 +178,55 @@ function ConvitesPage() {
           placeholder="amigo1@gmail.com&#10;amigo2@gmail.com, amigo3@gmail.com"
           className="bg-surface border-border min-h-32 mb-3"
         />
+
+        {parsed.validos.length > 0 && (
+          <div className="mb-3 rounded-lg border border-primary/30 bg-primary/5 p-3">
+            <p className="text-xs font-medium text-primary mb-2">
+              Serão autorizados: {parsed.validos.length} e-mail(s)
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {parsed.validos.map((e) => (
+                <Badge key={e} className="bg-primary/15 text-primary border-primary/30 font-normal">
+                  {e}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {parsed.invalidos.length > 0 && (
+          <div className="mb-3 rounded-lg border border-destructive/40 bg-destructive/5 p-3">
+            <p className="text-xs font-medium text-destructive mb-2 flex items-center gap-1">
+              <AlertTriangle className="w-3.5 h-3.5" />
+              Formato inválido — corrija antes de adicionar ({parsed.invalidos.length})
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {parsed.invalidos.map((e) => (
+                <Badge key={e} variant="destructive" className="font-mono text-[11px]">
+                  {e}
+                </Badge>
+              ))}
+            </div>
+            <p className="text-[11px] text-muted-foreground mt-2">
+              Esperado: nome@dominio.com — verifique se não falta o "@" ou o domínio.
+            </p>
+          </div>
+        )}
+
         <Button
           onClick={handleAdd}
-          disabled={adicionar.isPending}
+          disabled={
+            adicionar.isPending ||
+            parsed.invalidos.length > 0 ||
+            parsed.validos.length === 0
+          }
           className="bg-gradient-primary shadow-glow"
         >
-          {adicionar.isPending ? "Adicionando..." : "Adicionar à allowlist"}
+          {adicionar.isPending
+            ? "Adicionando..."
+            : parsed.validos.length > 0
+              ? `Adicionar ${parsed.validos.length} à allowlist`
+              : "Adicionar à allowlist"}
         </Button>
       </Card>
 
@@ -162,6 +254,17 @@ function ConvitesPage() {
 
         {isLoading ? (
           <p className="text-sm text-muted-foreground py-4">Carregando...</p>
+        ) : isError ? (
+          <div className="py-8 text-center rounded-lg border border-destructive/40 bg-destructive/5">
+            <AlertTriangle className="w-8 h-8 mx-auto mb-2 text-destructive" />
+            <p className="font-semibold text-destructive mb-1">Erro ao carregar lista</p>
+            <p className="text-[11px] text-muted-foreground mb-3 px-4 break-words">
+              {(error as Error)?.message}
+            </p>
+            <Button size="sm" variant="outline" onClick={() => refetch()}>
+              <RefreshCw className="w-3 h-3 mr-1" /> Tentar novamente
+            </Button>
+          </div>
         ) : filtrados.length === 0 ? (
           <div className="py-8 text-center text-sm text-muted-foreground">
             <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
