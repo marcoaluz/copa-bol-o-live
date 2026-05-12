@@ -530,6 +530,7 @@ export type Database = {
           bolo_acumulado_centavos: number
           bracket_proximo_id: string | null
           codigo: string | null
+          codigo_partida: string | null
           created_at: string
           data_hora: string
           estadio: string | null
@@ -554,6 +555,7 @@ export type Database = {
           bolo_acumulado_centavos?: number
           bracket_proximo_id?: string | null
           codigo?: string | null
+          codigo_partida?: string | null
           created_at?: string
           data_hora: string
           estadio?: string | null
@@ -578,6 +580,7 @@ export type Database = {
           bolo_acumulado_centavos?: number
           bracket_proximo_id?: string | null
           codigo?: string | null
+          codigo_partida?: string | null
           created_at?: string
           data_hora?: string
           estadio?: string | null
@@ -1012,6 +1015,7 @@ export type Database = {
           bolo_acumulado_centavos: number
           bracket_proximo_id: string | null
           codigo: string | null
+          codigo_partida: string | null
           created_at: string
           data_hora: string
           estadio: string | null
@@ -1076,6 +1080,7 @@ export type Database = {
           bolo_acumulado_centavos: number
           bracket_proximo_id: string | null
           codigo: string | null
+          codigo_partida: string | null
           created_at: string
           data_hora: string
           estadio: string | null
@@ -1190,6 +1195,7 @@ export type Database = {
           bolo_acumulado_centavos: number
           bracket_proximo_id: string | null
           codigo: string | null
+          codigo_partida: string | null
           created_at: string
           data_hora: string
           estadio: string | null
