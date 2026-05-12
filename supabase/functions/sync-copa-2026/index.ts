@@ -176,6 +176,9 @@ Deno.serve(async (req) => {
       const grupo = extrairLetraGrupo(m.group);
       const dataHora = montarDataHora(m.date, m.time);
 
+      const codigoPartida = `WC2026-${fase}-${m.team1.replace(/\s/g, "")}` +
+        `-${m.team2.replace(/\s/g, "")}-${m.date}`;
+
       const score = m.score?.ft;
       const gols_casa = score?.[0] ?? null;
       const gols_visit = score?.[1] ?? null;
@@ -197,15 +200,13 @@ Deno.serve(async (req) => {
         resultado,
         api_fixture_id: null,
         sincronizada_em: new Date().toISOString(),
+        codigo_partida: codigoPartida,
       };
 
       const { data: existente } = await supa
         .from("partidas")
         .select("id, status")
-        .eq("selecao_casa_id", casaId)
-        .eq("selecao_visitante_id", visitId)
-        .gte("data_hora", `${m.date}T00:00:00Z`)
-        .lt("data_hora", `${m.date}T23:59:59Z`)
+        .eq("codigo_partida", codigoPartida)
         .maybeSingle();
 
       if (existente) {
