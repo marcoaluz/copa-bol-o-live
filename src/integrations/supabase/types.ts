@@ -24,10 +24,12 @@ export type Database = {
           iniciado_em: string
           partidas_atualizadas: number
           partidas_inseridas: number
+          partidas_puladas: number
           requests_consumidos: number
           selecoes_atualizadas: number
           selecoes_inseridas: number
           status: string
+          times_nao_mapeados: string[]
         }
         Insert: {
           detalhes?: Json | null
@@ -38,10 +40,12 @@ export type Database = {
           iniciado_em?: string
           partidas_atualizadas?: number
           partidas_inseridas?: number
+          partidas_puladas?: number
           requests_consumidos?: number
           selecoes_atualizadas?: number
           selecoes_inseridas?: number
           status?: string
+          times_nao_mapeados?: string[]
         }
         Update: {
           detalhes?: Json | null
@@ -52,10 +56,12 @@ export type Database = {
           iniciado_em?: string
           partidas_atualizadas?: number
           partidas_inseridas?: number
+          partidas_puladas?: number
           requests_consumidos?: number
           selecoes_atualizadas?: number
           selecoes_inseridas?: number
           status?: string
+          times_nao_mapeados?: string[]
         }
         Relationships: []
       }
