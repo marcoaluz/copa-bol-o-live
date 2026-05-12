@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LegalModal } from "@/components/LegalModal";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { useAuth, isOnboarded } from "@/hooks/use-auth";
 import { toast } from "sonner";
 
@@ -37,14 +38,16 @@ function LoginPage() {
 
   const handleGoogle = async () => {
     setSigning(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/onboarding` },
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: `${window.location.origin}/onboarding`,
     });
-    if (error) {
+    if (result.error) {
       toast.error("Não foi possível entrar. Tente novamente.");
       setSigning(false);
+      return;
     }
+    if (result.redirected) return;
+    navigate({ to: "/onboarding" });
   };
 
   const entrarComSenha = async () => {
