@@ -11,6 +11,7 @@ import { useSelecoes, usePartidas, selecaoMap, FASE_LABEL, type Partida } from "
 import { useApostasEncerradas } from "@/components/CountdownPartida";
 import { useRealtimePartidas, usePlacarFlash, minutoPartida } from "@/lib/realtime-partidas";
 import { useTorneioAtivo } from "@/lib/torneio";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/_main/home")({
   head: () => ({ meta: [{ title: "Home — Copa Bolão 2026" }] }),
@@ -109,6 +110,19 @@ function HomePage() {
     return sorted;
   }, [partidas, now, isPC]);
 
+  const { rodadasAtuais, rodadasHistorico } = useMemo(() => {
+    const atuais: typeof rodadas = [];
+    const historico: typeof rodadas = [];
+    rodadas.forEach((r) => {
+      const temPendente = r.partidas.some((p) => p.status !== "encerrada");
+      if (temPendente) atuais.push(r);
+      else historico.push(r);
+    });
+    // Sort historico by most recent round first
+    historico.sort((a, b) => b.rodada - a.rodada);
+    return { rodadasAtuais: atuais.slice(0, 2), rodadasHistorico: historico };
+  }, [rodadas]);
+
   const aoVivoPC = useMemo(
     () => (isPC ? (partidas ?? []).filter((p) => p.status === "ao_vivo") : []),
     [partidas, isPC],
@@ -126,24 +140,50 @@ function HomePage() {
       {isLoading ? (
         <div className="text-muted-foreground text-sm">Carregando partidas…</div>
       ) : isPC ? (
-        <div className="space-y-8">
-          {aoVivoPC.length > 0 && (
-            <LiveSection partidas={aoVivoPC} sMap={sMap} onOpen={openDetail} />
-          )}
-          {rodadas.length === 0 && (
-            <p className="text-sm text-muted-foreground">Sem partidas cadastradas. Sincronize em /admin/sync.</p>
-          )}
-          {rodadas.map((r) => (
-            <Section
-              key={r.rodada}
-              title={r.rodada > 0 ? `Rodada ${r.rodada}` : "Sem rodada"}
-              partidas={r.partidas}
-              sMap={sMap}
-              now={now}
-              onOpen={openDetail}
-            />
-          ))}
-        </div>
+        <Tabs defaultValue="atuais" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="atuais">Rodada atual e próxima</TabsTrigger>
+            <TabsTrigger value="historico">Histórico de jogos</TabsTrigger>
+          </TabsList>
+          <TabsContent value="atuais" className="space-y-8">
+            {aoVivoPC.length > 0 && (
+              <LiveSection partidas={aoVivoPC} sMap={sMap} onOpen={openDetail} />
+            )}
+            {rodadasAtuais.length === 0 && aoVivoPC.length === 0 && (
+              <p className="text-sm text-muted-foreground">
+                {rodadas.length === 0
+                  ? "Sem partidas cadastradas. Sincronize em /admin/sync."
+                  : "Nenhuma rodada em aberto. Veja os jogos no Histórico."}
+              </p>
+            )}
+            {rodadasAtuais.map((r) => (
+              <Section
+                key={r.rodada}
+                title={r.rodada > 0 ? `Rodada ${r.rodada}` : "Sem rodada"}
+                partidas={r.partidas}
+                sMap={sMap}
+                now={now}
+                onOpen={openDetail}
+              />
+            ))}
+          </TabsContent>
+          <TabsContent value="historico" className="space-y-8">
+            {rodadasHistorico.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nenhuma rodada encerrada ainda.</p>
+            ) : (
+              rodadasHistorico.map((r) => (
+                <Section
+                  key={r.rodada}
+                  title={r.rodada > 0 ? `Rodada ${r.rodada}` : "Sem rodada"}
+                  partidas={r.partidas}
+                  sMap={sMap}
+                  now={now}
+                  onOpen={openDetail}
+                />
+              ))
+            )}
+          </TabsContent>
+        </Tabs>
       ) : (
         <div className="space-y-8">
           {buckets.ao_vivo.length > 0 && (
