@@ -99,16 +99,29 @@ function AdminPartidasPage() {
       <PageHeader title="Gestão de partidas" subtitle="Lance resultados, apure e distribua prêmios" />
 
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <Select value={statusFiltro} onValueChange={setStatusFiltro}>
-          <SelectTrigger className="w-44 bg-card border-border"><SelectValue /></SelectTrigger>
-          <SelectContent className="bg-card border-border z-50">
-            <SelectItem value="todos">Todos status</SelectItem>
-            <SelectItem value="agendada">Agendadas</SelectItem>
-            <SelectItem value="ao_vivo">Ao vivo</SelectItem>
-            <SelectItem value="encerrada">Encerradas</SelectItem>
-            <SelectItem value="cancelada">Canceladas</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex flex-wrap items-center gap-2">
+          <Select value={modo} onValueChange={(v) => setModo(v as "pendentes" | "todas")}>
+            <SelectTrigger className="w-56 bg-card border-border"><SelectValue /></SelectTrigger>
+            <SelectContent className="bg-card border-border z-50">
+              <SelectItem value="pendentes">
+                Pendentes{rodadaAtual != null ? ` (Rodada ${rodadaAtual})` : ""}
+              </SelectItem>
+              <SelectItem value="todas">Todas as partidas</SelectItem>
+            </SelectContent>
+          </Select>
+          {modo === "todas" && (
+            <Select value={statusFiltro} onValueChange={setStatusFiltro}>
+              <SelectTrigger className="w-44 bg-card border-border"><SelectValue /></SelectTrigger>
+              <SelectContent className="bg-card border-border z-50">
+                <SelectItem value="todos">Todos status</SelectItem>
+                <SelectItem value="agendada">Agendadas</SelectItem>
+                <SelectItem value="ao_vivo">Ao vivo</SelectItem>
+                <SelectItem value="encerrada">Encerradas</SelectItem>
+                <SelectItem value="cancelada">Canceladas</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        </div>
         <Button variant="outline" className="border-gold/40 text-gold hover:bg-gold/10" onClick={runSelfTest} disabled={selfTest.isPending}>
           <Beaker className="w-4 h-4 mr-2" />
           {selfTest.isPending ? "Executando…" : "Executar testes de apuração"}
