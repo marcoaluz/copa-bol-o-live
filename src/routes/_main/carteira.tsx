@@ -243,32 +243,6 @@ function CarteiraPage() {
       />
 
       <section className="space-y-4">
-        <h2 className="font-display text-xl">Resgatar bônus</h2>
-        <div className="grid md:grid-cols-2 gap-4">
-          <BonusCard
-            title="Bônus diário"
-            descricao="Resgate 1x a cada 24 horas"
-            valor={5000}
-            icon={Gift}
-            tipo="diario"
-            ultimo={ultimoDiario ? new Date(ultimoDiario.created_at) : null}
-            intervaloMs={24 * 60 * 60 * 1000}
-            onClaimed={onClaimed}
-          />
-          <BonusCard
-            title="Bônus semanal"
-            descricao="Resgate 1x a cada 7 dias"
-            valor={20000}
-            icon={CalendarDays}
-            tipo="semanal"
-            ultimo={ultimoSemanal ? new Date(ultimoSemanal.created_at) : null}
-            intervaloMs={7 * 24 * 60 * 60 * 1000}
-            onClaimed={onClaimed}
-          />
-        </div>
-      </section>
-
-      <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl">Acerto via PIX</h2>
           <Button onClick={() => setSaqueOpen(true)} disabled={(profile?.saldo_centavos ?? 0) < 2000}>
