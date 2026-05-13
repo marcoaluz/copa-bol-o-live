@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_main/grupos")({
   component: GroupsPage,
 });
 
-const GRUPOS = ["A","B","C","D","E","F","G","H","I","J","K","L"];
+const GRUPOS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"];
 
 function GroupsPage() {
   const { data: selecoes, isLoading: ls } = useSelecoes();
@@ -23,9 +23,7 @@ function GroupsPage() {
       if (!m[l.grupo]) m[l.grupo] = [];
       m[l.grupo].push(l);
     });
-    Object.values(m).forEach((arr) =>
-      arr.sort((a, b) => b.pontos - a.pontos || b.sg - a.sg || b.gp - a.gp),
-    );
+    Object.values(m).forEach((arr) => arr.sort((a, b) => b.pontos - a.pontos || b.sg - a.sg || b.gp - a.gp));
     return m;
   }, [classif]);
 
@@ -42,7 +40,7 @@ function GroupsPage() {
               <Card key={g} className="bg-card border-border rounded-xl shadow-card overflow-hidden">
                 <div className="bg-gradient-primary px-4 py-2 flex items-center justify-between">
                   <h3 className="font-display text-lg text-primary-foreground tracking-wider">Grupo {g}</h3>
-                  <span className="text-xs text-primary-foreground/80">{linhas.length} times</span>
+                  {/* <span className="text-xs text-primary-foreground/80">{linhas.length} times</span>*/}
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
@@ -67,9 +65,7 @@ function GroupsPage() {
                         return (
                           <tr
                             key={l.selecao_id}
-                            className={`border-t border-border ${
-                              classificado ? "bg-primary/10" : ""
-                            }`}
+                            className={`border-t border-border ${classificado ? "bg-primary/10" : ""}`}
                           >
                             <td className="p-2 pl-3">
                               <span
@@ -91,7 +87,9 @@ function GroupsPage() {
                             <td className="text-center p-2 text-muted-foreground tabular-nums">{l.derrotas}</td>
                             <td className="text-center p-2 text-muted-foreground tabular-nums">{l.gp}</td>
                             <td className="text-center p-2 text-muted-foreground tabular-nums">{l.gc}</td>
-                            <td className={`text-center p-2 tabular-nums ${l.sg > 0 ? "text-primary-glow" : l.sg < 0 ? "text-destructive" : "text-muted-foreground"}`}>
+                            <td
+                              className={`text-center p-2 tabular-nums ${l.sg > 0 ? "text-primary-glow" : l.sg < 0 ? "text-destructive" : "text-muted-foreground"}`}
+                            >
                               {l.sg > 0 ? `+${l.sg}` : l.sg}
                             </td>
                             <td className="text-center p-2 pr-3 font-bold text-foreground tabular-nums">{l.pontos}</td>
