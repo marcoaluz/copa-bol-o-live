@@ -1,5 +1,5 @@
 import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
-import { Home, Trophy, Users, BarChart3, User, Shield, Wallet, ChevronDown, LogOut, Settings, Coins, LifeBuoy } from "lucide-react";
+import { Home, Trophy, Users, BarChart3, User, Shield, Wallet, ChevronDown, LogOut, Settings, Coins, LifeBuoy, ListOrdered } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,15 +15,28 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AlertTriangle } from "lucide-react";
 import { LegalModal } from "@/components/LegalModal";
+import { TorneioSelector } from "@/components/TorneioSelector";
+import { useTorneioAtivo } from "@/lib/torneio";
 
-const navItems = [
+const NAV_ALL = [
   { to: "/home", label: "Home", icon: Home },
-  { to: "/chaveamento", label: "Chaveamento", icon: Trophy, tour: "bracket" },
-  { to: "/grupos", label: "Grupos", icon: Users },
+  { to: "/chaveamento", label: "Chaveamento", icon: Trophy, tour: "bracket", soCopa: true },
+  { to: "/grupos", label: "Grupos", icon: Users, soCopa: true },
+  { to: "/tabela", label: "Tabela", icon: ListOrdered, soPC: true },
   { to: "/ranking", label: "Ranking", icon: BarChart3, tour: "ranking" },
   { to: "/carteira", label: "Carteira", icon: Coins, tour: "wallet" },
   { to: "/perfil", label: "Perfil", icon: User, tour: "profile" },
 ] as const;
+
+function useNavItems() {
+  const torneio = useTorneioAtivo();
+  const tipo = torneio?.tipo;
+  return NAV_ALL.filter((item) => {
+    if ("soCopa" in item && item.soCopa) return tipo !== "pontos_corridos";
+    if ("soPC" in item && item.soPC) return tipo === "pontos_corridos";
+    return true;
+  });
+}
 
 function Logo() {
   return (
@@ -110,6 +123,7 @@ function Header() {
       <div className="h-full px-4 lg:px-6 flex items-center justify-between gap-4">
         <Logo />
         <div className="flex items-center gap-3">
+            <TorneioSelector />
             <Link
               to="/carteira"
               className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-border hover:border-gold/50 transition-colors"
@@ -127,6 +141,7 @@ function Header() {
 
 function Sidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navItems = useNavItems();
   return (
     <aside className="hidden lg:flex flex-col w-60 border-r border-border bg-surface/40 px-3 py-6 gap-1 sticky top-16 h-[calc(100vh-4rem)]">
       {navItems.map((item) => {
@@ -164,9 +179,11 @@ function Sidebar() {
 
 function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navItems = useNavItems();
+  const cols = `grid-cols-${Math.min(navItems.length, 6)}`;
   return (
     <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 h-16 border-t border-border bg-background/95 backdrop-blur-lg">
-      <div className="grid grid-cols-6 h-full">
+      <div className={`grid h-full ${cols}`}>
         {navItems.map((item) => {
           const active = pathname === item.to;
           return (
