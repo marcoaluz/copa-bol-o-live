@@ -40,7 +40,8 @@ export function LancarResultadoDialog({
   const casa = partida.selecao_casa_id ? sMap[partida.selecao_casa_id] : undefined;
   const visit = partida.selecao_visitante_id ? sMap[partida.selecao_visitante_id] : undefined;
 
-  const podeLancar = partida.status === "agendada" || partida.status === "ao_vivo";
+  // modo teste: liberar edição mesmo em partidas encerradas
+  const podeLancar = partida.status !== "cancelada";
   const podeApurar = partida.status === "encerrada" && partida.resultado != null;
   const podeCancelar = partida.status !== "cancelada";
 
@@ -90,6 +91,11 @@ export function LancarResultadoDialog({
         {/* Lançar resultado */}
         <div className="space-y-3">
           <div className="text-xs uppercase text-muted-foreground tracking-wider">Placar final</div>
+          {partida.status === "encerrada" && (
+            <div className="text-[11px] text-gold bg-gold/10 border border-gold/30 rounded px-2 py-1">
+              Modo teste: você pode reescrever o placar de uma partida já encerrada. Apostas já apuradas (ganhou/perdeu/devolvida) NÃO serão reprocessadas; apenas apostas que ainda estiverem "ativa" serão pagas ao reapurar.
+            </div>
+          )}
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
             <div className="text-center">
               <div className="text-sm font-semibold mb-2">{casa?.nome ?? "—"}</div>
