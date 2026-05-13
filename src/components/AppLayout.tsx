@@ -17,6 +17,7 @@ import { AlertTriangle } from "lucide-react";
 import { LegalModal } from "@/components/LegalModal";
 import { TorneioSelector } from "@/components/TorneioSelector";
 import { useTorneioAtivo } from "@/lib/torneio";
+import { InstallPWABanner } from "@/components/InstallPWABanner";
 
 const NAV_ALL = [
   { to: "/home", label: "Home", icon: Home },
@@ -241,6 +242,7 @@ export function AppLayout() {
           trigger={<button type="button" className="underline hover:text-foreground">Como funciona</button>}
         />
       </footer>
+      <InstallPWABanner />
     </div>
   );
 }
