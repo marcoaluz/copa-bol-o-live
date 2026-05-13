@@ -63,6 +63,21 @@ function AdminSyncPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const syncBrMut = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke("sync-brasileirao-2026", { body: {} });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (d: any) => {
+      if (d?.erro) toast.error(`Brasileirão falhou: ${d.erro}`);
+      else toast.success(`Brasileirão: ${d?.partidas?.inseridas ?? 0} inseridas, ${d?.partidas?.atualizadas ?? 0} atualizadas, ${d?.selecoes?.inseridas ?? 0} times novos`);
+      qc.invalidateQueries({ queryKey: ["sync-logs"] });
+      qc.invalidateQueries({ queryKey: ["config", "sync"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const toggleMut = useMutation({
     mutationFn: async (ativo: boolean) => {
       const { error } = await supabase.from("config")
@@ -152,6 +167,35 @@ function AdminSyncPage() {
           <Button onClick={() => syncMut.mutate()} disabled={syncMut.isPending}>
             <RefreshCw className={`w-4 h-4 ${syncMut.isPending ? "animate-spin" : ""}`} />
             {syncMut.isPending ? "Sincronizando..." : "Sincronizar agora"}
+          </Button>
+        </div>
+      </Card>
+
+      <Card className="bg-card border-border rounded-xl p-5 shadow-card mb-4">
+        <div className="flex items-start justify-between gap-4 mb-3">
+          <div>
+            <h3 className="font-semibold mb-1">⚽ Brasileirão Série A 2026</h3>
+            <p className="text-xs text-muted-foreground">
+              Fonte: Football-Data.org · roda a cada 30 min via pg_cron
+            </p>
+          </div>
+        </div>
+        {cfg?.brasileirao_ultimo_sync ? (
+          <Badge className="bg-green-600 text-white">
+            Último em {new Date(cfg.brasileirao_ultimo_sync).toLocaleString("pt-BR")}
+          </Badge>
+        ) : (
+          <Badge variant="outline">Nunca sincronizado</Badge>
+        )}
+        {cfg?.brasileirao_ultimo_erro && (
+          <p className="text-xs text-destructive mt-2 break-words">
+            Último erro: {cfg.brasileirao_ultimo_erro}
+          </p>
+        )}
+        <div className="mt-4">
+          <Button onClick={() => syncBrMut.mutate()} disabled={syncBrMut.isPending} variant="outline">
+            <RefreshCw className={`w-4 h-4 ${syncBrMut.isPending ? "animate-spin" : ""}`} />
+            {syncBrMut.isPending ? "Sincronizando..." : "Sincronizar Brasileirão"}
           </Button>
         </div>
       </Card>
