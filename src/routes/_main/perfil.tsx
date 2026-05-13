@@ -355,3 +355,26 @@ function ApostasList({
     </div>
   );
 }
+
+function PWAStatusBadge() {
+  const [installed, setInstalled] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const check = () =>
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
+    setInstalled(check());
+  }, []);
+  return (
+    <Card className="bg-card border-border p-4 mt-6">
+      <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Sobre</div>
+      {installed ? (
+        <div className="text-sm text-primary font-medium">✅ Instalado como app</div>
+      ) : (
+        <div className="text-sm text-muted-foreground">
+          🌐 Navegador <span className="text-xs">(instale para uma melhor experiência)</span>
+        </div>
+      )}
+    </Card>
+  );
+}
