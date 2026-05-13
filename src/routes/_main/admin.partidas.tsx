@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -26,9 +28,26 @@ function AdminPartidasPage() {
   const selfTest = useSelfTest();
 
   const [statusFiltro, setStatusFiltro] = useState<string>("todos");
+  const [modo, setModo] = useState<"pendentes" | "todas">("pendentes");
   const [open, setOpen] = useState(false);
   const [partidaSel, setPartidaSel] = useState<Partida | null>(null);
   const [testResult, setTestResult] = useState<any>(null);
+
+  // IDs de partidas que ainda têm apostas ativas (não apuradas)
+  const { data: pendentesIds } = useQuery({
+    queryKey: ["admin-partidas-com-apostas-ativas"],
+    queryFn: async () => {
+      const [{ data: a }, { data: ap }] = await Promise.all([
+        supabase.from("apostas").select("partida_id").eq("status", "ativa"),
+        supabase.from("apostas_placar").select("partida_id").eq("status", "ativa"),
+      ]);
+      const set = new Set<string>();
+      (a ?? []).forEach((r: any) => set.add(r.partida_id));
+      (ap ?? []).forEach((r: any) => set.add(r.partida_id));
+      return set;
+    },
+    staleTime: 30_000,
+  });
 
   if (!profile?.is_admin) {
     return (
@@ -38,7 +57,27 @@ function AdminPartidasPage() {
     );
   }
 
-  const lista = (partidas ?? []).filter((p) => statusFiltro === "todos" || p.status === statusFiltro);
+  // Rodada atual = menor rodada com pelo menos uma partida não encerrada/cancelada
+  const rodadaAtual = useMemo(() => {
+    const rs = (partidas ?? [])
+      .filter((p) => p.status === "agendada" || p.status === "ao_vivo")
+      .map((p) => p.rodada ?? null)
+      .filter((r): r is number => r != null);
+    return rs.length ? Math.min(...rs) : null;
+  }, [partidas]);
+
+  const lista = (partidas ?? []).filter((p) => {
+    if (modo === "pendentes") {
+      const temAposta = pendentesIds?.has(p.id) ?? false;
+      // mostrar partidas da rodada atual (independente do status)
+      // OU partidas encerradas com apostas ainda ativas (faltou apurar)
+      const naRodadaAtual = rodadaAtual != null && p.rodada === rodadaAtual && p.status !== "cancelada";
+      const encerradaPendente = p.status === "encerrada" && temAposta;
+      const aoVivo = p.status === "ao_vivo";
+      if (!(naRodadaAtual || encerradaPendente || aoVivo)) return false;
+    }
+    return statusFiltro === "todos" || p.status === statusFiltro;
+  });
 
   const onAbrir = (p: Partida) => { setPartidaSel(p); setOpen(true); };
 
@@ -60,16 +99,29 @@ function AdminPartidasPage() {
       <PageHeader title="Gestão de partidas" subtitle="Lance resultados, apure e distribua prêmios" />
 
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <Select value={statusFiltro} onValueChange={setStatusFiltro}>
-          <SelectTrigger className="w-44 bg-card border-border"><SelectValue /></SelectTrigger>
-          <SelectContent className="bg-card border-border z-50">
-            <SelectItem value="todos">Todos status</SelectItem>
-            <SelectItem value="agendada">Agendadas</SelectItem>
-            <SelectItem value="ao_vivo">Ao vivo</SelectItem>
-            <SelectItem value="encerrada">Encerradas</SelectItem>
-            <SelectItem value="cancelada">Canceladas</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex flex-wrap items-center gap-2">
+          <Select value={modo} onValueChange={(v) => setModo(v as "pendentes" | "todas")}>
+            <SelectTrigger className="w-56 bg-card border-border"><SelectValue /></SelectTrigger>
+            <SelectContent className="bg-card border-border z-50">
+              <SelectItem value="pendentes">
+                Pendentes{rodadaAtual != null ? ` (Rodada ${rodadaAtual})` : ""}
+              </SelectItem>
+              <SelectItem value="todas">Todas as partidas</SelectItem>
+            </SelectContent>
+          </Select>
+          {modo === "todas" && (
+            <Select value={statusFiltro} onValueChange={setStatusFiltro}>
+              <SelectTrigger className="w-44 bg-card border-border"><SelectValue /></SelectTrigger>
+              <SelectContent className="bg-card border-border z-50">
+                <SelectItem value="todos">Todos status</SelectItem>
+                <SelectItem value="agendada">Agendadas</SelectItem>
+                <SelectItem value="ao_vivo">Ao vivo</SelectItem>
+                <SelectItem value="encerrada">Encerradas</SelectItem>
+                <SelectItem value="cancelada">Canceladas</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        </div>
         <Button variant="outline" className="border-gold/40 text-gold hover:bg-gold/10" onClick={runSelfTest} disabled={selfTest.isPending}>
           <Beaker className="w-4 h-4 mr-2" />
           {selfTest.isPending ? "Executando…" : "Executar testes de apuração"}
