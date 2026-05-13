@@ -55,6 +55,11 @@ function MatchSlot({
 }
 
 function BracketPage() {
+  const torneio = useTorneioAtivo();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (torneio && torneio.tipo !== "copa") navigate({ to: "/home" });
+  }, [torneio, navigate]);
   const { data: selecoes } = useSelecoes();
   const { data: partidas, isLoading } = usePartidas();
   const sMap = useMemo(() => selecaoMap(selecoes), [selecoes]);
