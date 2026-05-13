@@ -106,7 +106,7 @@ function HomePage() {
         if (fb) return 1;
         return b.rodada - a.rodada;
       });
-    return [{ ao_vivo, sorted } as any].length ? sorted : sorted;
+    return sorted;
   }, [partidas, now, isPC]);
 
   const aoVivoPC = useMemo(
