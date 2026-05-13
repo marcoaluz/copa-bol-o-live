@@ -307,6 +307,9 @@ export type Database = {
           api_football_ultimo_erro: string | null
           api_football_ultimo_sync: string | null
           app_url_publica: string
+          brasileirao_sync_ativo: boolean
+          brasileirao_ultimo_erro: string | null
+          brasileirao_ultimo_sync: string | null
           chave_pix_admin: string
           convite_template: string
           deposito_maximo_centavos: number
@@ -336,6 +339,9 @@ export type Database = {
           api_football_ultimo_erro?: string | null
           api_football_ultimo_sync?: string | null
           app_url_publica?: string
+          brasileirao_sync_ativo?: boolean
+          brasileirao_ultimo_erro?: string | null
+          brasileirao_ultimo_sync?: string | null
           chave_pix_admin?: string
           convite_template?: string
           deposito_maximo_centavos?: number
@@ -365,6 +371,9 @@ export type Database = {
           api_football_ultimo_erro?: string | null
           api_football_ultimo_sync?: string | null
           app_url_publica?: string
+          brasileirao_sync_ativo?: boolean
+          brasileirao_ultimo_erro?: string | null
+          brasileirao_ultimo_sync?: string | null
           chave_pix_admin?: string
           convite_template?: string
           deposito_maximo_centavos?: number
@@ -1440,7 +1449,7 @@ export type Database = {
         }
       }
       ranking_filtrado: {
-        Args: { p_filtro?: string }
+        Args: { p_filtro?: string; p_torneio_id?: string }
         Returns: {
           anonimo: boolean
           apelido: string

@@ -1,9 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { Card } from "@/components/ui/card";
 import { TeamLabel } from "@/components/TeamLabel";
 import { useSelecoes, useClassificacao, selecaoMap, type ClassificacaoLinha } from "@/lib/tournament";
+import { useTorneioAtivo } from "@/lib/torneio";
 
 export const Route = createFileRoute("/_main/grupos")({
   head: () => ({ meta: [{ title: "Grupos — Copa Bolão 2026" }] }),
@@ -13,6 +14,11 @@ export const Route = createFileRoute("/_main/grupos")({
 const GRUPOS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"];
 
 function GroupsPage() {
+  const torneio = useTorneioAtivo();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (torneio && torneio.tipo !== "copa") navigate({ to: "/home" });
+  }, [torneio, navigate]);
   const { data: selecoes, isLoading: ls } = useSelecoes();
   const { data: classif, isLoading: lc } = useClassificacao();
   const sMap = useMemo(() => selecaoMap(selecoes), [selecoes]);

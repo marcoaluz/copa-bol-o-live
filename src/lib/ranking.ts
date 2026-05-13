@@ -18,10 +18,17 @@ export type RankingLinha = {
 };
 
 export function useRanking(filtro: RankingFiltro) {
+  return useRankingTorneio(filtro, null);
+}
+
+export function useRankingTorneio(filtro: RankingFiltro, torneioId: string | null) {
   return useQuery({
-    queryKey: ["ranking", filtro],
+    queryKey: ["ranking", filtro, torneioId ?? "all"],
     queryFn: async (): Promise<RankingLinha[]> => {
-      const { data, error } = await supabase.rpc("ranking_filtrado", { p_filtro: filtro });
+      const { data, error } = await supabase.rpc("ranking_filtrado", {
+        p_filtro: filtro,
+        p_torneio_id: torneioId,
+      } as any);
       if (error) throw error;
       return (data ?? []) as unknown as RankingLinha[];
     },

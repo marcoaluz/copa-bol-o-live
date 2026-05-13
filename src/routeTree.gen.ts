@@ -15,6 +15,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as MainRouteImport } from './routes/_main'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiSitemapDotxmlRouteImport } from './routes/api/sitemap[.]xml'
+import { Route as MainTabelaRouteImport } from './routes/_main/tabela'
 import { Route as MainRankingRouteImport } from './routes/_main/ranking'
 import { Route as MainPerfilRouteImport } from './routes/_main/perfil'
 import { Route as MainHomeRouteImport } from './routes/_main/home'
@@ -67,6 +68,11 @@ const ApiSitemapDotxmlRoute = ApiSitemapDotxmlRouteImport.update({
   id: '/api/sitemap.xml',
   path: '/api/sitemap.xml',
   getParentRoute: () => rootRouteImport,
+} as any)
+const MainTabelaRoute = MainTabelaRouteImport.update({
+  id: '/tabela',
+  path: '/tabela',
+  getParentRoute: () => MainRoute,
 } as any)
 const MainRankingRoute = MainRankingRouteImport.update({
   id: '/ranking',
@@ -198,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/home': typeof MainHomeRoute
   '/perfil': typeof MainPerfilRoute
   '/ranking': typeof MainRankingRoute
+  '/tabela': typeof MainTabelaRoute
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/admin/auditoria': typeof MainAdminAuditoriaRoute
   '/admin/checklist': typeof MainAdminChecklistRoute
@@ -227,6 +234,7 @@ export interface FileRoutesByTo {
   '/home': typeof MainHomeRoute
   '/perfil': typeof MainPerfilRoute
   '/ranking': typeof MainRankingRoute
+  '/tabela': typeof MainTabelaRoute
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/admin/auditoria': typeof MainAdminAuditoriaRoute
   '/admin/checklist': typeof MainAdminChecklistRoute
@@ -259,6 +267,7 @@ export interface FileRoutesById {
   '/_main/home': typeof MainHomeRoute
   '/_main/perfil': typeof MainPerfilRoute
   '/_main/ranking': typeof MainRankingRoute
+  '/_main/tabela': typeof MainTabelaRoute
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/_main/admin/auditoria': typeof MainAdminAuditoriaRoute
   '/_main/admin/checklist': typeof MainAdminChecklistRoute
@@ -291,6 +300,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/perfil'
     | '/ranking'
+    | '/tabela'
     | '/api/sitemap.xml'
     | '/admin/auditoria'
     | '/admin/checklist'
@@ -320,6 +330,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/perfil'
     | '/ranking'
+    | '/tabela'
     | '/api/sitemap.xml'
     | '/admin/auditoria'
     | '/admin/checklist'
@@ -351,6 +362,7 @@ export interface FileRouteTypes {
     | '/_main/home'
     | '/_main/perfil'
     | '/_main/ranking'
+    | '/_main/tabela'
     | '/api/sitemap.xml'
     | '/_main/admin/auditoria'
     | '/_main/admin/checklist'
@@ -422,6 +434,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/sitemap.xml'
       preLoaderRoute: typeof ApiSitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_main/tabela': {
+      id: '/_main/tabela'
+      path: '/tabela'
+      fullPath: '/tabela'
+      preLoaderRoute: typeof MainTabelaRouteImport
+      parentRoute: typeof MainRoute
     }
     '/_main/ranking': {
       id: '/_main/ranking'
@@ -643,6 +662,7 @@ interface MainRouteChildren {
   MainHomeRoute: typeof MainHomeRoute
   MainPerfilRoute: typeof MainPerfilRoute
   MainRankingRoute: typeof MainRankingRoute
+  MainTabelaRoute: typeof MainTabelaRoute
 }
 
 const MainRouteChildren: MainRouteChildren = {
@@ -654,6 +674,7 @@ const MainRouteChildren: MainRouteChildren = {
   MainHomeRoute: MainHomeRoute,
   MainPerfilRoute: MainPerfilRoute,
   MainRankingRoute: MainRankingRoute,
+  MainTabelaRoute: MainTabelaRoute,
 }
 
 const MainRouteWithChildren = MainRoute._addFileChildren(MainRouteChildren)

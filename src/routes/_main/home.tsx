@@ -10,6 +10,7 @@ import { MatchDetailDialog } from "@/components/MatchDetailDialog";
 import { useSelecoes, usePartidas, selecaoMap, FASE_LABEL, type Partida } from "@/lib/tournament";
 import { useApostasEncerradas } from "@/components/CountdownPartida";
 import { useRealtimePartidas, usePlacarFlash, minutoPartida } from "@/lib/realtime-partidas";
+import { useTorneioAtivo } from "@/lib/torneio";
 
 export const Route = createFileRoute("/_main/home")({
   head: () => ({ meta: [{ title: "Home — Copa Bolão 2026" }] }),
@@ -48,6 +49,8 @@ function fmtHora(d: string) {
 
 function HomePage() {
   useRealtimePartidas();
+  const torneio = useTorneioAtivo();
+  const isPC = torneio?.tipo === "pontos_corridos";
   const { data: selecoes } = useSelecoes();
   const { data: partidas, isLoading } = usePartidas();
   const sMap = useMemo(() => selecaoMap(selecoes), [selecoes]);
@@ -79,6 +82,38 @@ function HomePage() {
     return { ao_vivo, hoje, amanha, semana, proximas: proximas.slice(0, 6) };
   }, [partidas, now]);
 
+  const rodadas = useMemo(() => {
+    if (!isPC) return [] as { rodada: number; partidas: Partida[] }[];
+    const ao_vivo = (partidas ?? []).filter((p) => p.status === "ao_vivo");
+    const map = new Map<number, Partida[]>();
+    (partidas ?? []).forEach((p) => {
+      if (p.status === "ao_vivo") return;
+      const r = p.rodada ?? 0;
+      if (!map.has(r)) map.set(r, []);
+      map.get(r)!.push(p);
+    });
+    const sorted = Array.from(map.entries())
+      .map(([rodada, ps]) => ({
+        rodada,
+        partidas: ps.slice().sort((a, b) => new Date(a.data_hora).getTime() - new Date(b.data_hora).getTime()),
+      }))
+      .sort((a, b) => {
+        // current/next round first: round with earliest future game, then chronological
+        const fa = a.partidas.find((p) => new Date(p.data_hora) >= now);
+        const fb = b.partidas.find((p) => new Date(p.data_hora) >= now);
+        if (fa && fb) return new Date(fa.data_hora).getTime() - new Date(fb.data_hora).getTime();
+        if (fa) return -1;
+        if (fb) return 1;
+        return b.rodada - a.rodada;
+      });
+    return sorted;
+  }, [partidas, now, isPC]);
+
+  const aoVivoPC = useMemo(
+    () => (isPC ? (partidas ?? []).filter((p) => p.status === "ao_vivo") : []),
+    [partidas, isPC],
+  );
+
   const openDetail = (p: Partida) => {
     setSelected(p);
     setOpen(true);
@@ -90,6 +125,25 @@ function HomePage() {
 
       {isLoading ? (
         <div className="text-muted-foreground text-sm">Carregando partidas…</div>
+      ) : isPC ? (
+        <div className="space-y-8">
+          {aoVivoPC.length > 0 && (
+            <LiveSection partidas={aoVivoPC} sMap={sMap} onOpen={openDetail} />
+          )}
+          {rodadas.length === 0 && (
+            <p className="text-sm text-muted-foreground">Sem partidas cadastradas. Sincronize em /admin/sync.</p>
+          )}
+          {rodadas.map((r) => (
+            <Section
+              key={r.rodada}
+              title={r.rodada > 0 ? `Rodada ${r.rodada}` : "Sem rodada"}
+              partidas={r.partidas}
+              sMap={sMap}
+              now={now}
+              onOpen={openDetail}
+            />
+          ))}
+        </div>
       ) : (
         <div className="space-y-8">
           {buckets.ao_vivo.length > 0 && (

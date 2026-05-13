@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trophy, Medal, Search } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { useRanking, nomeExibicao, iniciais, type RankingFiltro, type RankingLinha } from "@/lib/ranking";
+import { useRankingTorneio, nomeExibicao, iniciais, type RankingFiltro, type RankingLinha } from "@/lib/ranking";
+import { useTorneios } from "@/lib/torneio";
 import { formatBRL } from "@/lib/bets";
 
 export const Route = createFileRoute("/_main/ranking")({
@@ -19,7 +20,10 @@ function RankingPage() {
   const { user } = useAuth();
   const [filtro, setFiltro] = useState<RankingFiltro>("geral");
   const [busca, setBusca] = useState("");
-  const { data: ranking, isLoading } = useRanking(filtro);
+  const { data: torneios } = useTorneios();
+  const [torneioTab, setTorneioTab] = useState<string>("all");
+  const torneioId = torneioTab === "all" ? null : torneioTab;
+  const { data: ranking, isLoading } = useRankingTorneio(filtro, torneioId);
 
   const ordenado = useMemo(
     () => (ranking ?? []).slice().sort((a, b) => a.posicao - b.posicao),
@@ -41,6 +45,19 @@ function RankingPage() {
   return (
     <div>
       <PageHeader title="Ranking" subtitle="Top apostadores do bolão" />
+
+      {torneios && torneios.length > 1 && (
+        <Tabs value={torneioTab} onValueChange={setTorneioTab} className="mb-3">
+          <TabsList className="bg-card border border-border">
+            <TabsTrigger value="all">Geral</TabsTrigger>
+            {torneios.map((t) => (
+              <TabsTrigger key={t.id} value={t.id}>
+                {t.emoji} {t.nome_curto}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+      )}
 
       <div className="flex flex-col sm:flex-row gap-3 mb-5">
         <Tabs value={filtro} onValueChange={(v) => setFiltro(v as RankingFiltro)} className="flex-1">
