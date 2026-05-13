@@ -38,9 +38,8 @@ function GroupsPage() {
             const linhas = porGrupo[g] ?? [];
             return (
               <Card key={g} className="bg-card border-border rounded-xl shadow-card overflow-hidden">
-                <div className="bg-gradient-primary px-4 py-2 flex items-center justify-between">
+                <div className="bg-gradient-primary px-4 py-2 flex items-center">
                   <h3 className="font-display text-lg text-primary-foreground tracking-wider">Grupo {g}</h3>
-                  {/* <span className="text-xs text-primary-foreground/80">{linhas.length} times</span>*/}
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
