@@ -73,6 +73,7 @@ export type Database = {
           partida_id: string
           premio_centavos: number | null
           status: Database["public"]["Enums"]["status_aposta"]
+          torneio_id: string
           updated_at: string
           usuario_id: string
           valor_centavos: number
@@ -84,6 +85,7 @@ export type Database = {
           partida_id: string
           premio_centavos?: number | null
           status?: Database["public"]["Enums"]["status_aposta"]
+          torneio_id: string
           updated_at?: string
           usuario_id: string
           valor_centavos: number
@@ -95,6 +97,7 @@ export type Database = {
           partida_id?: string
           premio_centavos?: number | null
           status?: Database["public"]["Enums"]["status_aposta"]
+          torneio_id?: string
           updated_at?: string
           usuario_id?: string
           valor_centavos?: number
@@ -105,6 +108,13 @@ export type Database = {
             columns: ["partida_id"]
             isOneToOne: false
             referencedRelation: "partidas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "apostas_torneio_id_fkey"
+            columns: ["torneio_id"]
+            isOneToOne: false
+            referencedRelation: "torneios"
             referencedColumns: ["id"]
           },
           {
@@ -132,6 +142,7 @@ export type Database = {
           partida_id: string
           premio_centavos: number
           status: string
+          torneio_id: string
           updated_at: string
           usuario_id: string
           valor_centavos: number
@@ -144,6 +155,7 @@ export type Database = {
           partida_id: string
           premio_centavos?: number
           status?: string
+          torneio_id: string
           updated_at?: string
           usuario_id: string
           valor_centavos: number
@@ -156,6 +168,7 @@ export type Database = {
           partida_id?: string
           premio_centavos?: number
           status?: string
+          torneio_id?: string
           updated_at?: string
           usuario_id?: string
           valor_centavos?: number
@@ -166,6 +179,13 @@ export type Database = {
             columns: ["partida_id"]
             isOneToOne: false
             referencedRelation: "partidas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "apostas_placar_torneio_id_fkey"
+            columns: ["torneio_id"]
+            isOneToOne: false
+            referencedRelation: "torneios"
             referencedColumns: ["id"]
           },
           {
@@ -550,10 +570,12 @@ export type Database = {
           placeholder_casa: string | null
           placeholder_visitante: string | null
           resultado: Database["public"]["Enums"]["resultado_partida"] | null
+          rodada: number | null
           selecao_casa_id: string | null
           selecao_visitante_id: string | null
           sincronizada_em: string | null
           status: Database["public"]["Enums"]["status_partida"]
+          torneio_id: string
           updated_at: string
         }
         Insert: {
@@ -575,10 +597,12 @@ export type Database = {
           placeholder_casa?: string | null
           placeholder_visitante?: string | null
           resultado?: Database["public"]["Enums"]["resultado_partida"] | null
+          rodada?: number | null
           selecao_casa_id?: string | null
           selecao_visitante_id?: string | null
           sincronizada_em?: string | null
           status?: Database["public"]["Enums"]["status_partida"]
+          torneio_id: string
           updated_at?: string
         }
         Update: {
@@ -600,10 +624,12 @@ export type Database = {
           placeholder_casa?: string | null
           placeholder_visitante?: string | null
           resultado?: Database["public"]["Enums"]["resultado_partida"] | null
+          rodada?: number | null
           selecao_casa_id?: string | null
           selecao_visitante_id?: string | null
           sincronizada_em?: string | null
           status?: Database["public"]["Enums"]["status_partida"]
+          torneio_id?: string
           updated_at?: string
         }
         Relationships: [
@@ -625,6 +651,13 @@ export type Database = {
             foreignKeyName: "partidas_selecao_casa_id_fkey"
             columns: ["selecao_casa_id"]
             isOneToOne: false
+            referencedRelation: "classificacao_pontos_corridos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partidas_selecao_casa_id_fkey"
+            columns: ["selecao_casa_id"]
+            isOneToOne: false
             referencedRelation: "selecoes"
             referencedColumns: ["id"]
           },
@@ -639,7 +672,21 @@ export type Database = {
             foreignKeyName: "partidas_selecao_visitante_id_fkey"
             columns: ["selecao_visitante_id"]
             isOneToOne: false
+            referencedRelation: "classificacao_pontos_corridos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partidas_selecao_visitante_id_fkey"
+            columns: ["selecao_visitante_id"]
+            isOneToOne: false
             referencedRelation: "selecoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partidas_torneio_id_fkey"
+            columns: ["torneio_id"]
+            isOneToOne: false
+            referencedRelation: "torneios"
             referencedColumns: ["id"]
           },
         ]
@@ -761,6 +808,7 @@ export type Database = {
           grupo: string | null
           id: string
           nome: string
+          torneio_id: string
         }
         Insert: {
           api_team_id?: number | null
@@ -770,6 +818,7 @@ export type Database = {
           grupo?: string | null
           id?: string
           nome: string
+          torneio_id: string
         }
         Update: {
           api_team_id?: number | null
@@ -779,8 +828,17 @@ export type Database = {
           grupo?: string | null
           id?: string
           nome?: string
+          torneio_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "selecoes_torneio_id_fkey"
+            columns: ["torneio_id"]
+            isOneToOne: false
+            referencedRelation: "torneios"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       suporte_mensagens: {
         Row: {
@@ -852,6 +910,60 @@ export type Database = {
             referencedColumns: ["usuario_id"]
           },
         ]
+      }
+      torneios: {
+        Row: {
+          ativo: boolean
+          config_sync: Json
+          cor_primaria: string | null
+          created_at: string
+          data_fim: string | null
+          data_inicio: string | null
+          emoji: string
+          fonte_dados: string
+          id: string
+          nome: string
+          nome_curto: string
+          ordem: number
+          slug: string
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          config_sync?: Json
+          cor_primaria?: string | null
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          emoji?: string
+          fonte_dados?: string
+          id?: string
+          nome: string
+          nome_curto: string
+          ordem?: number
+          slug: string
+          tipo: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          config_sync?: Json
+          cor_primaria?: string | null
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          emoji?: string
+          fonte_dados?: string
+          id?: string
+          nome?: string
+          nome_curto?: string
+          ordem?: number
+          slug?: string
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       transacoes: {
         Row: {
@@ -957,6 +1069,31 @@ export type Database = {
         }
         Relationships: []
       }
+      classificacao_pontos_corridos: {
+        Row: {
+          bandeira_url: string | null
+          codigo_iso: string | null
+          derrotas: number | null
+          empates: number | null
+          gc: number | null
+          gp: number | null
+          id: string | null
+          jogos: number | null
+          nome: string | null
+          pontos: number | null
+          torneio_id: string | null
+          vitorias: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "selecoes_torneio_id_fkey"
+            columns: ["torneio_id"]
+            isOneToOne: false
+            referencedRelation: "torneios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ranking_usuarios: {
         Row: {
           anonimo: boolean | null
@@ -1035,10 +1172,12 @@ export type Database = {
           placeholder_casa: string | null
           placeholder_visitante: string | null
           resultado: Database["public"]["Enums"]["resultado_partida"] | null
+          rodada: number | null
           selecao_casa_id: string | null
           selecao_visitante_id: string | null
           sincronizada_em: string | null
           status: Database["public"]["Enums"]["status_partida"]
+          torneio_id: string
           updated_at: string
         }
         SetofOptions: {
@@ -1100,10 +1239,12 @@ export type Database = {
           placeholder_casa: string | null
           placeholder_visitante: string | null
           resultado: Database["public"]["Enums"]["resultado_partida"] | null
+          rodada: number | null
           selecao_casa_id: string | null
           selecao_visitante_id: string | null
           sincronizada_em: string | null
           status: Database["public"]["Enums"]["status_partida"]
+          torneio_id: string
           updated_at: string
         }
         SetofOptions: {
@@ -1127,6 +1268,7 @@ export type Database = {
           partida_id: string
           premio_centavos: number | null
           status: Database["public"]["Enums"]["status_aposta"]
+          torneio_id: string
           updated_at: string
           usuario_id: string
           valor_centavos: number
@@ -1153,6 +1295,7 @@ export type Database = {
           partida_id: string
           premio_centavos: number
           status: string
+          torneio_id: string
           updated_at: string
           usuario_id: string
           valor_centavos: number
@@ -1215,10 +1358,12 @@ export type Database = {
           placeholder_casa: string | null
           placeholder_visitante: string | null
           resultado: Database["public"]["Enums"]["resultado_partida"] | null
+          rodada: number | null
           selecao_casa_id: string | null
           selecao_visitante_id: string | null
           sincronizada_em: string | null
           status: Database["public"]["Enums"]["status_partida"]
+          torneio_id: string
           updated_at: string
         }
         SetofOptions: {

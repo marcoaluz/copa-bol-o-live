@@ -1,10 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { Card } from "@/components/ui/card";
 import { TeamLabel } from "@/components/TeamLabel";
 import { MatchDetailDialog } from "@/components/MatchDetailDialog";
 import { useSelecoes, usePartidas, selecaoMap, type Partida } from "@/lib/tournament";
+import { useTorneioAtivo } from "@/lib/torneio";
 
 export const Route = createFileRoute("/_main/chaveamento")({
   head: () => ({ meta: [{ title: "Chaveamento — Copa Bolão 2026" }] }),
@@ -54,6 +55,11 @@ function MatchSlot({
 }
 
 function BracketPage() {
+  const torneio = useTorneioAtivo();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (torneio && torneio.tipo !== "copa") navigate({ to: "/home" });
+  }, [torneio, navigate]);
   const { data: selecoes } = useSelecoes();
   const { data: partidas, isLoading } = usePartidas();
   const sMap = useMemo(() => selecaoMap(selecoes), [selecoes]);
