@@ -180,7 +180,13 @@ function Sidebar() {
 function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navItems = useNavItems();
-  const cols = `grid-cols-${Math.min(navItems.length, 6)}`;
+  const colsMap: Record<number, string> = {
+    3: "grid-cols-3",
+    4: "grid-cols-4",
+    5: "grid-cols-5",
+    6: "grid-cols-6",
+  };
+  const cols = colsMap[Math.min(Math.max(navItems.length, 3), 6)] ?? "grid-cols-5";
   return (
     <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 h-16 border-t border-border bg-background/95 backdrop-blur-lg">
       <div className={`grid h-full ${cols}`}>
