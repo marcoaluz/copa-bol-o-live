@@ -14,13 +14,28 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-function shortCode(name: string): string {
+function baseCode(name: string): string {
   return name
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^A-Za-z]/g, "")
     .substring(0, 3)
     .toUpperCase() || "TBD";
+}
+
+function uniqueCode(name: string, apiId: number, used: Set<string>): string {
+  const base = baseCode(name);
+  if (!used.has(base)) { used.add(base); return base; }
+  // append last digit(s) of api id
+  const idStr = String(apiId);
+  for (let n = 1; n <= 3; n++) {
+    const candidate = (base.substring(0, 3 - n) + idStr.slice(-n)).toUpperCase();
+    if (!used.has(candidate)) { used.add(candidate); return candidate; }
+  }
+  // fallback: 4-char with full last 2 of id
+  const fallback = (base + idStr.slice(-2)).substring(0, 6).toUpperCase();
+  used.add(fallback);
+  return fallback;
 }
 
 function bandeira(team: any): string | null {
@@ -111,8 +126,20 @@ Deno.serve(async (req) => {
     let selecoes_inseridas = 0, selecoes_atualizadas = 0;
     const apiToId = new Map<number, string>();
 
+    // Pré-carregar códigos já usados nesse torneio para evitar colisão
+    const { data: existingTeams } = await supa
+      .from("selecoes")
+      .select("codigo_iso, api_team_id")
+      .eq("torneio_id", torneioId);
+    const usedCodes = new Set<string>((existingTeams ?? []).map((t: any) => t.codigo_iso));
+    const apiIdToCode = new Map<number, string>();
+    (existingTeams ?? []).forEach((t: any) => {
+      if (t.api_team_id) apiIdToCode.set(Number(t.api_team_id), t.codigo_iso);
+    });
+
     for (const [apiId, info] of teamsMap) {
-      const codigo = shortCode(info.nome);
+      // reusar código existente se time já existe; senão gerar único
+      const codigo = apiIdToCode.get(apiId) ?? uniqueCode(info.nome, apiId, usedCodes);
       const payload = {
         torneio_id: torneioId,
         nome: info.nome,
