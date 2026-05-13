@@ -12,7 +12,8 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Lock, Unlock, Wallet, Search, KeyRound, Copy, Loader2 } from "lucide-react";
+import { ArrowLeft, Lock, Unlock, Wallet, Search, KeyRound, Copy, Loader2, Trash2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_main/admin/usuarios")({
@@ -29,6 +30,7 @@ function Page() {
   const [ajuste, setAjuste] = useState<{ id: string; nome: string } | null>(null);
   const [bloqueio, setBloqueio] = useState<{ id: string; nome: string } | null>(null);
   const [reset, setReset] = useState<{ id: string; nome: string } | null>(null);
+  const [excluir, setExcluir] = useState<{ id: string; nome: string; apelido: string } | null>(null);
   const qc = useQueryClient();
 
   const { data: users } = useQuery({
@@ -67,6 +69,17 @@ function Page() {
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Saldo ajustado"); qc.invalidateQueries({ queryKey: ["admin", "usuarios"] }); setAjuste(null); },
+    onError: (e: any) => toast.error(e.message),
+  });
+  const mExcluir = useMutation({
+    mutationFn: async ({ id, forcar }: { id: string; forcar: boolean }) => {
+      const { data, error } = await supabase.functions.invoke("admin-excluir-usuario", {
+        body: { usuario_id: id, forcar },
+      });
+      if (error) throw error;
+      if ((data as any)?.erro) throw new Error((data as any).erro);
+    },
+    onSuccess: () => { toast.success("Usuário excluído"); qc.invalidateQueries({ queryKey: ["admin", "usuarios"] }); setExcluir(null); },
     onError: (e: any) => toast.error(e.message),
   });
 
@@ -122,6 +135,11 @@ function Page() {
                   <Lock className="w-3 h-3 mr-1" /> Bloquear
                 </Button>
               )}
+              {!u.is_admin && (
+                <Button size="sm" variant="destructive" onClick={() => setExcluir({ id: u.id, nome: u.nome_completo || u.apelido || "", apelido: u.apelido || "" })}>
+                  <Trash2 className="w-3 h-3 mr-1" /> Excluir
+                </Button>
+              )}
             </div>
           </div>
         ))}
@@ -131,6 +149,7 @@ function Page() {
       <AjustarSaldoDialog data={ajuste} onClose={() => setAjuste(null)} onSubmit={(v, m) => ajuste && mAjuste.mutate({ id: ajuste.id, valor: v, motivo: m })} loading={mAjuste.isPending} />
       <BloquearDialog data={bloqueio} onClose={() => setBloqueio(null)} onSubmit={(m) => bloqueio && mBlock.mutate({ id: bloqueio.id, motivo: m })} loading={mBlock.isPending} />
       <ResetarSenhaDialog data={reset} onClose={() => setReset(null)} />
+      <ExcluirUsuarioDialog data={excluir} onClose={() => setExcluir(null)} onSubmit={(forcar) => excluir && mExcluir.mutate({ id: excluir.id, forcar })} loading={mExcluir.isPending} />
     </div>
   );
 }
@@ -260,6 +279,36 @@ function ResetarSenhaDialog({ data, onClose }: { data: { id: string; nome: strin
 
         <DialogFooter>
           <Button variant="outline" onClick={() => { reset(); onClose(); }}>Fechar</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+function ExcluirUsuarioDialog({ data, onClose, onSubmit, loading }: { data: { id: string; nome: string; apelido: string } | null; onClose: () => void; onSubmit: (forcar: boolean) => void; loading: boolean }) {
+  const [confirmacao, setConfirmacao] = useState("");
+  const [forcar, setForcar] = useState(false);
+  return (
+    <Dialog open={!!data} onOpenChange={(o) => { if (!o) { setConfirmacao(""); setForcar(false); onClose(); } }}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Excluir usuário — {data?.nome}</DialogTitle>
+          <DialogDescription>
+            Ação <strong>permanente</strong>. Apaga apostas, transações, depósitos, saques, notificações e o login do usuário.
+            Para confirmar, digite o apelido <code className="font-mono text-foreground">{data?.apelido}</code> abaixo.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3">
+          <Input placeholder={`Digite "${data?.apelido}" para confirmar`} value={confirmacao} onChange={(e) => setConfirmacao(e.target.value)} />
+          <label className="flex items-start gap-2 text-xs text-muted-foreground">
+            <Checkbox checked={forcar} onCheckedChange={(v) => setForcar(!!v)} />
+            <span>Forçar exclusão mesmo com saldo ou pendências (use apenas se souber o que está fazendo).</span>
+          </label>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button variant="destructive" disabled={loading || confirmacao.trim() !== (data?.apelido ?? "__")} onClick={() => onSubmit(forcar)}>
+            {loading && <Loader2 className="w-3 h-3 mr-1 animate-spin" />} Excluir definitivamente
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
