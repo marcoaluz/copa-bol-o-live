@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useTorneioAtivoId } from "@/lib/torneio";
 
 export type Selecao = {
   id: string;
@@ -7,6 +8,7 @@ export type Selecao = {
   codigo_iso: string;
   bandeira_url: string | null;
   grupo: string | null;
+  torneio_id?: string;
 };
 
 export type Partida = {
@@ -27,6 +29,8 @@ export type Partida = {
   ordem_bracket: number | null;
   codigo: string | null;
   bolo_acumulado_centavos: number;
+  rodada?: number | null;
+  torneio_id?: string;
 };
 
 export type ClassificacaoLinha = {
@@ -42,11 +46,33 @@ export type ClassificacaoLinha = {
   pontos: number;
 };
 
+export type ClassificacaoPCLinha = {
+  id: string;
+  torneio_id: string;
+  nome: string;
+  codigo_iso: string;
+  bandeira_url: string | null;
+  jogos: number;
+  vitorias: number;
+  empates: number;
+  derrotas: number;
+  gp: number;
+  gc: number;
+  pontos: number;
+};
+
 export function useSelecoes() {
+  const torneioId = useTorneioAtivoId();
   return useQuery({
-    queryKey: ["selecoes"],
+    queryKey: ["selecoes", torneioId],
+    enabled: !!torneioId,
     queryFn: async (): Promise<Selecao[]> => {
-      const { data, error } = await supabase.from("selecoes").select("*").order("grupo").order("nome");
+      const { data, error } = await supabase
+        .from("selecoes")
+        .select("*")
+        .eq("torneio_id", torneioId!)
+        .order("grupo")
+        .order("nome");
       if (error) throw error;
       return data as Selecao[];
     },
@@ -55,14 +81,17 @@ export function useSelecoes() {
 }
 
 export function usePartidas() {
+  const torneioId = useTorneioAtivoId();
   return useQuery({
-    queryKey: ["partidas"],
+    queryKey: ["partidas", torneioId],
+    enabled: !!torneioId,
     queryFn: async (): Promise<Partida[]> => {
       const { data, error } = await supabase
         .from("partidas")
         .select("*")
+        .eq("torneio_id", torneioId!)
         .order("data_hora", { ascending: true })
-        .limit(200);
+        .limit(500);
       if (error) throw error;
       return data as Partida[];
     },
@@ -71,12 +100,33 @@ export function usePartidas() {
 }
 
 export function useClassificacao() {
+  const torneioId = useTorneioAtivoId();
   return useQuery({
-    queryKey: ["classificacao"],
+    queryKey: ["classificacao", torneioId],
+    enabled: !!torneioId,
     queryFn: async (): Promise<ClassificacaoLinha[]> => {
-      const { data, error } = await supabase.from("classificacao_grupos").select("*");
+      const { data, error } = await supabase
+        .from("classificacao_grupos")
+        .select("*");
       if (error) throw error;
       return data as ClassificacaoLinha[];
+    },
+    staleTime: 60 * 1000,
+  });
+}
+
+export function useClassificacaoPontosCorridos() {
+  const torneioId = useTorneioAtivoId();
+  return useQuery({
+    queryKey: ["classificacao-pc", torneioId],
+    enabled: !!torneioId,
+    queryFn: async (): Promise<ClassificacaoPCLinha[]> => {
+      const { data, error } = await (supabase as any)
+        .from("classificacao_pontos_corridos")
+        .select("*")
+        .eq("torneio_id", torneioId!);
+      if (error) throw error;
+      return (data ?? []) as ClassificacaoPCLinha[];
     },
     staleTime: 60 * 1000,
   });
