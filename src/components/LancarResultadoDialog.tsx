@@ -40,7 +40,8 @@ export function LancarResultadoDialog({
   const casa = partida.selecao_casa_id ? sMap[partida.selecao_casa_id] : undefined;
   const visit = partida.selecao_visitante_id ? sMap[partida.selecao_visitante_id] : undefined;
 
-  const podeLancar = partida.status === "agendada" || partida.status === "ao_vivo";
+  // modo teste: liberar edição mesmo em partidas encerradas
+  const podeLancar = partida.status !== "cancelada";
   const podeApurar = partida.status === "encerrada" && partida.resultado != null;
   const podeCancelar = partida.status !== "cancelada";
 
