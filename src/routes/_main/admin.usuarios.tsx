@@ -284,3 +284,33 @@ function ResetarSenhaDialog({ data, onClose }: { data: { id: string; nome: strin
     </Dialog>
   );
 }
+function ExcluirUsuarioDialog({ data, onClose, onSubmit, loading }: { data: { id: string; nome: string; apelido: string } | null; onClose: () => void; onSubmit: (forcar: boolean) => void; loading: boolean }) {
+  const [confirmacao, setConfirmacao] = useState("");
+  const [forcar, setForcar] = useState(false);
+  return (
+    <Dialog open={!!data} onOpenChange={(o) => { if (!o) { setConfirmacao(""); setForcar(false); onClose(); } }}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Excluir usuário — {data?.nome}</DialogTitle>
+          <DialogDescription>
+            Ação <strong>permanente</strong>. Apaga apostas, transações, depósitos, saques, notificações e o login do usuário.
+            Para confirmar, digite o apelido <code className="font-mono text-foreground">{data?.apelido}</code> abaixo.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3">
+          <Input placeholder={`Digite "${data?.apelido}" para confirmar`} value={confirmacao} onChange={(e) => setConfirmacao(e.target.value)} />
+          <label className="flex items-start gap-2 text-xs text-muted-foreground">
+            <Checkbox checked={forcar} onCheckedChange={(v) => setForcar(!!v)} />
+            <span>Forçar exclusão mesmo com saldo ou pendências (use apenas se souber o que está fazendo).</span>
+          </label>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button variant="destructive" disabled={loading || confirmacao.trim() !== (data?.apelido ?? "__")} onClick={() => onSubmit(forcar)}>
+            {loading && <Loader2 className="w-3 h-3 mr-1 animate-spin" />} Excluir definitivamente
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
