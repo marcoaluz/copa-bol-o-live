@@ -268,6 +268,8 @@ function ProfilePage() {
           <ApostasList apostas={todasList} pMap={pMap} sMap={sMap} />
         </TabsContent>
       </Tabs>
+
+      <PWAStatusBadge />
     </div>
   );
 }
