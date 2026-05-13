@@ -37,6 +37,7 @@ import { Route as MainAdminConvitesRouteImport } from './routes/_main/admin.conv
 import { Route as MainAdminConfiguracoesRouteImport } from './routes/_main/admin.configuracoes'
 import { Route as MainAdminChecklistRouteImport } from './routes/_main/admin.checklist'
 import { Route as MainAdminAuditoriaRouteImport } from './routes/_main/admin.auditoria'
+import { Route as MainAdminApostasRouteImport } from './routes/_main/admin.apostas'
 import { Route as ApiPublicHooksSyncPartidasRouteImport } from './routes/api/public/hooks/sync-partidas'
 import { Route as MainAdminUsuariosIdRouteImport } from './routes/_main/admin.usuarios.$id'
 
@@ -179,6 +180,11 @@ const MainAdminAuditoriaRoute = MainAdminAuditoriaRouteImport.update({
   path: '/auditoria',
   getParentRoute: () => MainAdminRoute,
 } as any)
+const MainAdminApostasRoute = MainAdminApostasRouteImport.update({
+  id: '/apostas',
+  path: '/apostas',
+  getParentRoute: () => MainAdminRoute,
+} as any)
 const ApiPublicHooksSyncPartidasRoute =
   ApiPublicHooksSyncPartidasRouteImport.update({
     id: '/api/public/hooks/sync-partidas',
@@ -206,6 +212,7 @@ export interface FileRoutesByFullPath {
   '/ranking': typeof MainRankingRoute
   '/tabela': typeof MainTabelaRoute
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
+  '/admin/apostas': typeof MainAdminApostasRoute
   '/admin/auditoria': typeof MainAdminAuditoriaRoute
   '/admin/checklist': typeof MainAdminChecklistRoute
   '/admin/configuracoes': typeof MainAdminConfiguracoesRoute
@@ -236,6 +243,7 @@ export interface FileRoutesByTo {
   '/ranking': typeof MainRankingRoute
   '/tabela': typeof MainTabelaRoute
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
+  '/admin/apostas': typeof MainAdminApostasRoute
   '/admin/auditoria': typeof MainAdminAuditoriaRoute
   '/admin/checklist': typeof MainAdminChecklistRoute
   '/admin/configuracoes': typeof MainAdminConfiguracoesRoute
@@ -269,6 +277,7 @@ export interface FileRoutesById {
   '/_main/ranking': typeof MainRankingRoute
   '/_main/tabela': typeof MainTabelaRoute
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
+  '/_main/admin/apostas': typeof MainAdminApostasRoute
   '/_main/admin/auditoria': typeof MainAdminAuditoriaRoute
   '/_main/admin/checklist': typeof MainAdminChecklistRoute
   '/_main/admin/configuracoes': typeof MainAdminConfiguracoesRoute
@@ -302,6 +311,7 @@ export interface FileRouteTypes {
     | '/ranking'
     | '/tabela'
     | '/api/sitemap.xml'
+    | '/admin/apostas'
     | '/admin/auditoria'
     | '/admin/checklist'
     | '/admin/configuracoes'
@@ -332,6 +342,7 @@ export interface FileRouteTypes {
     | '/ranking'
     | '/tabela'
     | '/api/sitemap.xml'
+    | '/admin/apostas'
     | '/admin/auditoria'
     | '/admin/checklist'
     | '/admin/configuracoes'
@@ -364,6 +375,7 @@ export interface FileRouteTypes {
     | '/_main/ranking'
     | '/_main/tabela'
     | '/api/sitemap.xml'
+    | '/_main/admin/apostas'
     | '/_main/admin/auditoria'
     | '/_main/admin/checklist'
     | '/_main/admin/configuracoes'
@@ -589,6 +601,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainAdminAuditoriaRouteImport
       parentRoute: typeof MainAdminRoute
     }
+    '/_main/admin/apostas': {
+      id: '/_main/admin/apostas'
+      path: '/apostas'
+      fullPath: '/admin/apostas'
+      preLoaderRoute: typeof MainAdminApostasRouteImport
+      parentRoute: typeof MainAdminRoute
+    }
     '/api/public/hooks/sync-partidas': {
       id: '/api/public/hooks/sync-partidas'
       path: '/api/public/hooks/sync-partidas'
@@ -618,6 +637,7 @@ const MainAdminUsuariosRouteWithChildren =
   MainAdminUsuariosRoute._addFileChildren(MainAdminUsuariosRouteChildren)
 
 interface MainAdminRouteChildren {
+  MainAdminApostasRoute: typeof MainAdminApostasRoute
   MainAdminAuditoriaRoute: typeof MainAdminAuditoriaRoute
   MainAdminChecklistRoute: typeof MainAdminChecklistRoute
   MainAdminConfiguracoesRoute: typeof MainAdminConfiguracoesRoute
@@ -634,6 +654,7 @@ interface MainAdminRouteChildren {
 }
 
 const MainAdminRouteChildren: MainAdminRouteChildren = {
+  MainAdminApostasRoute: MainAdminApostasRoute,
   MainAdminAuditoriaRoute: MainAdminAuditoriaRoute,
   MainAdminChecklistRoute: MainAdminChecklistRoute,
   MainAdminConfiguracoesRoute: MainAdminConfiguracoesRoute,
@@ -691,3 +712,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

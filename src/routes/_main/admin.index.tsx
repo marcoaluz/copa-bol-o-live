@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Shield, Users, Trophy, Settings, Banknote, Wallet, FileText, ClipboardList,
-  TrendingUp, AlertCircle, MailPlus, ArrowDownCircle, Scale, Bell, RefreshCw,
+  TrendingUp, AlertCircle, MailPlus, ArrowDownCircle, Scale, Bell, RefreshCw, Ticket,
 } from "lucide-react";
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
@@ -22,6 +22,7 @@ const fmt = (c: number) =>
 
 const tiles = [
   { icon: Trophy, label: "Partidas", desc: "Lançar resultados e apurar", to: "/admin/partidas" as const },
+  { icon: Ticket, label: "Apostas ativas", desc: "Ver apostas em aberto por usuário", to: "/admin/apostas" as const },
   { icon: ArrowDownCircle, label: "Depósitos", desc: "Confirmar PIX recebido", to: "/admin/depositos" as const },
   { icon: Banknote, label: "Saques", desc: "Aprovar acertos via PIX", to: "/admin/saques" as const },
   { icon: Scale, label: "Custódia", desc: "Conciliação com extrato", to: "/admin/custodia" as const },
