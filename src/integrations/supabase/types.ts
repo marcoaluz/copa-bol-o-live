@@ -1223,6 +1223,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      cancelar_aposta: { Args: { p_aposta_id: string }; Returns: undefined }
       cancelar_aposta_placar: {
         Args: { p_aposta_id: string }
         Returns: undefined
