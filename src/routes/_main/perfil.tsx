@@ -97,20 +97,28 @@ function ProfilePage() {
   const total = apostas?.length ?? 0;
   const ganhas = apostas?.filter((a) => a.status === "ganhou").length ?? 0;
   const ativas = apostas?.filter((a) => a.status === "ativa").length ?? 0;
-  const premioTotal = apostas?.reduce((s, a) => s + (a.premio_centavos ?? 0), 0) ?? 0;
+  const premioTotal =
+    apostas?.filter((a) => a.status === "ganhou").reduce((s, a) => s + (a.premio_centavos ?? 0), 0) ?? 0;
+  const devolvido =
+    apostas?.filter((a) => a.status === "devolvida").reduce((s, a) => s + (a.premio_centavos ?? 0), 0) ?? 0;
 
-  const cards = [
+  const cards: { label: string; value: string; muted?: boolean }[] = [
     { label: "Apostas", value: String(total) },
     { label: "Ativas", value: String(ativas) },
     { label: "Acertos", value: String(ganhas) },
     { label: "Prêmios", value: formatBRL(premioTotal) },
   ];
+  if (devolvido > 0) {
+    cards.push({ label: "Devoluções", value: formatBRL(devolvido), muted: true });
+  }
 
   const filtra = (lista: Aposta[] | undefined) =>
     (lista ?? []).filter((a) => {
       if (faseFiltro === "todas") return true;
       const part = pMap[a.partida_id];
-      return part?.fase === faseFiltro;
+      // Defensivo: se a partida ainda não carregou, mostra a aposta em vez de escondê-la.
+      if (!part) return true;
+      return part.fase === faseFiltro;
     });
 
   const ativasList = filtra(apostas?.filter((a) => a.status === "ativa"));
@@ -225,10 +233,10 @@ function ProfilePage() {
         )}
       </Card>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+      <div className={`grid grid-cols-2 ${devolvido > 0 ? "sm:grid-cols-5" : "sm:grid-cols-4"} gap-3 mb-6`}>
         {cards.map((s) => (
           <Card key={s.label} className="bg-card border-border rounded-xl p-4 text-center">
-            <div className="font-display text-2xl text-foreground">{s.value}</div>
+            <div className={`font-display text-2xl ${s.muted ? "text-muted-foreground" : "text-foreground"}`}>{s.value}</div>
             <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1">{s.label}</div>
           </Card>
         ))}
