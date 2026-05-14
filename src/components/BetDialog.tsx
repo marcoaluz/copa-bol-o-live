@@ -15,6 +15,7 @@ import {
   formatBRL,
   useApostaDaPartida,
   useCriarOuAlterarAposta,
+  useCancelarAposta,
   PALPITE_LABEL,
   type Aposta,
 } from "@/lib/bets";
@@ -42,6 +43,7 @@ export function BetDialog({
   const { data: apostaAtual } = useApostaDaPartida(user?.id, partida?.id);
   const { data: placarAtual } = useApostaPlacarDaPartida(user?.id, partida?.id);
   const mutation = useCriarOuAlterarAposta();
+  const mCancelar = useCancelarAposta();
   const mPlacar = useCriarOuAlterarApostaPlacar();
   const mCancelarPlacar = useCancelarApostaPlacar();
   const encerrada = useApostasEncerradas(partida?.data_hora);
@@ -92,6 +94,19 @@ export function BetDialog({
       toast.success(apostaAtual ? "Aposta alterada com sucesso" : "Aposta confirmada");
     } catch (e: any) {
       toast.error(e?.message ?? "Erro ao registrar aposta");
+    }
+  };
+
+  const cancelarVencedor = async () => {
+    if (!apostaAtual) return;
+    try {
+      await mCancelar.mutateAsync(apostaAtual.id);
+      await refreshProfile();
+      setPalpite(null);
+      setValor(MIN_APOSTA);
+      toast.success("Aposta cancelada e valor devolvido");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro ao cancelar");
     }
   };
 
@@ -215,11 +230,19 @@ export function BetDialog({
             {!podeApostar ? (
               <Button disabled className="w-full">{encerrada ? "Apostas encerradas" : "Indisponível"}</Button>
             ) : (
-              <Button onClick={submit}
-                disabled={!palpite || saldoInsuficiente || mutation.isPending}
-                className="w-full bg-gradient-primary shadow-glow font-semibold">
-                {mutation.isPending ? "Enviando…" : apostaAtual ? "Alterar palpite de vencedor" : "Confirmar palpite de vencedor"}
-              </Button>
+              <div className="grid gap-2">
+                <Button onClick={submit}
+                  disabled={!palpite || saldoInsuficiente || mutation.isPending}
+                  className="w-full bg-gradient-primary shadow-glow font-semibold">
+                  {mutation.isPending ? "Enviando…" : apostaAtual ? "Alterar palpite de vencedor" : "Confirmar palpite de vencedor"}
+                </Button>
+                {apostaAtual && (
+                  <Button onClick={cancelarVencedor} variant="outline"
+                    disabled={mCancelar.isPending} className="w-full">
+                    {mCancelar.isPending ? "Cancelando…" : "Cancelar aposta de vencedor"}
+                  </Button>
+                )}
+              </div>
             )}
           </TabsContent>
 

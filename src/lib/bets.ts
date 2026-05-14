@@ -107,6 +107,22 @@ export function useCriarOuAlterarAposta() {
   });
 }
 
+export function useCancelarAposta() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (apostaId: string) => {
+      const { error } = await (supabase.rpc as any)("cancelar_aposta", {
+        p_aposta_id: apostaId,
+      });
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["apostas"] });
+      qc.invalidateQueries({ queryKey: ["aposta"] });
+    },
+  });
+}
+
 export const PALPITE_LABEL: Record<Aposta["palpite"], string> = {
   casa: "Casa vence",
   empate: "Empate",
