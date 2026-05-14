@@ -1,5 +1,5 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Trophy, Mail, Lock, Loader2 } from "lucide-react";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { Trophy, Mail, Lock, Loader2, ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -117,6 +117,13 @@ function LoginPage() {
         <h1 className="font-display text-4xl tracking-wider text-foreground">COPA BOLÃO</h1>
         <p className="font-display text-xl tracking-[0.4em] text-gold mb-2">2026</p>
         <p className="text-sm text-muted-foreground mb-6">Bolão privado entre amigos</p>
+
+        <Link
+          to="/"
+          className="text-sm text-muted-foreground hover:text-foreground transition-colors mb-4 inline-flex items-center gap-1"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" /> Voltar para a tela de boas-vindas
+        </Link>
 
         <Button
           onClick={handleGoogle}
