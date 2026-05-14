@@ -14,6 +14,33 @@ export type Aposta = {
   updated_at: string;
 };
 
+export type ApostaUnificada =
+  | {
+      tipo: "vencedor";
+      id: string;
+      usuario_id: string;
+      partida_id: string;
+      palpite: "casa" | "empate" | "visitante";
+      valor_centavos: number;
+      status: "ativa" | "ganhou" | "perdeu" | "devolvida";
+      premio_centavos: number | null;
+      created_at: string;
+      updated_at: string;
+    }
+  | {
+      tipo: "placar";
+      id: string;
+      usuario_id: string;
+      partida_id: string;
+      gols_casa: number;
+      gols_visitante: number;
+      valor_centavos: number;
+      status: "ativa" | "ganhou" | "perdeu" | "devolvida";
+      premio_centavos: number | null;
+      created_at: string;
+      updated_at: string;
+    };
+
 export const MIN_APOSTA = 200;
 export const MAX_APOSTA = 50000;
 export const TRAVA_MINUTOS = 60;
@@ -55,17 +82,64 @@ export function useServerNow(resyncMs = 30_000) {
 
 export function useMinhasApostas(userId: string | undefined) {
   return useQuery({
-    queryKey: ["apostas", userId],
+    queryKey: ["apostas-unificadas", userId],
     enabled: !!userId,
-    queryFn: async (): Promise<Aposta[]> => {
-      const { data, error } = await supabase
-        .from("apostas")
-        .select("*")
-        .eq("usuario_id", userId!)
-        .order("created_at", { ascending: false })
-        .limit(500);
-      if (error) throw error;
-      return data as Aposta[];
+    queryFn: async (): Promise<ApostaUnificada[]> => {
+      const [vencedor, placar] = await Promise.all([
+        supabase
+          .from("apostas")
+          .select("*")
+          .eq("usuario_id", userId!)
+          .order("created_at", { ascending: false })
+          .limit(500),
+        (supabase as any)
+          .from("apostas_placar")
+          .select("*")
+          .eq("usuario_id", userId!)
+          .order("created_at", { ascending: false })
+          .limit(500),
+      ]);
+      if (vencedor.error) throw vencedor.error;
+      if (placar.error) throw placar.error;
+      const v: ApostaUnificada[] = (vencedor.data ?? []).map((a: Aposta) => ({
+        tipo: "vencedor" as const,
+        id: a.id,
+        usuario_id: a.usuario_id,
+        partida_id: a.partida_id,
+        palpite: a.palpite,
+        valor_centavos: Number(a.valor_centavos),
+        status: a.status,
+        premio_centavos: a.premio_centavos == null ? null : Number(a.premio_centavos),
+        created_at: a.created_at,
+        updated_at: a.updated_at,
+      }));
+      const p: ApostaUnificada[] = ((placar.data ?? []) as Array<{
+        id: string;
+        usuario_id: string;
+        partida_id: string;
+        gols_casa_palpite: number;
+        gols_visitante_palpite: number;
+        valor_centavos: number;
+        status: "ativa" | "ganhou" | "perdeu" | "devolvida";
+        premio_centavos: number | null;
+        created_at: string;
+        updated_at: string;
+      }>).map((a) => ({
+        tipo: "placar" as const,
+        id: a.id,
+        usuario_id: a.usuario_id,
+        partida_id: a.partida_id,
+        gols_casa: Number(a.gols_casa_palpite),
+        gols_visitante: Number(a.gols_visitante_palpite),
+        valor_centavos: Number(a.valor_centavos),
+        status: a.status,
+        premio_centavos: a.premio_centavos == null ? null : Number(a.premio_centavos),
+        created_at: a.created_at,
+        updated_at: a.updated_at,
+      }));
+      return [...v, ...p].sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      );
     },
   });
 }
