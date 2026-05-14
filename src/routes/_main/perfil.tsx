@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
-import { useMinhasApostas, useCancelarAposta, formatBRL, PALPITE_LABEL, STATUS_LABEL, TRAVA_MINUTOS, type Aposta } from "@/lib/bets";
+import { useMinhasApostas, useCancelarAposta, formatBRL, PALPITE_LABEL, STATUS_LABEL, TRAVA_MINUTOS, type ApostaUnificada } from "@/lib/bets";
+import { useCancelarApostaPlacar } from "@/lib/score-bets";
 import { usePartidas, useSelecoes, selecaoMap, FASE_LABEL, type Partida } from "@/lib/tournament";
 import { useEstatisticasUsuario, useEvolucaoSaldo, useToggleAnonimo } from "@/lib/ranking";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
@@ -112,7 +113,7 @@ function ProfilePage() {
     cards.push({ label: "Devoluções", value: formatBRL(devolvido), muted: true });
   }
 
-  const filtra = (lista: Aposta[] | undefined) =>
+  const filtra = (lista: ApostaUnificada[] | undefined) =>
     (lista ?? []).filter((a) => {
       if (faseFiltro === "todas") return true;
       const part = pMap[a.partida_id];
