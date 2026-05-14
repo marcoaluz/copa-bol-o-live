@@ -1,5 +1,5 @@
 import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
-import { Home, Trophy, Users, BarChart3, User, Shield, Wallet, ChevronDown, LogOut, Settings, Coins, LifeBuoy, ListOrdered } from "lucide-react";
+import { Home, Trophy, Users, BarChart3, User, Shield, Wallet, ChevronDown, LogOut, Settings, Coins, LifeBuoy, ListOrdered, UserPlus } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,7 +17,8 @@ import { AlertTriangle } from "lucide-react";
 import { LegalModal } from "@/components/LegalModal";
 import { TorneioSelector } from "@/components/TorneioSelector";
 import { useTorneioAtivo } from "@/lib/torneio";
-import { InstallPWABanner } from "@/components/InstallPWABanner";
+import { InstallBanner } from "@/components/InstallBanner";
+import { toast } from "sonner";
 
 const NAV_ALL = [
   { to: "/home", label: "Home", icon: Home },
@@ -87,6 +88,26 @@ function UserMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => {
+            const nick = profile?.apelido || profile?.nome_completo?.split(" ")[0] || "um amigo";
+            const url = `${window.location.origin}/?de=${encodeURIComponent(nick)}`;
+            const nav = window.navigator as Navigator & { share?: (data: ShareData) => Promise<void> };
+            if (nav.share) {
+              nav
+                .share({ title: "Copa Bolão 2026", text: "Vem participar do bolão da Copa comigo!", url })
+                .catch(() => {});
+            } else {
+              navigator.clipboard.writeText(url).then(
+                () => toast.success("Link copiado! Cole no WhatsApp."),
+                () => toast.error("Não foi possível copiar o link."),
+              );
+            }
+          }}
+          className="cursor-pointer"
+        >
+          <UserPlus className="w-4 h-4 mr-2" /> Convidar amigos
+        </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link to="/perfil" className="cursor-pointer"><User className="w-4 h-4 mr-2" /> Meu perfil</Link>
         </DropdownMenuItem>
@@ -227,6 +248,7 @@ export function AppLayout() {
           <span>{cfg.manutencao_mensagem || "Sistema em manutenção. Apostas temporariamente bloqueadas."}</span>
         </div>
       )}
+      <InstallBanner />
       <div className="flex flex-1 w-full">
         <Sidebar />
         <main className="flex-1 pb-20 lg:pb-8 px-4 lg:px-8 py-6 max-w-7xl mx-auto w-full">
@@ -242,7 +264,6 @@ export function AppLayout() {
           trigger={<button type="button" className="underline hover:text-foreground">Como funciona</button>}
         />
       </footer>
-      <InstallPWABanner />
     </div>
   );
 }
