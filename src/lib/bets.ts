@@ -61,6 +61,7 @@ export function useMinhasApostas(userId: string | undefined) {
       const { data, error } = await supabase
         .from("apostas")
         .select("*")
+        .eq("usuario_id", userId!)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data as Aposta[];
@@ -77,6 +78,7 @@ export function useApostaDaPartida(userId: string | undefined, partidaId: string
         .from("apostas")
         .select("*")
         .eq("partida_id", partidaId!)
+        .eq("usuario_id", userId!)
         .maybeSingle();
       if (error) throw error;
       return (data as Aposta) ?? null;
