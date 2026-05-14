@@ -294,7 +294,7 @@ function StatTile({ icon, label, value, className }: { icon: React.ReactNode; la
   );
 }
 
-function statusVariant(s: Aposta["status"]) {
+function statusVariant(s: ApostaUnificada["status"]) {
   switch (s) {
     case "ganhou":
       return "bg-primary/20 text-primary border-primary/40";
@@ -312,16 +312,21 @@ function ApostasList({
   pMap,
   sMap,
 }: {
-  apostas: Aposta[];
+  apostas: ApostaUnificada[];
   pMap: Record<string, Partida>;
   sMap: Record<string, ReturnType<typeof selecaoMap> extends Record<string, infer T> ? T : never>;
 }) {
   const { refreshProfile } = useAuth();
   const mCancelar = useCancelarAposta();
-  const cancelar = async (id: string) => {
+  const mCancelarPlacar = useCancelarApostaPlacar();
+  const cancelar = async (a: ApostaUnificada) => {
     if (!window.confirm("Cancelar esta aposta? O valor será devolvido ao seu saldo.")) return;
     try {
-      await mCancelar.mutateAsync(id);
+      if (a.tipo === "placar") {
+        await mCancelarPlacar.mutateAsync(a.id);
+      } else {
+        await mCancelar.mutateAsync(a.id);
+      }
       await refreshProfile();
       toast.success("Aposta cancelada e valor devolvido");
     } catch (e: any) {
@@ -343,13 +348,22 @@ function ApostasList({
         const visit = p?.selecao_visitante_id ? sMap[p.selecao_visitante_id] : null;
         const minutosAteJogo = p ? (new Date(p.data_hora).getTime() - Date.now()) / 60000 : 0;
         const podeCancelar = a.status === "ativa" && p?.status === "agendada" && minutosAteJogo > TRAVA_MINUTOS;
+        const isPending = mCancelar.isPending || mCancelarPlacar.isPending;
         return (
           <Card key={a.id} className="bg-card border-border rounded-xl p-4">
             <div className="flex items-start justify-between gap-2 mb-2">
               <div className="text-xs text-muted-foreground">
                 {p ? FASE_LABEL[p.fase] : "—"} · {p ? new Date(p.data_hora).toLocaleString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : ""}
               </div>
-              <Badge variant="outline" className={statusVariant(a.status)}>{STATUS_LABEL[a.status]}</Badge>
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant="outline"
+                  className={a.tipo === "placar" ? "bg-gold/15 text-gold border-gold/40" : "bg-primary/15 text-primary border-primary/40"}
+                >
+                  {a.tipo === "placar" ? "Placar exato" : "Vencedor"}
+                </Badge>
+                <Badge variant="outline" className={statusVariant(a.status)}>{STATUS_LABEL[a.status]}</Badge>
+              </div>
             </div>
             <div className="flex items-center justify-between gap-3">
               <div className="text-sm font-semibold">
@@ -359,7 +373,11 @@ function ApostasList({
             <div className="flex justify-between items-center mt-3 text-sm">
               <div>
                 <div className="text-xs text-muted-foreground">Palpite</div>
-                <div className="font-semibold">{PALPITE_LABEL[a.palpite]}</div>
+                <div className="font-semibold">
+                  {a.tipo === "placar"
+                    ? `${a.gols_casa} × ${a.gols_visitante}`
+                    : PALPITE_LABEL[a.palpite]}
+                </div>
               </div>
               <div className="text-right">
                 <div className="text-xs text-muted-foreground">Valor</div>
@@ -378,10 +396,10 @@ function ApostasList({
                   variant="outline"
                   size="sm"
                   className="w-full"
-                  disabled={mCancelar.isPending}
-                  onClick={() => cancelar(a.id)}
+                  disabled={isPending}
+                  onClick={() => cancelar(a)}
                 >
-                  {mCancelar.isPending ? "Cancelando…" : "Cancelar aposta"}
+                  {isPending ? "Cancelando…" : "Cancelar aposta"}
                 </Button>
               </div>
             )}
