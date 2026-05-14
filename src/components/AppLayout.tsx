@@ -148,10 +148,11 @@ function Header() {
             <TorneioSelector />
             <Link
               to="/carteira"
-              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-border hover:border-gold/50 transition-colors"
+              className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full bg-surface border border-border hover:border-gold/50 transition-colors"
+              aria-label="Ver carteira (depositar ou sacar)"
             >
               <Wallet className="w-4 h-4 text-gold" />
-              <span className="text-sm font-semibold tabular-nums">R$ {saldo}</span>
+              <span className="text-xs sm:text-sm font-semibold tabular-nums">R$ {saldo}</span>
             </Link>
           <NotificationBell />
           <UserMenu />
