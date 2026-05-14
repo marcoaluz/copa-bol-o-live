@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
-import { useMinhasApostas, formatBRL, PALPITE_LABEL, STATUS_LABEL, type Aposta } from "@/lib/bets";
+import { useMinhasApostas, useCancelarAposta, formatBRL, PALPITE_LABEL, STATUS_LABEL, TRAVA_MINUTOS, type Aposta } from "@/lib/bets";
 import { usePartidas, useSelecoes, selecaoMap, FASE_LABEL, type Partida } from "@/lib/tournament";
 import { useEstatisticasUsuario, useEvolucaoSaldo, useToggleAnonimo } from "@/lib/ranking";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
@@ -307,6 +307,18 @@ function ApostasList({
   pMap: Record<string, Partida>;
   sMap: Record<string, ReturnType<typeof selecaoMap> extends Record<string, infer T> ? T : never>;
 }) {
+  const { refreshProfile } = useAuth();
+  const mCancelar = useCancelarAposta();
+  const cancelar = async (id: string) => {
+    if (!window.confirm("Cancelar esta aposta? O valor será devolvido ao seu saldo.")) return;
+    try {
+      await mCancelar.mutateAsync(id);
+      await refreshProfile();
+      toast.success("Aposta cancelada e valor devolvido");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro ao cancelar");
+    }
+  };
   if (apostas.length === 0) {
     return (
       <Card className="bg-card border-border rounded-xl p-8 text-center text-muted-foreground">
@@ -320,6 +332,8 @@ function ApostasList({
         const p = pMap[a.partida_id];
         const casa = p?.selecao_casa_id ? sMap[p.selecao_casa_id] : null;
         const visit = p?.selecao_visitante_id ? sMap[p.selecao_visitante_id] : null;
+        const minutosAteJogo = p ? (new Date(p.data_hora).getTime() - Date.now()) / 60000 : 0;
+        const podeCancelar = a.status === "ativa" && p?.status === "agendada" && minutosAteJogo > TRAVA_MINUTOS;
         return (
           <Card key={a.id} className="bg-card border-border rounded-xl p-4">
             <div className="flex items-start justify-between gap-2 mb-2">
@@ -349,6 +363,19 @@ function ApostasList({
                 </div>
               )}
             </div>
+            {podeCancelar && (
+              <div className="mt-3 pt-3 border-t border-border/50">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  disabled={mCancelar.isPending}
+                  onClick={() => cancelar(a.id)}
+                >
+                  {mCancelar.isPending ? "Cancelando…" : "Cancelar aposta"}
+                </Button>
+              </div>
+            )}
           </Card>
         );
       })}
